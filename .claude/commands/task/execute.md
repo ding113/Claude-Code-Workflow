@@ -65,7 +65,7 @@ END FUNCTION
 
 `Validate Task & Dependencies` **->** `Prepare Execution Context` **->** `Coordinate with TodoWrite`
 
--   **Validation**: Checks for the task's JSON file in `.task/` and resolves its dependencies.
+-   **Validation**: Checks for the task's TOON file in `.task/` and resolves its dependencies.
 -   **Context Preparation**: Loads task and workflow context, preparing it for the selected agent.
 -   **Session Context Injection**: Provides workflow directory paths to agents for TODO_LIST.md and summary management.
 -   **TodoWrite Coordination**: Generates execution Todos and checkpoints, syncing with `TODO_LIST.md`.
@@ -74,7 +74,7 @@ END FUNCTION
 
 `Update Task Status` **->** `Generate Summary` **->** `Save Artifacts` **->** `Sync All Progress` **->** `Validate File Integrity`
 
--   Updates status in the task's JSON file and `TODO_LIST.md`.
+-   Updates status in the task's TOON file and `TODO_LIST.md`.
 -   Creates a summary in `.summaries/`.
 -   Stores outputs and syncs progress across the entire workflow session.
 
@@ -129,7 +129,7 @@ END FUNCTION
 ```
 
 
-### Simplified Context Structure (JSON)
+### Simplified Context Structure (TOON)
 
 This is the simplified data structure loaded to provide context for task execution.
 

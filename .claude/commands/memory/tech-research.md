@@ -61,8 +61,8 @@ fi
 ```bash
 # For session mode, peek at session to get tech stack name
 if [[ "$MODE" == "session" ]]; then
-  bash(test -f ".workflow/${SESSION_ID}/workflow-session.json")
-  Read(.workflow/${SESSION_ID}/workflow-session.json)
+  bash(test -f ".workflow/${SESSION_ID}/workflow-session.toon")
+  Read(.workflow/${SESSION_ID}/workflow-session.toon)
   # Extract tech_stack_name (minimal extraction)
 fi
 
@@ -128,8 +128,8 @@ Generate a complete tech stack SKILL package with Exa research.
 1. **Extract Tech Stack Information**:
 
    IF MODE == 'session':
-     - Read `.workflow/{SESSION_ID}/workflow-session.json`
-     - Read `.workflow/{SESSION_ID}/.process/context-package.json`
+     - Read `.workflow/{SESSION_ID}/workflow-session.toon`
+     - Read `.workflow/{SESSION_ID}/.process/context-package.toon`
      - Extract tech_stack: {language, frameworks, libraries}
      - Build tech stack name: \"{language}-{framework1}-{framework2}\"
      - Example: \"typescript-react-nextjs\"
@@ -189,10 +189,10 @@ Generate a complete tech stack SKILL package with Exa research.
    Write({ file_path: \".claude/skills/{tech_stack_name}/config.md\", content: ... })
    // Write frameworks.md only if composite
 
-   // Write metadata.json
+   // Write metadata.toon
    Write({
-     file_path: \".claude/skills/{tech_stack_name}/metadata.json\",
-     content: JSON.stringify({
+     file_path: \".claude/skills/{tech_stack_name}/metadata.toon\",
+     content: encodeTOON({
        tech_stack_name,
        components,
        is_composite,
@@ -224,7 +224,7 @@ Generate a complete tech stack SKILL package with Exa research.
 **Completion Criteria**:
 - Agent task executed successfully
 - 5-6 modular files written to `.claude/skills/{tech_stack_name}/`
-- metadata.json written
+- metadata.toon written
 - Agent reports completion
 
 **TodoWrite**: Mark phase 2 completed, phase 3 in_progress
@@ -244,9 +244,9 @@ Generate a complete tech stack SKILL package with Exa research.
    bash(find ".claude/skills/${TECH_STACK_NAME}" -name "*.md" -type f | sort)
    ```
 
-2. **Read metadata.json**:
+2. **Read metadata.toon**:
    ```javascript
-   Read(.claude/skills/${TECH_STACK_NAME}/metadata.json)
+   Read(.claude/skills/${TECH_STACK_NAME}/metadata.toon)
    // Extract: tech_stack_name, components, is_composite, research_summary
    ```
 
@@ -265,7 +265,7 @@ Generate a complete tech stack SKILL package with Exa research.
 5. **Generate SKILL.md Index**:
 
    Follow template from tech-skill-index.txt with variable substitutions:
-   - `{TECH_STACK_NAME}`: From metadata.json
+   - `{TECH_STACK_NAME}`: From metadata.toon
    - `{MAIN_TECH}`: Primary technology
    - `{ISO_TIMESTAMP}`: Current timestamp
    - `{QUERY_COUNT}`: From research_summary
@@ -302,7 +302,7 @@ Tech Stack SKILL Package Complete
 Tech Stack: {TECH_STACK_NAME}
 Location: .claude/skills/{TECH_STACK_NAME}/
 
-Files: SKILL.md + 5-6 modules + metadata.json
+Files: SKILL.md + 5-6 modules + metadata.toon
 Exa Research: {queries} queries, {sources} sources
 
 Usage: Skill(command: "{TECH_STACK_NAME}")
@@ -414,7 +414,7 @@ User → TodoWrite Init → Phase 1 (detect existing) → Phase 3 (update index)
 ├── testing.md         # Agent
 ├── config.md          # Agent
 ├── frameworks.md      # Agent (if composite)
-└── metadata.json      # Agent
+└── metadata.toon      # Agent
 ```
 
 ### Direct Mode - Single Stack

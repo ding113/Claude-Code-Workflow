@@ -172,7 +172,7 @@ When step contains `command` field with Codex CLI, execute via Bash tool. For Co
 2. **Update TODO List**: 
    - Update TODO_LIST.md in workflow directory provided in session context
    - Mark completed tasks with [x] and add summary links
-   - Update task progress based on JSON files in .task/ directory
+   - Update task progress based on TOON files in .task/ directory
    - **CRITICAL**: Use session context paths provided by context
    
    **Session Context Usage**:

@@ -15,12 +15,12 @@ graph TB
 
     subgraph "Session Management"
         MARKER[".active-session marker"]
-        SESSION["workflow-session.json"]
+        SESSION["workflow-session.toon"]
         WDIR[".workflow/ directories"]
     end
 
     subgraph "Task System"
-        TASK_JSON[".task/impl-*.json"]
+        TASK_JSON[".task/impl-*.toon"]
         HIERARCHY["Task Hierarchy (max 2 levels)"]
         STATUS["Task Status Management"]
     end
@@ -121,8 +121,8 @@ stateDiagram-v2
     [*] --> SessionInit: Create New Session
 
     SessionInit --> CreateStructure: mkdir .workflow/WFS-session-name
-    CreateStructure --> CreateJSON: Create workflow-session.json
-    CreateJSON --> CreatePlan: Create IMPL_PLAN.md
+    CreateStructure --> CreateTOON: Create workflow-session.toon
+    CreateTOON --> CreatePlan: Create IMPL_PLAN.md
     CreatePlan --> CreateTasks: Create .task/ directory
     CreateTasks --> SetActive: touch .active-session-name
 
@@ -153,8 +153,8 @@ graph TD
         ANALYZE -->|Yes| GEMINI[Gemini Analysis]
         ANALYZE -->|No| DIRECT[Direct Creation]
         GEMINI --> CONTEXT[Extract Context]
-        CONTEXT --> TASK_JSON[Create impl-*.json]
-        DIRECT --> TASK_JSON
+        CONTEXT --> TASK_TOON[Create impl-*.toon]
+        DIRECT --> TASK_TOON
     end
 
     subgraph "Task Hierarchy"
@@ -290,7 +290,7 @@ sequenceDiagram
 
     ActionAgent->>ActionAgent: Break Down into Tasks
     ActionAgent->>TaskSystem: Create Task Hierarchy
-    TaskSystem->>TaskSystem: Generate impl-*.json files
+    TaskSystem->>TaskSystem: Generate impl-*.toon files
 
     loop For Each Implementation Task
         TaskSystem->>CodeAgent: Execute Task
@@ -631,7 +631,7 @@ sequenceDiagram
 
     User->>WF: /workflow:execute --type=complex
     WF->>TASK: Auto-create task hierarchy
-    TASK->>TASK: Create impl-*.json files
+    TASK->>TASK: Create impl-*.toon files
 
     loop Task Execution
         User->>EXEC: /task:execute impl-1

@@ -256,7 +256,7 @@ All tests pass - code is ready for deployment.
 
 ## Criticality Assessment
 
-When reporting test failures (especially in JSON format for orchestrator consumption), assess the criticality level of each failure to help make 95%-100% threshold decisions:
+When reporting test failures (especially in TOON format for orchestrator consumption), assess the criticality level of each failure to help make 95%-100% threshold decisions:
 
 ### Criticality Levels
 
@@ -282,7 +282,7 @@ When reporting test failures (especially in JSON format for orchestrator consump
 - Non-critical test warnings
 - Known issues with documented workarounds
 
-### Test Results JSON Format
+### Test Results TOON Format
 
 When generating test results for orchestrator (saved to `.process/test-results.toon`):
 

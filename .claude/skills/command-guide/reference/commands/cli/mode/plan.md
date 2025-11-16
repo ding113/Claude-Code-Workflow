@@ -1,7 +1,7 @@
 ---
 name: plan
-description: Read-only architecture planning using Gemini/Qwen/Codex with strategic planning template for modification plans and impact analysis
-argument-hint: "[--tool codex|gemini|qwen] [--enhance] [--cd path] topic"
+description: Read-only architecture planning using Gemini/Codex with strategic planning template for modification plans and impact analysis
+argument-hint: "[--tool codex|gemini] [--enhance] [--cd path] topic"
 allowed-tools: SlashCommand(*), Bash(*), Task(*)
 ---
 
@@ -18,7 +18,7 @@ Strategic software architecture planning template (`~/.claude/workflows/cli-temp
 
 ## Parameters
 
-- `--tool <gemini|qwen|codex>` - Tool selection (default: gemini)
+- `--tool <gemini|codex>` - Tool selection (default: gemini)
 - `--enhance` - Enhance task with `/enhance-prompt`
 - `--cd "path"` - Target directory for focused planning
 - `<planning-task>` (Required) - Architecture planning task or modification requirements

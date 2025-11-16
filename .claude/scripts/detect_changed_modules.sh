@@ -82,7 +82,7 @@ detect_changed_modules() {
             -name '*.py' -o -name '*.go' -o -name '*.rs' -o \
             -name '*.java' -o -name '*.cpp' -o -name '*.c' -o -name '*.h' -o \
             -name '*.sh' -o -name '*.ps1' -o \
-            -name '*.json' -o -name '*.yaml' -o -name '*.yml' \
+            -name '*.toon' -o -name '*.yaml' -o -name '*.yml' \
         \) $exclusion_filters -mtime -1 2>/dev/null")
     fi
     

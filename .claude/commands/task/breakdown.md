@@ -39,7 +39,7 @@ Breaks down complex tasks into executable subtasks with context inheritance and 
 - Parent becomes `container` status (not executable)
 - Subtasks use format: IMPL-N.M (max 2 levels)
 - Context flows from parent to subtasks
-- All relationships tracked in JSON
+- All relationships tracked in TOON
 - **10-task limit enforced**: Breakdown rejected if total would exceed 10 tasks
 - **File cohesion preserved**: Same files cannot be split across subtasks
 
@@ -142,7 +142,7 @@ Files updated: .task/IMPL-1.toon + 2 subtask files + TODO_LIST.md
 
 ## Implementation Details
 
-- Complete task TOON schema
+- Complete task TOON schema (see @~/.claude/workflows/task-core.md)
 - Implementation field structure
 - Context inheritance rules
 - Agent assignment logic

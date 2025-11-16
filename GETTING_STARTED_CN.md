@@ -220,8 +220,8 @@ CCW 支持通过统一的 CLI 接口直接调用外部 AI 工具（Gemini、Qwen
 # 使用 Gemini 进行代码分析
 /cli:analyze --tool gemini "分析认证模块的架构设计"
 
-# 使用 Qwen 分析代码质量
-/cli:analyze --tool qwen "检查数据库模型的设计是否合理"
+# 使用 Gemini 分析代码质量
+/cli:analyze --tool gemini "检查数据库模型的设计是否合理"
 ```
 
 #### 交互式对话
@@ -245,7 +245,7 @@ CCW 支持通过统一的 CLI 接口直接调用外部 AI 工具（Gemini、Qwen
 /cli:mode:plan --tool gemini "设计一个可扩展的微服务架构"
 
 # 深度代码分析
-/cli:mode:code-analysis --tool qwen "分析 src/utils/ 目录下的工具函数"
+/cli:mode:code-analysis --tool gemini "分析 src/utils/ 目录下的工具函数"
 
 # Bug 分析模式
 /cli:mode:bug-index --tool gemini "分析内存泄漏问题的可能原因"
@@ -297,7 +297,7 @@ CCW 使用分层的 CLAUDE.md 文档系统维护项目上下文。定期更新�
 
 # 使用特定工具进行索引
 /memory:update-full --tool gemini   # 全面分析（推荐）
-/memory:update-full --tool qwen     # 架构重点
+/memory:update-full --tool gemini     # 架构重点
 /memory:update-full --tool codex    # 实现细节
 ```
 
@@ -316,13 +316,13 @@ CCW 使用分层的 CLAUDE.md 文档系统维护项目上下文。定期更新�
 /memory:load "在当前前端基础上开发用户认证功能"
 
 # 使用其他 CLI 工具进行分析
-/memory:load --tool qwen "重构支付模块API"
+/memory:load --tool gemini "重构支付模块API"
 ```
 
 **工作原理**：
 - 委托 AI 智能体进行自主项目分析
 - 发现相关文件并提取任务特定关键词
-- 使用 CLI 工具（Gemini/Qwen）进行深度分析以节省令牌
+- 使用 CLI 工具（Gemini）进行深度分析以节省令牌
 - 返回加载到内存中的结构化"核心内容包"
 - 为后续智能体操作提供上下文
 

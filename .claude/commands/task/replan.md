@@ -74,7 +74,7 @@ Guided step-by-step modification process with validation
 1. **Load & Validate**: Read task TOON and validate session
 2. **Parse Input**: Process changes from input source
 3. **Create Backup**: Save previous version to backup folder
-4. **Update Task**: Modify JSON structure and relationships
+4. **Update Task**: Modify TOON structure and relationships
 5. **Save Changes**: Write updated task and increment version
 6. **Update Session**: Reflect changes in workflow stats
 
@@ -95,20 +95,11 @@ Guided step-by-step modification process with validation
 
 ### Backup Tracking
 Tasks maintain backup history:
-```json
-{
-  "id": "IMPL-1",
-  "version": "1.2",
-  "replan_history": [
-    {
-      "version": "1.2",
-      "reason": "Add OAuth2 support",
-      "input_source": "direct_text",
-      "backup_location": ".task/backup/IMPL-1-v1.1.toon",
-      "timestamp": "2025-10-17T10:30:00Z"
-    }
-  ]
-}
+```toon
+id: IMPL-1
+version: 1.2
+replan_history[1]{version,reason,input_source,backup_location,timestamp}:
+  1.2,Add OAuth2 support,direct_text,.task/backup/IMPL-1-v1.1.toon,2025-10-17T10:30:00Z
 ```
 
 **Complete schema**: See @~/.claude/workflows/task-core.md

@@ -37,7 +37,7 @@ Core requirements, objectives, technical approach summary (2-3 paragraphs max).
 **Phase Progression**:
 - ✅ Phase 1: Brainstorming (role analyses generated)
 - ✅ Phase 2: Context Gathering (context-package.json: {N} files, {M} modules analyzed)
-- ✅ Phase 3: Enhanced Analysis (ANALYSIS_RESULTS.md: Gemini/Qwen/Codex parallel insights)
+- ✅ Phase 3: Enhanced Analysis (ANALYSIS_RESULTS.md: Gemini/Codex parallel insights)
 - ✅ Phase 4: Concept Verification ({X} clarifications answered, role analyses updated | skipped)
 - ⏳ Phase 5: Action Planning (current phase - generating IMPL_PLAN.md)
 
@@ -90,7 +90,7 @@ Core requirements, objectives, technical approach summary (2-3 paragraphs max).
 - **CCW Value**: Automated intelligent context discovery replacing manual file exploration
 
 **Technical Analysis (ANALYSIS_RESULTS.md)**:
-- **What**: Gemini/Qwen/Codex parallel analysis results
+- **What**: Gemini/Codex parallel analysis results
 - **Content**: Optimization strategies, risk assessment, architecture review, implementation patterns
 - **Usage**: Referenced in task planning for technical guidance and risk mitigation
 - **CCW Value**: Multi-model parallel analysis providing comprehensive technical intelligence

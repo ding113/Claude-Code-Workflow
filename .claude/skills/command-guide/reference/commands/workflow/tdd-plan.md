@@ -13,7 +13,7 @@ allowed-tools: SlashCommand(*), TodoWrite(*), Read(*), Bash(*)
 
 **Execution Modes**:
 - **Agent Mode** (default): Use `/workflow:tools:task-generate-tdd` (autonomous agent-driven)
-- **CLI Mode** (`--cli-execute`): Use `/workflow:tools:task-generate-tdd --cli-execute` (Gemini/Qwen)
+- **CLI Mode** (`--cli-execute`): Use `/workflow:tools:task-generate-tdd --cli-execute` (Gemini)
 
 **Task Attachment Model**:
 - SlashCommand invocation **expands workflow** by attaching sub-tasks to current TodoWrite
@@ -533,7 +533,7 @@ Supports action-planning-agent for more autonomous TDD planning with:
 - `/workflow:tools:conflict-resolution` - Phase 4: Detect and resolve conflicts (auto-triggered if conflict_risk ≥ medium)
 - `/compact` - Phase 4: Memory optimization (if context approaching limits)
 - `/workflow:tools:task-generate-tdd` - Phase 5: Generate TDD tasks with agent-driven approach (default, autonomous)
-- `/workflow:tools:task-generate-tdd --cli-execute` - Phase 5: Generate TDD tasks with CLI tools (Gemini/Qwen, when `--cli-execute` flag used)
+- `/workflow:tools:task-generate-tdd --cli-execute` - Phase 5: Generate TDD tasks with CLI tools (Gemini, when `--cli-execute` flag used)
 
 **Follow-up Commands**:
 - `/workflow:action-plan-verify` - Recommended: Verify TDD plan quality and structure before execution

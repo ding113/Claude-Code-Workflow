@@ -109,9 +109,9 @@ After bash validation, the model takes control to:
      ```
 
    **Architecture Review** (`--type=architecture`):
-   - Use Qwen for architecture analysis:
+   - Use Gemini for architecture analysis:
      ```bash
-     cd .workflow/${sessionId} && qwen -p "
+     cd .workflow/${sessionId} && gemini -p "
      PURPOSE: Architecture compliance review
      TASK: Evaluate adherence to architectural patterns, identify technical debt, review design decisions
      CONTEXT: @.summaries/IMPL-*.md,../.. @../../CLAUDE.md
@@ -232,7 +232,7 @@ After bash validation, the model takes control to:
 - **No Complex Orchestration**: Direct analysis, no multi-phase pipeline
 - **Specialized Reviews**: Different prompts and tools for different review types
 - **MCP Integration**: Fast code search for security and architecture patterns
-- **CLI Tool Integration**: Gemini for analysis, Qwen for architecture
+- **CLI Tool Integration**: Gemini for analysis, Gemini for architecture
 - **Structured Output**: Markdown reports with severity levels and action items
 - **Optional Memory Update**: Suggests documentation updates for significant findings
 

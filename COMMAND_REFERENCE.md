@@ -10,9 +10,9 @@ These commands provide direct access to AI tools for quick analysis and interact
 
 | Command | Description |
 |---|---|
-| `/cli:analyze` | Quick codebase analysis using CLI tools (codex/gemini/qwen). |
+| `/cli:analyze` | Quick codebase analysis using CLI tools (codex/gemini). |
 | `/cli:chat` | Simple CLI interaction command for direct codebase analysis. |
-| `/cli:cli-init`| Initialize CLI tool configurations (Gemini and Qwen) based on workspace analysis. |
+| `/cli:cli-init`| Initialize CLI tool configurations (Gemini) based on workspace analysis. |
 | `/cli:codex-execute` | Automated task decomposition and execution with Codex using resume mechanism. |
 | `/cli:discuss-plan` | Orchestrates an iterative, multi-model discussion for planning and analysis without implementation. |
 | `/cli:execute` | Auto-execution of implementation tasks with YOLO permissions and intelligent context inference. |

@@ -13,7 +13,7 @@
 
 ### Universal Prompt Template
 
-All CLI tools (Gemini, Qwen, Codex) share this template structure:
+All CLI tools (Gemini, Codex) share this template structure:
 
 ```
 PURPOSE: [objective + why + success criteria]
@@ -26,13 +26,13 @@ RULES: $(cat ~/.claude/workflows/cli-templates/prompts/analysis/pattern.txt) | [
 
 ### Tool Selection
 
-- **Analysis/Documentation** → Gemini (preferred) or Qwen (fallback)
+- **Analysis/Documentation** → Gemini
 - **Implementation/Testing** → Codex
 
 ### Quick Command Syntax
 
 ```bash
-# Gemini/Qwen
+# Gemini
 cd [dir] && gemini -p "[prompt]" [-m model] [--approval-mode yolo]
 
 # Codex
@@ -45,13 +45,11 @@ codex -C [dir] --full-auto exec "[prompt]" [-m model] [--skip-git-repo-check -s 
 - `gemini-2.5-pro` - Analysis (default)
 - `gemini-2.5-flash` - Documentation updates
 
-**Qwen**:
-- `coder-model` - Code analysis (default)
-- `vision-model` - Image analysis (rare)
+ 
 
 **Codex**:
-- `gpt-5` - Analysis & execution (default)
-- `gpt5-codex` - Large context tasks
+- `gpt-5.1-codex` - Analysis & execution (default)
+- `gpt-5.1-codex` - Large context tasks
 
 **Note**: `-m` parameter placed AFTER prompt
 
@@ -59,11 +57,11 @@ codex -C [dir] --full-auto exec "[prompt]" [-m model] [--skip-git-repo-check -s 
 
 | Scenario | Tool | MODE | Template |
 |----------|------|------|----------|
-| Execution Tracing | Gemini → Qwen | analysis | `analysis/01-trace-code-execution.txt` |
-| Bug Diagnosis | Gemini → Qwen | analysis | `analysis/01-diagnose-bug-root-cause.txt` |
-| Architecture Planning | Gemini → Qwen | analysis | `planning/01-plan-architecture-design.txt` |
-| Code Pattern Analysis | Gemini → Qwen | analysis | `analysis/02-analyze-code-patterns.txt` |
-| Architecture Review | Gemini → Qwen | analysis | `analysis/02-review-architecture.txt` |
+| Execution Tracing | Gemini | analysis | `analysis/01-trace-code-execution.txt` |
+| Bug Diagnosis | Gemini | analysis | `analysis/01-diagnose-bug-root-cause.txt` |
+| Architecture Planning | Gemini | analysis | `planning/01-plan-architecture-design.txt` |
+| Code Pattern Analysis | Gemini | analysis | `analysis/02-analyze-code-patterns.txt` |
+| Architecture Review | Gemini | analysis | `analysis/02-review-architecture.txt` |
 | Feature Implementation | Codex | auto | `development/02-implement-feature.txt` |
 | Component Development | Codex | auto | `development/02-implement-component-ui.txt` |
 | Test Generation | Codex | write | `development/02-generate-tests.txt` |
@@ -91,18 +89,18 @@ codex -C [dir] --full-auto exec "[prompt]" [-m model] [--skip-git-repo-check -s 
 
 ### MODE Options
 
-**analysis** (default for Gemini/Qwen)
+**analysis** (default for Gemini)
 - Read-only operations, no file modifications
 - Analysis output returned as text response
 - Use for: code review, architecture analysis, pattern discovery
 - Permission: Default, no special parameters needed
 
-**write** (Gemini/Qwen/Codex)
+**write** (Gemini/Codex)
 - File creation/modification/deletion allowed
 - Requires explicit MODE=write specification
 - Use for: documentation generation, code creation, file modifications
 - Permission:
-  - Gemini/Qwen: `--approval-mode yolo`
+  - Gemini: `--approval-mode yolo`
   - Codex: `--skip-git-repo-check -s danger-full-access`
 
 **auto** (Codex only)
@@ -111,9 +109,9 @@ codex -C [dir] --full-auto exec "[prompt]" [-m model] [--skip-git-repo-check -s 
 - Use for: feature implementation, bug fixes, autonomous development
 - Permission: `--skip-git-repo-check -s danger-full-access`
 
-### Gemini & Qwen
+### Gemini
 
-**Commands**: `gemini` (primary) | `qwen` (fallback)
+**Command**: `gemini`
 
 **Strengths**: Large context window, pattern recognition
 
@@ -121,10 +119,10 @@ codex -C [dir] --full-auto exec "[prompt]" [-m model] [--skip-git-repo-check -s 
 
 **Default MODE**: `analysis` (read-only)
 
-**Priority**: Prefer Gemini; use Qwen as fallback when Gemini unavailable
+**Priority**: Prefer Gemini; use Gemini as fallback when Gemini unavailable
 
 **Error Handling**:
-- **HTTP 429**: May show error but still return results - check if results exist (results present = success, no results = retry/fallback to Qwen)
+- **HTTP 429**: May show error but still return results - check if results exist (results present = success, no results = retry)
 
 ### Codex
 
@@ -231,17 +229,17 @@ RULES: $(cat ~/.claude/workflows/cli-templates/prompts/[category]/[0X-template-n
 
 Use the **[Standard Prompt Template](#standard-prompt-template)** for all tools. This section only covers tool-specific command syntax.
 
-#### Gemini & Qwen
+#### Gemini
 
 **Command Format**: `cd [directory] && [tool] -p "[Standard Prompt Template]" [options]`
 
 **Syntax Elements**:
 - **Directory**: `cd [directory] &&` (navigate to target directory)
-- **Tool**: `gemini` (primary) | `qwen` (fallback)
+- **Tool**: `gemini` (primary) | `gemini` (fallback)
 - **Prompt**: `-p "[Standard Prompt Template]"` (prompt BEFORE options)
 - **Model**: `-m [model-name]` (optional, placed AFTER prompt)
   - Gemini: `gemini-2.5-pro` (default) | `gemini-2.5-flash`
-  - Qwen: `coder-model` (default) | `vision-model`
+
 - **Write Permission**: `--approval-mode yolo` (ONLY for MODE=write, placed AFTER prompt)
 
 **Command Examples**:
@@ -252,8 +250,8 @@ cd [directory] && gemini -p "[Standard Prompt Template]" -m gemini-2.5-pro
 # Write Mode (requires MODE=write in template + --approval-mode yolo)
 cd [directory] && gemini -p "[Standard Prompt Template with MODE: write]" -m gemini-2.5-flash --approval-mode yolo
 
-# Fallback to Qwen
-cd [directory] && qwen -p "[Standard Prompt Template]" -m coder-model
+# Fallback
+cd [directory] && gemini -p "[Standard Prompt Template]" -m coder-model
 
 # Multi-directory support
 cd [directory] && gemini -p "[Standard Prompt Template]" -m gemini-2.5-pro --include-directories ../shared,../types
@@ -268,28 +266,28 @@ cd [directory] && gemini -p "[Standard Prompt Template]" -m gemini-2.5-pro --inc
 - **Execution Mode**: `--full-auto exec` (required for autonomous execution)
 - **Prompt**: `exec "[Standard Prompt Template]"` (prompt BEFORE options)
 - **Model**: `-m [model-name]` (optional, placed AFTER prompt, BEFORE flags)
-  - `gpt-5` (default) | `gpt5-codex` (large context)
+  - `gpt-5.1-codex` (default) | `gpt-5.1-codex` (large context)
 - **Write Permission**: `--skip-git-repo-check -s danger-full-access` (ONLY for MODE=auto or MODE=write, placed at command END)
 - **Session Resume**: `resume --last` (placed AFTER prompt, BEFORE flags)
 
 **Command Examples**:
 ```bash
 # Auto Mode (requires MODE=auto in template + permission flags)
-codex -C [directory] --full-auto exec "[Standard Prompt Template with MODE: auto]" -m gpt-5 --skip-git-repo-check -s danger-full-access
+codex -C [directory] --full-auto exec "[Standard Prompt Template with MODE: auto]" -m gpt-5.1-codex --skip-git-repo-check -s danger-full-access
 
 # Write Mode (requires MODE=write in template + permission flags)
-codex -C [directory] --full-auto exec "[Standard Prompt Template with MODE: write]" -m gpt-5 --skip-git-repo-check -s danger-full-access
+codex -C [directory] --full-auto exec "[Standard Prompt Template with MODE: write]" -m gpt-5.1-codex --skip-git-repo-check -s danger-full-access
 
 # Session continuity
 # First task - MUST use full Standard Prompt Template to establish context
-codex -C project --full-auto exec "[Standard Prompt Template with MODE: auto]" -m gpt-5 --skip-git-repo-check -s danger-full-access
+codex -C project --full-auto exec "[Standard Prompt Template with MODE: auto]" -m gpt-5.1-codex --skip-git-repo-check -s danger-full-access
 
 # Subsequent tasks - Can use brief prompt ONLY when using 'resume --last'
 # (inherits full context from previous session, no need to repeat template)
 codex --full-auto exec "Add JWT refresh token validation" resume --last --skip-git-repo-check -s danger-full-access
 
 # With image attachment
-codex -C [directory] -i design.png --full-auto exec "[Standard Prompt Template]" -m gpt-5 --skip-git-repo-check -s danger-full-access
+codex -C [directory] -i design.png --full-auto exec "[Standard Prompt Template]" -m gpt-5.1-codex --skip-git-repo-check -s danger-full-access
 ```
 
 **Complete Example (Codex with full template)**:
@@ -302,7 +300,7 @@ MODE: auto
 CONTEXT: @**/* | Memory: Following security patterns from project standards
 EXPECTED: Complete auth module with tests
 RULES: $(cat ~/.claude/workflows/cli-templates/prompts/development/02-implement-feature.txt) | Follow existing patterns | auto=FULL operations
-" -m gpt-5 --skip-git-repo-check -s danger-full-access
+" -m gpt-5.1-codex --skip-git-repo-check -s danger-full-access
 
 # Subsequent tasks - brief description with resume
 codex --full-auto exec "Add JWT refresh token validation" resume --last --skip-git-repo-check -s danger-full-access
@@ -311,7 +309,7 @@ codex --full-auto exec "Add JWT refresh token validation" resume --last --skip-g
 ### Directory Context Configuration
 
 **Tool Directory Navigation**:
-- **Gemini & Qwen**: `cd path/to/project && gemini -p "prompt"`
+- **Gemini**: `cd path/to/project && gemini -p "prompt"`
 - **Codex**: `codex -C path/to/project --full-auto exec "task"`
 - **Path types**: Supports both relative (`../project`) and absolute (`/full/path`)
 
@@ -333,7 +331,7 @@ Example: `cd src/auth && gemini -p "CONTEXT: @**/* @../shared/**/*" -m gemini-2.
 
 **Rule**: If CONTEXT contains `@../dir/**/*`, command MUST include `--include-directories ../dir`
 
-#### Multi-Directory Support (Gemini & Qwen)
+#### Multi-Directory Support (Gemini)
 
 **Parameter**: `--include-directories <dir1,dir2,...>`
 - Includes additional directories beyond current `cd` directory
@@ -543,23 +541,23 @@ prompts/
 | Task Type | Tool | Template |
 |-----------|------|----------|
 | **Universal Fallbacks** | | |
-| Precision-Critical Tasks | Gemini/Qwen/Codex | `universal/00-universal-rigorous-style.txt` |
-| Exploratory/Innovative Tasks | Gemini/Qwen/Codex | `universal/00-universal-creative-style.txt` |
+| Precision-Critical Tasks | Gemini/Codex | `universal/00-universal-rigorous-style.txt` |
+| Exploratory/Innovative Tasks | Gemini/Codex | `universal/00-universal-creative-style.txt` |
 | **Analysis Tasks** | | |
-| Execution Tracing | Gemini (Qwen fallback) | `analysis/01-trace-code-execution.txt` |
-| Bug Diagnosis | Gemini (Qwen fallback) | `analysis/01-diagnose-bug-root-cause.txt` |
-| Code Pattern Analysis | Gemini (Qwen fallback) | `analysis/02-analyze-code-patterns.txt` |
-| Architecture Review | Gemini (Qwen fallback) | `analysis/02-review-architecture.txt` |
-| Code Review | Gemini (Qwen fallback) | `analysis/02-review-code-quality.txt` |
-| Performance Analysis | Gemini (Qwen fallback) | `analysis/03-analyze-performance.txt` |
-| Security Assessment | Gemini (Qwen fallback) | `analysis/03-assess-security-risks.txt` |
-| Quality Standards | Gemini (Qwen fallback) | `analysis/03-review-quality-standards.txt` |
+| Execution Tracing | Gemini | `analysis/01-trace-code-execution.txt` |
+| Bug Diagnosis | Gemini | `analysis/01-diagnose-bug-root-cause.txt` |
+| Code Pattern Analysis | Gemini | `analysis/02-analyze-code-patterns.txt` |
+| Architecture Review | Gemini | `analysis/02-review-architecture.txt` |
+| Code Review | Gemini | `analysis/02-review-code-quality.txt` |
+| Performance Analysis | Gemini | `analysis/03-analyze-performance.txt` |
+| Security Assessment | Gemini | `analysis/03-assess-security-risks.txt` |
+| Quality Standards | Gemini | `analysis/03-review-quality-standards.txt` |
 | **Planning Tasks** | | |
-| Architecture Planning | Gemini (Qwen fallback) | `planning/01-plan-architecture-design.txt` |
-| Task Breakdown | Gemini (Qwen fallback) | `planning/02-breakdown-task-steps.txt` |
-| Component Design | Gemini (Qwen fallback) | `planning/02-design-component-spec.txt` |
-| Concept Evaluation | Gemini (Qwen fallback) | `planning/03-evaluate-concept-feasibility.txt` |
-| Migration Planning | Gemini (Qwen fallback) | `planning/03-plan-migration-strategy.txt` |
+| Architecture Planning | Gemini | `planning/01-plan-architecture-design.txt` |
+| Task Breakdown | Gemini | `planning/02-breakdown-task-steps.txt` |
+| Component Design | Gemini | `planning/02-design-component-spec.txt` |
+| Concept Evaluation | Gemini | `planning/03-evaluate-concept-feasibility.txt` |
+| Migration Planning | Gemini | `planning/03-plan-migration-strategy.txt` |
 | **Development Tasks** | | |
 | Feature Development | Codex | `development/02-implement-feature.txt` |
 | Refactoring | Codex | `development/02-refactor-codebase.txt` |
@@ -580,7 +578,7 @@ prompts/
 
 **Codex Multiplier**: 1.5x of allocated time
 
-**Application**: All bash() wrapped commands including Gemini, Qwen and Codex executions
+**Application**: All bash() wrapped commands including Gemini, Gemini and Codex executions
 
 **Auto-detection**: Analyze PURPOSE and TASK fields to determine timeout
 
@@ -595,7 +593,7 @@ prompts/
 - **Exception**: User provides clear instructions like "modify", "create", "implement"
 
 **Tool-Specific Permissions**:
-- **Gemini/Qwen**: Use `--approval-mode yolo` ONLY when MODE=write (placed AFTER prompt)
+- **Gemini**: Use `--approval-mode yolo` ONLY when MODE=write (placed AFTER prompt)
 - **Codex**: Use `--skip-git-repo-check -s danger-full-access` ONLY when MODE=auto or MODE=write (placed at command END)
 - **Default**: All tools default to analysis/read-only mode
 
@@ -640,8 +638,8 @@ prompts/
 
 When planning any coding task, **ALWAYS** integrate CLI tools:
 
-1. **Understanding Phase**: Use Gemini for analysis (Qwen as fallback)
-2. **Architecture Phase**: Use Gemini for design and analysis (Qwen as fallback)
+1. **Understanding Phase**: Use Gemini for analysis
+2. **Architecture Phase**: Use Gemini for design and analysis
 3. **Implementation Phase**: Use Codex for development
 4. **Quality Phase**: Use Codex for testing and validation
 

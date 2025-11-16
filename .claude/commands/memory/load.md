@@ -1,11 +1,11 @@
 ---
 name: load
-description: Delegate to universal-executor agent to analyze project via Gemini/Qwen CLI and return JSON core content package for task context
+description: Delegate to universal-executor agent to analyze project via Gemini CLI and return JSON core content package for task context
 argument-hint: "[--tool gemini|qwen] \"task context description\""
 allowed-tools: Task(*), Bash(*)
 examples:
   - /memory:load "在当前前端基础上开发用户认证功能"
-  - /memory:load --tool qwen -p "重构支付模块API"
+  - /memory:load --tool gemini -p "重构支付模块API"
 ---
 
 # Memory Load Command (/memory:load)
@@ -40,7 +40,7 @@ The command fully delegates to **universal-executor agent**, which autonomously:
 2. **Loads Documentation**: Reads CLAUDE.md, README.md and other key docs
 3. **Extracts Keywords**: Derives core keywords from task description
 4. **Discovers Files**: Uses MCP code-index or rg/find to locate relevant files
-5. **CLI Deep Analysis**: Executes Gemini/Qwen CLI for deep context analysis
+5. **CLI Deep Analysis**: Executes Gemini CLI for deep context analysis
 6. **Generates Content Package**: Returns structured JSON core content package
 
 ## 4. Core Content Package Structure
@@ -133,7 +133,7 @@ Task(
 
 ### Step 3: Deep Analysis via CLI
 
-Execute Gemini/Qwen CLI for deep analysis (saves main thread tokens):
+Execute Gemini CLI for deep analysis (saves main thread tokens):
 
 \`\`\`bash
 cd . && ${tool} -p "
@@ -209,13 +209,13 @@ Before returning:
 }
 ```
 
-### Example 2: Using Qwen Tool
+### Example 2: Using Gemini Tool
 
 ```bash
-/memory:load --tool qwen -p "重构支付模块API"
+/memory:load --tool gemini -p "重构支付模块API"
 ```
 
-Agent uses Qwen CLI for analysis, returns same structured package.
+Agent uses Gemini CLI for analysis, returns same structured package.
 
 ### Example 3: Bug Fix Context
 

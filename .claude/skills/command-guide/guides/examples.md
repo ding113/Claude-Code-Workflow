@@ -16,7 +16,7 @@ Comprehensive examples of command-guide skill in action across all 5 operation m
 
 1. **cli:execute** (高级)
    描述: Auto-execution of implementation tasks with YOLO permissions
-   参数: [--agent] [--tool codex|gemini|qwen] [--enhance] description or task-id
+   参数: [--agent] [--tool codex|gemini] [--enhance] description or task-id
    场景: implementation
 
 2. **task:execute** (中级)

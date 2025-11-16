@@ -26,7 +26,7 @@ allowed-tools: SlashCommand(*), TodoWrite(*), Bash(*), Read(*), Write(*), Task(*
 **Orchestrator Responsibility**:
 - Provides feature keyword and analysis scope to agent
 - Transforms agent's JSON into Mermaid-enriched markdown documentation
-- Writes all files (5 docs + metadata.json + SKILL.md)
+- Writes all files (5 docs + metadata.toon + SKILL.md)
 
 ## Core Rules
 
@@ -139,7 +139,7 @@ Perform Deep Scan analysis for feature: {FEATURE_KEYWORD}
 
 **Scope**:
 - Feature: {FEATURE_KEYWORD}
-- CLI Tool: {TOOL} (gemini-2.5-pro or qwen coder-model)
+- CLI Tool: {TOOL} (gemini-2.5-pro or gemini coder-model)
 - File Discovery: MCP Code Index (preferred) + rg fallback
 - Target: 5-15 most relevant files
 
@@ -212,7 +212,7 @@ Return comprehensive analysis as structured JSON:
 - Include file:line references for ALL findings
 - Extract design intent from code structure and comments
 - NO FILE WRITING - return JSON analysis only
-- Handle tool failures gracefully (Gemini → Qwen fallback, MCP → rg fallback)
+- Handle tool failures gracefully (Gemini fallback, MCP → rg fallback)
   "
 )
 ```
@@ -422,11 +422,11 @@ ${analysis.recommendations.map(r => `- ${r}`).join('\n')}
    })
    ```
 
-3. **Write metadata.json**:
+3. **Write metadata.toon**:
    ```javascript
    Write({
-     file_path: `${CODEMAP_DIR}/metadata.json`,
-     content: JSON.stringify({
+     file_path: `${CODEMAP_DIR}/metadata.toon`,
+     content: encodeTOON({
        feature: feature,
        normalized_name: normalized_feature,
        generated_at: new Date().toISOString(),
@@ -448,14 +448,14 @@ ${analysis.recommendations.map(r => `- ${r}`).join('\n')}
 
    - Agent Analysis: cli-explore-agent with {TOOL}
    - Files Analyzed: {count}
-   - Documentation Generated: 5 markdown files + metadata.json
+   - Documentation Generated: 5 markdown files + metadata.toon
    - Location: {CODEMAP_DIR}
    ```
 
 **Completion Criteria**:
 - cli-explore-agent task completed successfully with JSON result
 - 5 documentation files written with valid Mermaid diagrams
-- metadata.json written with analysis summary
+- metadata.toon written with analysis summary
 - All files properly formatted and cross-referenced
 
 **TodoWrite**: Mark phase 2 completed, phase 3 in_progress
@@ -475,9 +475,9 @@ ${analysis.recommendations.map(r => `- ${r}`).join('\n')}
    bash(find "{CODEMAP_DIR}" -name "*.md" -type f | sort)
    ```
 
-2. **Read metadata.json**:
+2. **Read metadata.toon**:
    ```javascript
-   Read({CODEMAP_DIR}/metadata.json)
+   Read({CODEMAP_DIR}/metadata.toon)
    // Extract: feature, normalized_name, files_analyzed, analysis_summary
    ```
 
@@ -580,7 +580,7 @@ Files Generated:
 - data-flow.md (with Mermaid flowchart)
 - conditional-paths.md (with Mermaid decision tree)
 - complete-flow.md (with integrated Mermaid diagram)
-- metadata.json
+- metadata.toon
 
 Analysis:
 - Files analyzed: {count}
@@ -683,7 +683,7 @@ User → TodoWrite Init → Phase 1 (detect existing) → Phase 3 (update index)
 - **--regenerate**: Force regenerate existing codemap (deletes and recreates)
 - **--tool**: CLI tool for analysis (default: gemini)
   - `gemini`: Comprehensive flow analysis with gemini-2.5-pro
-  - `qwen`: Alternative with coder-model
+  - `gemini`: Alternative with coder-model
 
 ---
 
@@ -698,7 +698,7 @@ User → TodoWrite Init → Phase 1 (detect existing) → Phase 3 (update index)
 ├── data-flow.md                # Agent (Phase 2) - Data transformations
 ├── conditional-paths.md        # Agent (Phase 2) - Branches & errors
 ├── complete-flow.md            # Agent (Phase 2) - Integrated view
-└── metadata.json               # Agent (Phase 2)
+└── metadata.toon               # Agent (Phase 2)
 ```
 
 ### Example 1: User Authentication Flow
@@ -723,7 +723,7 @@ User → TodoWrite Init → Phase 1 (detect existing) → Phase 3 (update index)
 
 **Workflow**:
 1. Phase 1: Deletes existing codemap due to --regenerate
-2. Phase 2: Agent uses qwen with coder-model for fresh analysis
+2. Phase 2: Agent uses gemini with coder-model for fresh analysis
 3. Phase 3: Generates updated SKILL.md
 
 ---
@@ -739,7 +739,7 @@ User → TodoWrite Init → Phase 1 (detect existing) → Phase 3 (update index)
 - **Progressive Loading**: Token-efficient context loading (2K → 30K)
 - **Auto-Continue**: Fully autonomous 3-phase execution
 - **Smart Skip**: Detects existing codemap, 10x faster index updates
-- **CLI Integration**: Gemini/Qwen for deep semantic understanding
+- **CLI Integration**: Gemini for deep semantic understanding
 
 ## Architecture
 
@@ -750,7 +750,7 @@ code-map-memory (orchestrator)
   │   ├─ Phase 2a: cli-explore-agent Analysis
   │   │   └─ Deep Scan: Bash structural + Gemini semantic → JSON
   │   └─ Phase 2b: Orchestrator Documentation
-  │       └─ Transform JSON → 5 Mermaid markdown files + metadata.json
+  │       └─ Transform agent output → 5 Mermaid markdown files + metadata.toon
   └─ Phase 3: Write SKILL.md (index generation, always runs)
 
 Benefits:

@@ -58,7 +58,7 @@ Updated:
 **Purpose**: Full regeneration - process all archived sessions in parallel for complete SKILL package
 
 **Workflow**:
-1. **List sessions**: Read manifest.json to get all archived session IDs
+1. **List sessions**: Read manifest.toon to get all archived session IDs
 2. **Parallel invocation**: Launch multiple `universal-executor` agents in parallel (one per session)
 3. **Agent coordination**:
    - Each agent processes one session independently
@@ -129,7 +129,7 @@ If missing, report error: "Session {session_id} not found in archives"
 **All Sessions Mode**:
 ```bash
 # Read manifest and filter only WFS- sessions
-bash(cat .workflow/.archives/manifest.json | jq -r '.archives[].session_id | select(startswith("WFS-"))')
+bash(~/.claude/scripts/toon-query.sh .workflow/.archives/manifest.toon '.archives[].session_id | select(startswith("WFS-"))')
 ```
 
 Store filtered session IDs in array. Ignore doc sessions and other non-WFS sessions.
@@ -174,10 +174,10 @@ Context:
 Objectives:
 
 1. Read session data:
-   - workflow-session.json (metadata)
+   - workflow-session.toon (metadata)
    - IMPL_PLAN.md (implementation summary)
    - TODO_LIST.md (if exists)
-   - manifest.json entry for lessons
+   - manifest.toon entry for lessons
 
 2. Extract key information:
    - Description, tags, metrics
@@ -195,7 +195,7 @@ Objectives:
    • Extract conflict patterns with resolutions
    • Categorize by functional domain
    MODE: analysis
-   CONTEXT: @IMPL_PLAN.md @workflow-session.json
+   CONTEXT: @IMPL_PLAN.md @workflow-session.toon
    EXPECTED: Structured lessons and conflicts in JSON format
    RULES: Template reference from skill-aggregation.txt
    "
@@ -486,7 +486,7 @@ All templates located in: `~/.claude/workflows/cli-templates/prompts/workflow/`
 - **No archives directory**: "Error: No workflow archives found at .workflow/.archives/"
 - **Invalid session ID format**: "Error: Invalid session ID format. Only WFS-* sessions are supported"
 - **Session not found**: "Error: Session {session_id} not found in archives"
-- **No WFS sessions in manifest**: "Error: No WFS-* workflow sessions found in manifest.json"
+- **No WFS sessions in manifest**: "Error: No WFS-* workflow sessions found in manifest.toon"
 
 ### Agent Errors
 - If agent fails, report error message from agent result

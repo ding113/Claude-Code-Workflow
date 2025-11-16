@@ -1691,7 +1691,7 @@ function Show-Summary {
     Write-Host "1. Review CLAUDE.md - Customize guidelines for your project"
     Write-Host "2. Review .codex/Agent.md - Codex agent execution protocol"
     Write-Host "3. Review .gemini/CLAUDE.md - Gemini agent execution protocol"
-    Write-Host "4. Review .qwen/QWEN.md - Qwen agent execution protocol"
+    Write-Host "4. Review .qwen/QWEN.md - Gemini agent execution protocol"
     Write-Host "5. Configure settings - Edit .claude/settings.local.json as needed"
     Write-Host "6. Install TOON dependencies - Run 'npm install' for workflow utilities"
     Write-Host "7. Test TOON wrapper - Try './scripts/toon-wrapper.sh --help'"

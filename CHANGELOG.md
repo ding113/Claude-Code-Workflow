@@ -38,14 +38,14 @@ This release introduces a comprehensive command-guide skill with interactive hel
 
 **Command Descriptions Enhanced** (69 files):
 - 🔄 **Detailed Functionality** - All command descriptions updated from basic to comprehensive
-  - Includes tools used (Gemini/Qwen/Codex)
+  - Includes tools used (Gemini/Codex)
   - Specifies agents invoked
   - Lists workflow phases
   - Documents output files
   - Mentions key flags and modes
 - 🔄 **Example Updates**:
   - `workflow:plan`: "5-phase planning workflow with Gemini analysis and action-planning-agent task generation, outputs IMPL_PLAN.md and task JSONs with optional CLI auto-execution"
-  - `cli:execute`: "Autonomous code implementation with YOLO auto-approval using Gemini/Qwen/Codex, supports task ID or description input with automatic file pattern detection"
+  - `cli:execute`: "Autonomous code implementation with YOLO auto-approval using Gemini/Codex, supports task ID or description input with automatic file pattern detection"
   - `memory:update-related`: "Update CLAUDE.md for git-changed modules using batched agent execution (4 modules/agent) with gemini→qwen→codex fallback"
 
 **Index Organization**:
@@ -71,7 +71,7 @@ This release introduces a comprehensive command-guide skill with interactive hel
 - ✨ **guides/examples.md** - Usage examples for all modes
 - ✨ **guides/getting-started.md** - 5-minute quickstart guide
 - ✨ **guides/workflow-patterns.md** - Common workflow examples
-- ✨ **guides/cli-tools-guide.md** - Gemini/Qwen/Codex usage
+- ✨ **guides/cli-tools-guide.md** - Gemini/Codex usage
 - ✨ **guides/troubleshooting.md** - Common issues and solutions
 
 **Updated Files**:
@@ -356,7 +356,7 @@ This release introduces a powerful new command that automatically generates prog
 
 **Command Parameters**:
 ```bash
-/memory:skill-memory [path] [--tool <gemini|qwen|codex>] [--regenerate] [--mode <full|partial>] [--cli-execute]
+/memory:skill-memory [path] [--tool <gemini|codex>] [--regenerate] [--mode <full|partial>] [--cli-execute]
 ```
 
 **Path Mirroring Strategy**:
@@ -390,7 +390,7 @@ SKILL: .claude/skills/my_app/knowledge/src/modules/auth/API.md
 - 🔄 **Conflict Resolution** - Automatic splitting when exceeding document limit
 
 **Documentation Workflow Improvements**:
-- 🔄 **CLI Execute Support** - Direct documentation generation via CLI tools (gemini/qwen/codex)
+- 🔄 **CLI Execute Support** - Direct documentation generation via CLI tools (gemini/codex)
 - 🔄 **workflow-session.json** - Unified session metadata storage
 - 🔄 **Improved Structure Quality** - Enhanced documentation generation guidelines
 

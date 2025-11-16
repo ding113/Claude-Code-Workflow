@@ -428,7 +428,7 @@ Calculate risk level based on:
 
 Before completion verify:
 - [ ] context-package.toon in `.workflow/{session}/.process/`
-- [ ] Valid JSON with all required fields
+- [ ] Valid TOON with all required fields
 - [ ] Metadata complete (description, keywords, complexity)
 - [ ] Project context documented (patterns, conventions, tech stack)
 - [ ] Assets organized by type with metadata
@@ -506,7 +506,7 @@ Output: .workflow/{session}/.process/context-package.toon
 - Build dependency graphs
 - Synthesize all 3 sources
 - Calculate conflict risk
-- Generate valid JSON output
+- Generate valid TOON output
 - Report completion with stats
 
 ### Windows Path Format Guidelines

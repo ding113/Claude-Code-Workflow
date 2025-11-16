@@ -139,7 +139,7 @@ Perform Deep Scan analysis for feature: {FEATURE_KEYWORD}
 
 **Scope**:
 - Feature: {FEATURE_KEYWORD}
-- CLI Tool: {TOOL} (gemini-2.5-pro or qwen coder-model)
+- CLI Tool: {TOOL} (gemini-2.5-pro or gemini coder-model)
 - File Discovery: MCP Code Index (preferred) + rg fallback
 - Target: 5-15 most relevant files
 
@@ -212,7 +212,7 @@ Return comprehensive analysis as structured JSON:
 - Include file:line references for ALL findings
 - Extract design intent from code structure and comments
 - NO FILE WRITING - return JSON analysis only
-- Handle tool failures gracefully (Gemini → Qwen fallback, MCP → rg fallback)
+- Handle tool failures gracefully (Gemini fallback, MCP → rg fallback)
   "
 )
 ```
@@ -683,7 +683,7 @@ User → TodoWrite Init → Phase 1 (detect existing) → Phase 3 (update index)
 - **--regenerate**: Force regenerate existing codemap (deletes and recreates)
 - **--tool**: CLI tool for analysis (default: gemini)
   - `gemini`: Comprehensive flow analysis with gemini-2.5-pro
-  - `qwen`: Alternative with coder-model
+  - `gemini`: Alternative with coder-model
 
 ---
 
@@ -723,7 +723,7 @@ User → TodoWrite Init → Phase 1 (detect existing) → Phase 3 (update index)
 
 **Workflow**:
 1. Phase 1: Deletes existing codemap due to --regenerate
-2. Phase 2: Agent uses qwen with coder-model for fresh analysis
+2. Phase 2: Agent uses gemini with coder-model for fresh analysis
 3. Phase 3: Generates updated SKILL.md
 
 ---
@@ -739,7 +739,7 @@ User → TodoWrite Init → Phase 1 (detect existing) → Phase 3 (update index)
 - **Progressive Loading**: Token-efficient context loading (2K → 30K)
 - **Auto-Continue**: Fully autonomous 3-phase execution
 - **Smart Skip**: Detects existing codemap, 10x faster index updates
-- **CLI Integration**: Gemini/Qwen for deep semantic understanding
+- **CLI Integration**: Gemini for deep semantic understanding
 
 ## Architecture
 

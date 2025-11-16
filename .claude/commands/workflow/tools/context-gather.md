@@ -106,7 +106,7 @@ Complete context-package.toon with:
 
 ## Quality Validation
 Before completion verify:
-- [ ] Valid JSON format with all required fields
+- [ ] Valid TOON format with all required fields
 - [ ] File relevance accuracy >80%
 - [ ] Dependency graph complete (max 2 transitive levels)
 - [ ] Conflict risk level calculated correctly
@@ -204,22 +204,13 @@ relevantArchives.forEach(archive => {
 **Step 5: Inject into Context Package**
 ```json
 {
-  "conflict_detection": {
-    "risk_level": "medium",
-    "risk_factors": ["..."],
-    "affected_modules": ["..."],
-    "mitigation_strategy": "...",
-    "historical_conflicts": [
-      {
-        "source_session": "WFS-auth-feature",
-        "pattern": "When modifying User model",
-        "action": "Check reporting-service and auditing-service dependencies",
-        "files_to_check": ["src/models/User.ts", "src/services/reporting.ts"],
-        "archived_at": "2025-09-16T09:00:00Z"
-      }
-    ]
-  }
-}
+conflict_detection:
+  risk_level: medium
+  risk_factors[1]: ...
+  affected_modules[1]: ...
+  mitigation_strategy: ...
+  historical_conflicts[1]{source_session,pattern,action,files_to_check,archived_at}:
+    WFS-auth-feature,"When modifying User model","Check reporting-service and auditing-service dependencies","src/models/User.ts,src/services/reporting.ts",2025-09-16T09:00:00Z
 ```
 
 ### Risk Level Escalation

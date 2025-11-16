@@ -62,16 +62,16 @@ package-name    Style reference package name (required)
 - `REGENERATE`: `true` if --regenerate flag, `false` otherwise
 
 **Data Sources** (Phase 2):
-- `DESIGN_TOKENS_DATA`: Complete design-tokens.json content (from Read)
-- `LAYOUT_TEMPLATES_DATA`: Complete layout-templates.json content (from Read)
-- `ANIMATION_TOKENS_DATA`: Complete animation-tokens.json content (from Read, if exists)
+- `DESIGN_TOKENS_DATA`: Complete design-tokens.toon content (from Read)
+- `LAYOUT_TEMPLATES_DATA`: Complete layout-templates.toon content (from Read)
+- `ANIMATION_TOKENS_DATA`: Complete animation-tokens.toon content (from Read, if exists)
 
 **Metadata** (Phase 2):
 - `COMPONENT_COUNT`: Total components
 - `UNIVERSAL_COUNT`: Universal components count
 - `SPECIALIZED_COUNT`: Specialized components count
 - `UNIVERSAL_COMPONENTS`: Universal component names (first 5)
-- `HAS_ANIMATIONS`: Whether animation-tokens.json exists
+- `HAS_ANIMATIONS`: Whether animation-tokens.toon exists
 
 **Analysis Output** (`DESIGN_ANALYSIS` - Phase 2):
 - `has_colors`: Colors exist
@@ -97,8 +97,8 @@ package-name    Style reference package name (required)
 |-------|-------|------------|
 | Package not found | Invalid package name or doesn't exist | Run `/workflow:ui-design:codify-style` first |
 | SKILL already exists | SKILL.md already generated | Use `--regenerate` flag |
-| Missing layout-templates.json | Incomplete package | Verify package integrity, re-run codify-style |
-| Invalid JSON format | Corrupted package files | Regenerate package with codify-style |
+| Missing layout-templates.toon | Incomplete package | Verify package integrity, re-run codify-style |
+| Invalid TOON format | Corrupted package files | Regenerate package with codify-style |
 
 ---
 
@@ -176,71 +176,71 @@ if (regenerate_flag && skill_exists) {
 
 ### Phase 2: Read Package Data & Analyze Design System
 
-**Step 1: Read All JSON Files**
+**Step 1: Read All TOON Files**
 
 ```bash
 # Read layout templates
-Read(file_path=".workflow/reference_style/${package_name}/layout-templates.json")
+Read(file_path=".workflow/reference_style/${package_name}/layout-templates.toon")
 
 # Read design tokens
-Read(file_path=".workflow/reference_style/${package_name}/design-tokens.json")
+Read(file_path=".workflow/reference_style/${package_name}/design-tokens.toon")
 
 # Read animation tokens (if exists)
-bash(test -f .workflow/reference_style/${package_name}/animation-tokens.json && echo "exists" || echo "missing")
-Read(file_path=".workflow/reference_style/${package_name}/animation-tokens.json")  # if exists
+bash(test -f .workflow/reference_style/${package_name}/animation-tokens.toon && echo "exists" || echo "missing")
+Read(file_path=".workflow/reference_style/${package_name}/animation-tokens.toon")  # if exists
 ```
 
 **Step 2: Extract Metadata for Description**
 
 ```bash
 # Count components and classify by type
-bash(jq '.layout_templates | length' layout-templates.json)
-bash(jq '[.layout_templates[] | select(.component_type == "universal")] | length' layout-templates.json)
-bash(jq '[.layout_templates[] | select(.component_type == "specialized")] | length' layout-templates.json)
-bash(jq -r '.layout_templates | to_entries[] | select(.value.component_type == "universal") | .key' layout-templates.json | head -5)
+bash(~/.claude/scripts/toon-query.sh layout-templates.toon '.layout_templates | length')
+bash(~/.claude/scripts/toon-query.sh layout-templates.toon '[.layout_templates[] | select(.component_type == "universal")] | length')
+bash(~/.claude/scripts/toon-query.sh layout-templates.toon '[.layout_templates[] | select(.component_type == "specialized")] | length')
+bash(~/.claude/scripts/toon-query.sh layout-templates.toon '.layout_templates | to_entries[] | select(.value.component_type == "universal") | .key' | head -5)
 ```
 
 Store results in metadata variables (see [Key Variables](#key-variables))
 
 **Step 3: Analyze Design System for Dynamic Principles**
 
-Analyze design-tokens.json to extract characteristics and patterns:
+Analyze design-tokens.toon to extract characteristics and patterns:
 
 ```bash
 # Color system characteristics
-bash(jq '.colors | keys' design-tokens.json)
-bash(jq '.colors | to_entries[0:2] | map(.value)' design-tokens.json)
+bash(~/.claude/scripts/toon-query.sh design-tokens.toon '.colors | keys')
+bash(~/.claude/scripts/toon-query.sh design-tokens.toon '.colors | to_entries[0:2] | map(.value)')
 # Check for modern color spaces
-bash(jq '.colors | to_entries[] | .value | test("oklch|lab|lch")' design-tokens.json)
+bash(~/.claude/scripts/toon-query.sh design-tokens.toon '.colors | to_entries[] | .value | test("oklch|lab|lch")')
 # Check for dark mode variants
-bash(jq '.colors | keys | map(select(contains("dark") or contains("light")))' design-tokens.json)
+bash(~/.claude/scripts/toon-query.sh design-tokens.toon '.colors | keys | map(select(contains("dark") or contains("light")))')
 # → Store: has_colors, color_semantic, uses_oklch, has_dark_mode
 
 # Spacing pattern detection
-bash(jq '.spacing | to_entries | map(.value) | map(gsub("[^0-9.]"; "") | tonumber)' design-tokens.json)
+bash(~/.claude/scripts/toon-query.sh design-tokens.toon '.spacing | to_entries | map(.value) | map(gsub("[^0-9.]"; "") | tonumber)')
 # Analyze pattern: linear (4-8-12-16) vs geometric (4-8-16-32) vs custom
 # → Store: spacing_pattern, spacing_scale
 
 # Typography characteristics
-bash(jq '.typography | keys | map(select(contains("family") or contains("weight")))' design-tokens.json)
-bash(jq '.typography | to_entries | map(select(.key | contains("size"))) | .[].value' design-tokens.json)
+bash(~/.claude/scripts/toon-query.sh design-tokens.toon '.typography | keys | map(select(contains("family") or contains("weight")))')
+bash(~/.claude/scripts/toon-query.sh design-tokens.toon '.typography | to_entries | map(select(.key | contains("size"))) | .[].value')
 # Check for calc() usage
-bash(jq '. | tostring | test("calc\\(")' design-tokens.json)
+bash(~/.claude/scripts/toon-query.sh design-tokens.toon '. | tostring | test("calc\\(")')
 # → Store: has_typography, typography_hierarchy, uses_calc
 
 # Border radius style
-bash(jq '.border_radius | to_entries | map(.value)' design-tokens.json)
+bash(~/.claude/scripts/toon-query.sh design-tokens.toon '.border_radius | to_entries | map(.value)')
 # Check range: small (sharp <4px) vs moderate (4-8px) vs large (rounded >8px)
 # → Store: has_radius, radius_style
 
 # Shadow characteristics
-bash(jq '.shadows | keys' design-tokens.json)
-bash(jq '.shadows | to_entries[0].value' design-tokens.json)
+bash(~/.claude/scripts/toon-query.sh design-tokens.toon '.shadows | keys')
+bash(~/.claude/scripts/toon-query.sh design-tokens.toon '.shadows | to_entries[0].value')
 # → Store: has_shadows, shadow_pattern
 
 # Animations (if available)
-bash(jq '.duration | to_entries | map(.value)' animation-tokens.json)
-bash(jq '.easing | keys' animation-tokens.json)
+bash(~/.claude/scripts/toon-query.sh animation-tokens.toon '.duration | to_entries | map(.value)')
+bash(~/.claude/scripts/toon-query.sh animation-tokens.toon '.easing | keys')
 # → Store: has_animations, animation_range, easing_variety
 ```
 
@@ -378,9 +378,9 @@ Phase 1: Validate
   └─ Check SKILL_DIR exists (skip if exists and no --regenerate)
 
 Phase 2: Read & Analyze
-  ├─ Read design-tokens.json → DESIGN_TOKENS_DATA
-  ├─ Read layout-templates.json → LAYOUT_TEMPLATES_DATA
-  ├─ Read animation-tokens.json → ANIMATION_TOKENS_DATA (if exists)
+  ├─ Read design-tokens.toon → DESIGN_TOKENS_DATA
+  ├─ Read layout-templates.toon → LAYOUT_TEMPLATES_DATA
+  ├─ Read animation-tokens.toon → ANIMATION_TOKENS_DATA (if exists)
   ├─ Extract Metadata → COMPONENT_COUNT, UNIVERSAL_COUNT, etc.
   └─ Analyze Design System → DESIGN_ANALYSIS (characteristics)
 

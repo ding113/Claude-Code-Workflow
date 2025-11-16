@@ -247,7 +247,7 @@ Before completion, verify:
      - Store result in `output` variable for future steps
   5. **CLI Command Execution** (CLI Mode):
      - When step contains `command` field, execute via Bash tool
-     - Commands use gemini/qwen/codex CLI with MODE=write
+     - Commands use gemini/codex CLI with MODE=write
      - CLI directly generates documentation files
      - Agent validates CLI output and ensures completeness
   6. **Agent Generation** (Agent Mode):
@@ -293,7 +293,7 @@ Before completing the task, you must verify the following:
 - [ ] **Target Files**: All files listed in `target_files` have been created or updated.
 
 ### 6. Task Completion
-1.  **Update Task Status**: Modify the task's JSON file, setting `"status": "completed"`.
+1.  **Update Task Status**: Modify the task's TOON file, setting `"status": "completed"`.
 2.  **Generate Summary**: Create a summary document in the `.summaries/` directory (e.g., `DOC-001-summary.md`).
 3.  **Update `TODO_LIST.md`**: Mark the corresponding task as completed `[x]`.
 

@@ -521,7 +521,7 @@ cat .workflow/WFS-*//.brainstorming/synthesis/final-recommendations.md
 
 **适用场景**：复杂任务需要多个 AI 工具配合
 
-**流程**：Gemini 分析 → Gemini/Qwen 规划 → Codex 实现
+**流程**：Gemini 分析 → Gemini 规划 → Codex 实现
 
 ### 完整示例
 
@@ -650,7 +650,7 @@ graph TD
 ## 🔗 相关资源
 
 - **快速入门**：[Getting Started](getting-started.md) - 5分钟上手
-- **CLI 工具**：[CLI Tools Guide](cli-tools-guide.md) - Gemini/Qwen/Codex 详解
+- **CLI 工具**：[CLI Tools Guide](cli-tools-guide.md) - Gemini/Codex 详解
 - **UI设计工作流**：[UI Design Workflow Guide](ui-design-workflow-guide.md) - UI设计完整指南
 - **问题排查**：[Troubleshooting](troubleshooting.md) - 常见问题解决
 - **完整命令列表**：查看 `index/all-commands.json`

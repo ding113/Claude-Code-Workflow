@@ -1,7 +1,7 @@
 ---
 name: skill-memory
 description: 4-phase autonomous orchestrator: check docs → /memory:docs planning → /workflow:execute → generate SKILL.md with progressive loading index (skips phases 2-3 if docs exist)
-argument-hint: "[path] [--tool <gemini|qwen|codex>] [--regenerate] [--mode <full|partial>] [--cli-execute]"
+argument-hint: "[path] [--tool <gemini|codex>] [--regenerate] [--mode <full|partial>] [--cli-execute]"
 allowed-tools: SlashCommand(*), TodoWrite(*), Bash(*), Read(*), Write(*)
 ---
 
@@ -423,13 +423,13 @@ User triggers command
 ## Parameters
 
 ```bash
-/memory:skill-memory [path] [--tool <gemini|qwen|codex>] [--regenerate] [--mode <full|partial>] [--cli-execute]
+/memory:skill-memory [path] [--tool <gemini|codex>] [--regenerate] [--mode <full|partial>] [--cli-execute]
 ```
 
 - **path**: Target directory (default: current directory)
 - **--tool**: CLI tool for documentation (default: gemini)
   - `gemini`: Comprehensive documentation
-  - `qwen`: Architecture analysis
+  - `gemini`: Architecture analysis
   - `codex`: Implementation validation
 - **--regenerate**: Force regenerate all documentation
   - When enabled: Deletes existing `.workflow/docs/{project_name}/` before regeneration
@@ -460,12 +460,12 @@ User triggers command
 ### Example 2: Regenerate with Qwen
 
 ```bash
-/memory:skill-memory /d/my_app --tool qwen --regenerate
+/memory:skill-memory /d/my_app --tool gemini --regenerate
 ```
 
 **Workflow**:
 1. Phase 1: Parses target path, detects regenerate flag, deletes existing docs
-2. Phase 2: Calls `/memory:docs /d/my_app --tool qwen --mode full`
+2. Phase 2: Calls `/memory:docs /d/my_app --tool gemini --mode full`
 3. Phase 3: Executes documentation regeneration
 4. Phase 4: Generates updated SKILL.md
 

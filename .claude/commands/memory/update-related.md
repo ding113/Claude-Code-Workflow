@@ -1,7 +1,7 @@
 ---
 name: update-related
 description: Update CLAUDE.md for git-changed modules using batched agent execution (4 modules/agent) with gemini→qwen→codex fallback, <15 modules uses direct execution
-argument-hint: "[--tool gemini|qwen|codex]"
+argument-hint: "[--tool gemini|codex]"
 ---
 
 # Related Documentation Update (/memory:update-related)
@@ -11,7 +11,7 @@ argument-hint: "[--tool gemini|qwen|codex]"
 Orchestrates context-aware CLAUDE.md updates for changed modules using batched agent execution with automatic tool fallback (gemini→qwen→codex).
 
 **Parameters**:
-- `--tool <gemini|qwen|codex>`: Primary tool (default: gemini)
+- `--tool <gemini|codex>`: Primary tool (default: gemini)
 
 **Execution Flow**:
 1. Change Detection → 2. Plan Presentation → 3. Batched Agent Execution → 4. Safety Verification
@@ -31,7 +31,7 @@ Orchestrates context-aware CLAUDE.md updates for changed modules using batched a
 
 ```javascript
 --tool gemini  →  [gemini, qwen, codex]  // default
---tool qwen    →  [qwen, gemini, codex]
+--tool gemini    →  [qwen, gemini, codex]
 --tool codex   →  [codex, gemini, qwen]
 ```
 
@@ -58,7 +58,7 @@ bash(git add -A 2>/dev/null || true)
 **Present filtered plan**:
 ```
 Related Update Plan:
-  Tool: gemini (fallback: qwen → codex)
+  Tool: gemini (fallback: gemini → codex)
   Changed: 4 modules | Batching: 4 modules/agent
 
   Will update:
@@ -69,7 +69,7 @@ Related Update Plan:
 
   Auto-skipped (12 paths):
   - Tests: ./src/api/auth.test.ts (8 paths)
-  - Config: tsconfig.json (3 paths)
+  - Config: tsconfig.toon (3 paths)
   - Other: node_modules (1 path)
 
   Agent allocation:
@@ -289,9 +289,9 @@ Update Summary:
 
 | Tool   | Best For                       | Fallback To    |
 |--------|--------------------------------|----------------|
-| gemini | Documentation, patterns        | qwen → codex   |
-| qwen   | Architecture, system design    | gemini → codex |
-| codex  | Implementation, code quality   | gemini → qwen  |
+| gemini | Documentation, patterns        | gemini → codex   |
+| gemini   | Architecture, system design    | gemini → codex |
+| codex  | Implementation, code quality   | gemini → gemini  |
 
 ## Usage Examples
 

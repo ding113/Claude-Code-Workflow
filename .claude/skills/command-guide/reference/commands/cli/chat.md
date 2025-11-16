@@ -1,7 +1,7 @@
 ---
 name: chat
-description: Read-only Q&A interaction with Gemini/Qwen/Codex for codebase questions with automatic context inference
-argument-hint: "[--tool codex|gemini|qwen] [--enhance] inquiry"
+description: Read-only Q&A interaction with Gemini/Codex for codebase questions with automatic context inference
+argument-hint: "[--tool codex|gemini] [--enhance] inquiry"
 allowed-tools: SlashCommand(*), Bash(*), Task(*)
 ---
 
@@ -18,7 +18,7 @@ Direct Q&A interaction with CLI tools for codebase analysis. **Read-only - does 
 
 ## Parameters
 
-- `--tool <gemini|qwen|codex>` - Tool selection (default: gemini)
+- `--tool <gemini|codex>` - Tool selection (default: gemini)
 - `--enhance` - Enhance inquiry with `/enhance-prompt`
 - `<inquiry>` (Required) - Question or analysis request
 

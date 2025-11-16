@@ -155,7 +155,7 @@ bash(npm install)
 bash(npm test)
 
 // ✅ 文件系统查询和文本处理
-bash(find .workflow -name "*.json" -type f)
+bash(find .workflow -name "*.toon" -type f)
 bash(rg "pattern" --type js --files-with-matches)
 ```
 
@@ -209,7 +209,7 @@ RETURN summary
 ```pseudo
 PARALLEL_START:
     check_git = bash(git status)
-    check_count = bash(find .workflow -name "*.json" | wc -l)
+    check_count = bash(find .workflow -name "*.toon" | wc -l)
     check_skill = Skill(command: "project-name")
 WAIT_ALL_COMPLETE
 VALIDATE results
@@ -257,9 +257,9 @@ RETURN result
 
 ```javascript
 // ❌ 错误1: Bash中不必要的echo
-bash(echo '{"status":"active"}' > status.json)
-// ✅ 正确: 使用Write工具
-Write({file_path: "status.json", content: '{"status":"active"}'})
+bash(echo 'status: active' > status.toon)
+// ✅ 正确: 使用Write工具（TOON格式）
+Write({file_path: "status.toon", content: 'status: active'})
 
 // ❌ 错误2: Task单行格式
 Task(subagent_type="agent", description="Do task", prompt=`...`)

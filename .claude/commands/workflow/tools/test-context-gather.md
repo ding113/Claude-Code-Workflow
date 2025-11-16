@@ -102,7 +102,7 @@ Complete test-context-package.toon with:
 
 ## Quality Validation
 Before completion verify:
-- [ ] Valid JSON format with all required fields
+- [ ] Valid TOON format with all required fields
 - [ ] Source session context loaded successfully
 - [ ] Test coverage gaps identified
 - [ ] Test framework detected (or marked as 'unknown')

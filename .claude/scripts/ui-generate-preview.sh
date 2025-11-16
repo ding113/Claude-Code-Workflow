@@ -75,18 +75,18 @@ if [[ ! -f "$TEMPLATE_PATH" ]]; then
     exit 1
 fi
 
-# Build pages/targets JSON array
-PAGES_JSON="["
+# Build pages/targets TOON array
+PAGES_TOON="["
 first=true
 for target in $targets; do
     if [[ "$first" == true ]]; then
         first=false
     else
-        PAGES_JSON+=", "
+        PAGES_TOON+=", "
     fi
-    PAGES_JSON+="\"$target\""
+    PAGES_TOON+="\"$target\""
 done
-PAGES_JSON+="]"
+PAGES_TOON+="]"
 
 # Generate metadata
 RUN_ID="run-$(date +%Y%m%d-%H%M%S)"
@@ -100,7 +100,7 @@ cat "$TEMPLATE_PATH" | \
     sed "s|{{timestamp}}|${TIMESTAMP}|g" | \
     sed "s|{{style_variants}}|${S}|g" | \
     sed "s|{{layout_variants}}|${L}|g" | \
-    sed "s|{{pages_json}}|${PAGES_JSON}|g" \
+    sed "s|{{pages_toon}}|${PAGES_TOON}|g" \
     > compare.html
 
 echo -e "${GREEN}   ✓ Generated compare.html from template${NC}"
@@ -286,7 +286,7 @@ Open \`compare.html\` in your browser to see all prototypes in an interactive ma
 - Switch between targets using the dropdown
 - Adjust grid columns for better viewing
 - Direct links to full-page views
-- Selection system with export to JSON
+- Selection system with export to TOON
 - Fullscreen mode for detailed inspection
 
 ### Option 2: Simple Index
@@ -356,7 +356,7 @@ cat >> PREVIEW.md << 'EOF5'
 1. **Comparison**: Use compare.html to see how different styles affect the same layout
 2. **Navigation**: Use index.html for quick access to specific prototypes
 3. **Selection**: Mark favorites in compare.html using star icons
-4. **Export**: Download selection JSON for implementation planning
+4. **Export**: Download selection TOON for implementation planning
 5. **Inspection**: Open browser DevTools to inspect HTML structure and CSS
 6. **Sharing**: All files are standalone - can be shared or deployed directly
 
@@ -364,7 +364,7 @@ cat >> PREVIEW.md << 'EOF5'
 
 1. Review prototypes in compare.html
 2. Select preferred style × layout combinations
-3. Export selections as JSON
+3. Export selections as TOON
 4. Provide feedback for refinement
 5. Use selected designs for implementation
 

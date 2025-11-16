@@ -201,7 +201,7 @@ Comprehensive command guide for Claude DMS3 workflow system covering 75 commands
 
 **Complex Query** (CLI-assisted analysis):
 1. **Detect complexity indicators** (多个命令对比、工作流程分析、最佳实践)
-2. **Design targeted analysis prompt** for gemini/qwen:
+2. **Design targeted analysis prompt** for gemini:
    - Frame user's question precisely
    - Specify required analysis depth
    - Request structured comparison/synthesis
@@ -268,7 +268,7 @@ All command metadata is stored in JSON indexes for fast querying:
 
 - **[Getting Started](guides/getting-started.md)** - 5-minute quickstart for beginners
 - **[Workflow Patterns](guides/workflow-patterns.md)** - Common workflow examples (Plan→Execute, TDD, UI design)
-- **[CLI Tools Guide](guides/cli-tools-guide.md)** - Gemini/Qwen/Codex usage
+- **[CLI Tools Guide](guides/cli-tools-guide.md)** - Gemini/Codex usage
 - **[Troubleshooting](guides/troubleshooting.md)** - Common issues and solutions
 - **[Implementation Details](guides/implementation-details.md)** - Detailed logic for each mode
 - **[Usage Examples](guides/examples.md)** - Example dialogues and edge cases
@@ -289,7 +289,7 @@ Complete backup of all command and agent documentation for deep analysis:
 
 **Absolute Reference Path**: `~/.claude/skills/command-guide/reference/`
 
-**Usage**: Mode 6 queries these files directly for detailed command/agent analysis, or uses CLI tools (gemini/qwen) with absolute paths for complex cross-command analysis.
+**Usage**: Mode 6 queries these files directly for detailed command/agent analysis, or uses CLI tools (gemini) with absolute paths for complex cross-command analysis.
 
 ---
 
@@ -384,6 +384,6 @@ This SKILL documentation is kept in sync with command implementations through a 
 - 5 JSON indexes for fast command lookup
 - 8 comprehensive guides covering all workflow patterns
 - 4 issue templates for standardized problem reporting
-- CLI-assisted complex query analysis with gemini/qwen integration
+- CLI-assisted complex query analysis with gemini integration
 
 **Maintainer**: Claude DMS3 Team

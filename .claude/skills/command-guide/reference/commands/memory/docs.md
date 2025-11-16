@@ -1,7 +1,7 @@
 ---
 name: docs
 description: Plan documentation workflow with dynamic grouping (≤10 docs/task), generates IMPL tasks for parallel module trees, README, ARCHITECTURE, and HTTP API docs
-argument-hint: "[path] [--tool <gemini|qwen|codex>] [--mode <full|partial>] [--cli-execute]"
+argument-hint: "[path] [--tool <gemini|codex>] [--mode <full|partial>] [--cli-execute]"
 ---
 
 # Documentation Workflow (/memory:docs)
@@ -41,7 +41,7 @@ Lightweight planner that analyzes project structure, decomposes documentation wo
 ## Parameters
 
 ```bash
-/memory:docs [path] [--tool <gemini|qwen|codex>] [--mode <full|partial>] [--cli-execute]
+/memory:docs [path] [--tool <gemini|codex>] [--mode <full|partial>] [--cli-execute]
 ```
 
 - **path**: Target directory (default: current directory)
@@ -50,7 +50,7 @@ Lightweight planner that analyzes project structure, decomposes documentation wo
   - `partial`: Module documentation only (API.md + README.md)
 - **--tool**: CLI tool selection (default: gemini)
   - `gemini`: Comprehensive documentation, pattern recognition
-  - `qwen`: Architecture analysis, system design focus
+  - `gemini`: Architecture analysis, system design focus
   - `codex`: Implementation validation, code quality
 - **--cli-execute**: Enable CLI-based documentation generation (optional)
 
@@ -231,7 +231,7 @@ api_id=$((group_count + 3))
 | **CLI** | true | implementation_approach | write | --approval-mode yolo | Execute CLI commands, validate output |
 
 **Command Patterns**:
-- Gemini/Qwen: `cd dir && gemini -p "..."`
+- Gemini: `cd dir && gemini -p "..."`
 - CLI Mode: `cd dir && gemini --approval-mode yolo -p "..."`
 - Codex: `codex -C dir --full-auto exec "..." --skip-git-repo-check -s danger-full-access`
 

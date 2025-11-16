@@ -507,7 +507,7 @@ Summary: [file references, changes, next steps]
 ## Notes
 
 **vs. `/cli:execute`**:
-- `/cli:execute`: Single-shot execution with Gemini/Qwen/Codex
+- `/cli:execute`: Single-shot execution with Gemini/Codex
 - `/cli:codex-execute`: Multi-stage Codex execution with automatic task decomposition and resume mechanism
 
 **Input Flexibility**: Accepts both freeform descriptions and task IDs (auto-detects and loads JSON)

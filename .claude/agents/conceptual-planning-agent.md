@@ -126,15 +126,14 @@ This agent processes **simplified inline [FLOW_CONTROL]** format from brainstorm
 
 ### NOT Handled by This Agent
 
-**JSON format** (used by code-developer, test-fix-agent):
-```json
-"flow_control": {
-  "pre_analysis": [...],
-  "implementation_approach": [...]
-}
+**TOON format** (used by code-developer, test-fix-agent):
+```
+flow_control:
+  pre_analysis[N]: ...
+  implementation_approach[N]: ...
 ```
 
-This complete JSON format is stored in `.task/IMPL-*.toon` files and handled by implementation agents, not conceptual-planning-agent.
+This complete TOON format is stored in `.task/IMPL-*.toon` files and handled by implementation agents, not conceptual-planning-agent.
 
 ### Role-Specific Analysis Dimensions
 

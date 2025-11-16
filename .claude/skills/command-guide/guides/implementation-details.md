@@ -56,7 +56,7 @@ function recognizeIntent(userQuery) {
 
     // Special case: CLI tools usage guide
     if (query.match(/cli.*工具/) || query.match(/如何.*使用.*cli/) ||
-        query.match(/gemini|qwen|codex.*使用/) || query.match(/优雅.*使用/) ||
+        query.match(/gemini|codex.*使用/) || query.match(/优雅.*使用/) ||
         query.includes('cli能力') || query.includes('cli特性') ||
         query.includes('语义调用') || query.includes('命令调用')) {
       return 'CLI_TOOLS_GUIDE';
@@ -248,7 +248,7 @@ async function getRecommendations(currentCommand) {
 - "task:create 详细文档"
 
 **Special Case - CLI Tools Guide**:
-**Keywords**: cli工具, 如何使用cli, gemini/qwen/codex使用, 优雅使用, cli能力, cli特性, 语义调用, 命令调用
+**Keywords**: cli工具, 如何使用cli, gemini/codex使用, 优雅使用, cli能力, cli特性, 语义调用, 命令调用
 
 **Examples**:
 - "如何优雅的使用cli工具"
@@ -552,7 +552,7 @@ This mode uses absolute paths (`~/.claude/skills/command-guide/reference`) to en
 4. Complex Query Path
    ├─ Identify all relevant files
    ├─ Construct CLI analysis prompt
-   ├─ Execute gemini/qwen analysis
+   ├─ Execute gemini analysis
    └─ Return comprehensive results
    ↓
 5. Response Enhancement
@@ -768,7 +768,7 @@ async function executeCLIAnalysis(prompt) {
     const result = await execBash(command, { timeout: 120000 }); // 2 min timeout
     return parseAnalysisResult(result.stdout);
   } catch (error) {
-    // Fallback to qwen if gemini fails
+    // Fallback to gemini if gemini fails
     console.warn('Gemini failed, falling back to qwen');
     const fallbackCmd = `qwen -p "${escapePrompt(prompt)}" -m coder-model --include-directories ${referencePath}`;
     const result = await execBash(fallbackCmd, { timeout: 120000 });

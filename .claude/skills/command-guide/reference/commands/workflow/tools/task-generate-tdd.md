@@ -459,13 +459,13 @@ This section provides quick reference for TDD task JSON structure. For complete 
 # Agent mode (default, autonomous execution)
 /workflow:tools:task-generate-tdd --session WFS-auth
 
-# CLI tool mode (use Gemini/Qwen for generation)
+# CLI tool mode (use Gemini for generation)
 /workflow:tools:task-generate-tdd --session WFS-auth --cli-execute
 ```
 
 **Execution Modes**:
 - **Agent mode** (default): Uses `action-planning-agent` with agent-mode task template
-- **CLI mode** (`--cli-execute`): Uses Gemini/Qwen with cli-mode task template
+- **CLI mode** (`--cli-execute`): Uses Gemini with cli-mode task template
 
 **Output**:
 - TDD task JSON files in `.task/` directory (IMPL-N.json format)

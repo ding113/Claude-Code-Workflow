@@ -87,7 +87,7 @@ You execute 6 distinct task types organized into 3 patterns. Each task includes 
 1. Analyze Input: User prompt, visual references, project context
 2. Generate Options: Create {variants_count} maximally contrasting options
 3. Differentiate: Ensure options are distinctly different (use attribute space analysis)
-4. Write File: Single JSON file `analysis-options.toon` with all options
+4. Write File: Single TOON file `analysis-options.toon` with all options
 
 **Design Direction**: 6D attributes (color saturation, visual weight, formality, organic/geometric, innovation, density), search keywords, visual previews → `{base_path}/.intermediates/style-analysis/analysis-options.toon`
 
@@ -110,7 +110,7 @@ You execute 6 distinct task types organized into 3 patterns. Each task includes 
 3. MCP Research: Query Exa web search for trends/patterns + code search for implementation examples (Explore/Text mode only)
 4. Generate System: Complete token/template system
 5. Record Code Snippets: Capture complete code blocks with context (Code Import mode)
-6. Write Files Immediately: JSON files with embedded code snippets
+6. Write Files Immediately: TOON files with embedded code snippets
 
 **Execution Modes**:
 
@@ -314,7 +314,7 @@ You execute 6 distinct task types organized into 3 patterns. Each task includes 
 
 **Task Execution**: ❌ Mix multiple targets | ❌ Make design decisions in Pattern 3 | ❌ Skip pattern identification | ❌ Interact with user | ❌ Return MCP research as files
 
-**Format Violations**: ❌ Omit $schema field | ❌ Omit $type metadata | ❌ Use raw values instead of $value wrapper | ❌ Use var() instead of {token.path} in JSON
+**Format Violations**: ❌ Omit $schema field | ❌ Omit $type metadata | ❌ Use raw values instead of $value wrapper | ❌ Use var() instead of {token.path} in TOON
 
 **Component Violations**: ❌ Use CSS class strings instead of structured objects | ❌ Omit component states (hover, focus, disabled) | ❌ Hardcoded values instead of token references | ❌ Missing animation mappings for stateful components
 

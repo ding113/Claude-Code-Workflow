@@ -11,7 +11,7 @@ CLI 工具是集成在 Claude DMS3 中的**智能分析和执行助手**。
 **工作流程**：
 1. **用户** → 用自然语言向 Claude Code 描述需求（如"分析认证模块的安全性"）
 2. **Claude Code** → 识别用户意图，决定使用哪种方式：
-   - **CLI 工具语义调用**：生成并执行 `gemini`/`qwen`/`codex` 命令
+   - **CLI 工具语义调用**：生成并执行 `gemini`/`gemini`/`codex` 命令
    - **Slash 命令调用**：执行预定义的工作流命令（如 `/workflow:plan`）
 3. **工具** → 自动完成任务并返回结果
 
@@ -67,14 +67,14 @@ cd src/auth && gemini -p "
 
 **用户输入**：
 ```
-用 qwen 追踪用户登录的完整执行流程，
+用 gemini 追踪用户登录的完整执行流程，
 从 API 入口到数据库查询，
 列出所有调用的函数和依赖关系
 ```
 
 **Claude Code 生成并执行**：
 ```bash
-cd src/auth && qwen -p "
+cd src/auth && gemini -p "
 追踪用户登录的完整执行流程，
 从 API 入口到数据库查询，
 列出所有调用的函数和依赖关系
@@ -104,7 +104,7 @@ codex -C src/auth --full-auto exec "
 2. 验证旧令牌的有效性
 3. 生成新的访问令牌
 4. 确保安全性（防重放攻击）
-" -m gpt-5 --skip-git-repo-check -s danger-full-access
+" -m gpt-5.1-codex --skip-git-repo-check -s danger-full-access
 ```
 
 **工具输出**：Codex 理解需求，自动生成代码并集成到现有系统
@@ -120,7 +120,7 @@ codex -C src/auth --full-auto exec "
 
 **触发方式**：
 - "使用 gemini ..."
-- "用 qwen ..."
+- "用 gemini ..."
 - "让 codex ..."
 - "通过 gemini 工具..."
 
@@ -145,7 +145,7 @@ codex -C src/auth --full-auto exec "
 /workflow:plan --agent "实现用户认证功能"
 ```
 
-**系统执行**：内部调用 gemini/qwen 分析 + action-planning-agent 生成任务
+**系统执行**：内部调用 gemini 分析 + action-planning-agent 生成任务
 
 ---
 
@@ -227,7 +227,7 @@ codex -C src/auth --full-auto exec "
 | 维度 | CLI 工具语义调用 | Slash 命令调用 |
 |------|------------------|----------------|
 | **用户输入** | 纯自然语言描述需求 | `/` 开头的固定命令格式 |
-| **Claude Code 行为** | 生成并执行 `gemini`/`qwen`/`codex` 命令 | 执行预定义工作流（内部调用 CLI 工具） |
+| **Claude Code 行为** | 生成并执行 `gemini`/`gemini`/`codex` 命令 | 执行预定义工作流（内部调用 CLI 工具） |
 | **灵活性** | 完全自定义任务和执行方式 | 固定工作流模板 |
 | **学习曲线** | 用户无需学习（纯自然语言） | 需要知道 Slash 命令名称 |
 | **适用复杂度** | 复杂、探索性、定制化任务 | 标准、重复性、工作流化任务 |
@@ -252,11 +252,11 @@ codex -C src/auth --full-auto exec "
 
 ---
 
-### Qwen - Gemini 的备选
+### Gemini - Gemini 的备选
 - 代码分析、模式识别、架构评审
 - 作为 Gemini 不可用时的备选方案
 
-**触发示例**：`用 qwen 分析数据处理模块`
+**触发示例**：`用 gemini 分析数据处理模块`
 
 ---
 
@@ -291,7 +291,7 @@ codex -C src/auth --full-auto exec "
 
 **方式 1：CLI 工具语义调用**
 - **用户输入**：`让 codex 实现用户认证功能：注册（邮箱+密码+验证）、登录（JWT token）、刷新令牌，技术栈 Node.js + Express`
-- **Claude Code 生成并执行**：`codex -C src/auth --full-auto exec "..." -m gpt-5 --skip-git-repo-check -s danger-full-access`
+- **Claude Code 生成并执行**：`codex -C src/auth --full-auto exec "..." -m gpt-5.1-codex --skip-git-repo-check -s danger-full-access`
 
 **方式 2：Slash 命令**（工作流化）
 - **用户输入**：`/workflow:plan --agent "实现用户认证功能"` → `/workflow:execute`
@@ -306,7 +306,7 @@ codex -C src/auth --full-auto exec "
 - **用户输入**：`使用 gemini 诊断登录超时问题，分析处理流程、性能瓶颈、数据库查询效率`
 - **Claude Code 生成并执行**：`cd src/auth && gemini -p "..." -m gemini-3-pro-preview-11-2025`
 - **用户输入**：`让 codex 根据上述分析修复登录超时，优化查询、添加缓存`
-- **Claude Code 生成并执行**：`codex -C src/auth --full-auto exec "..." -m gpt-5 --skip-git-repo-check -s danger-full-access`
+- **Claude Code 生成并执行**：`codex -C src/auth --full-auto exec "..." -m gpt-5.1-codex --skip-git-repo-check -s danger-full-access`
 
 **方式 2：Slash 命令**
 - **用户输入**：`/cli:mode:bug-diagnosis --tool gemini "诊断登录超时"` → `/cli:execute --tool codex "修复登录超时"`
@@ -368,7 +368,7 @@ codex -C src/auth --full-auto exec "
 
 **为项目重建多级结构的 CLAUDE.md 内存**
 ```
-/memory:docs [path] [--tool gemini|qwen|codex] [--mode full|partial]
+/memory:docs [path] [--tool gemini|codex] [--mode full|partial]
 ```
 
 ---
@@ -392,7 +392,7 @@ codex -C src/auth --full-auto exec "
 
 **触发 CLI 工具语义调用**：
 - "使用 gemini ..."
-- "用 qwen ..."
+- "用 gemini ..."
 - "让 codex ..."
 
 **选择工具**：

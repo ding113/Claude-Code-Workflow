@@ -1,7 +1,7 @@
 ---
 name: docs
 description: Plan documentation workflow with dynamic grouping (≤10 docs/task), generates IMPL tasks for parallel module trees, README, ARCHITECTURE, and HTTP API docs
-argument-hint: "[path] [--tool <gemini|qwen|codex>] [--mode <full|partial>] [--cli-execute]"
+argument-hint: "[path] [--tool <gemini|codex>] [--mode <full|partial>] [--cli-execute]"
 ---
 
 # Documentation Workflow (/memory:docs)
@@ -41,7 +41,7 @@ Lightweight planner that analyzes project structure, decomposes documentation wo
 ## Parameters
 
 ```bash
-/memory:docs [path] [--tool <gemini|qwen|codex>] [--mode <full|partial>] [--cli-execute]
+/memory:docs [path] [--tool <gemini|codex>] [--mode <full|partial>] [--cli-execute]
 ```
 
 - **path**: Target directory (default: current directory)
@@ -50,7 +50,7 @@ Lightweight planner that analyzes project structure, decomposes documentation wo
   - `partial`: Module documentation only (API.md + README.md)
 - **--tool**: CLI tool selection (default: gemini)
   - `gemini`: Comprehensive documentation, pattern recognition
-  - `qwen`: Architecture analysis, system design focus
+  - `gemini`: Architecture analysis, system design focus
   - `codex`: Implementation validation, code quality
 - **--cli-execute**: Enable CLI-based documentation generation (optional)
 
@@ -65,8 +65,8 @@ bash(pwd && basename "$(pwd)" && git rev-parse --show-toplevel 2>/dev/null || pw
 # Create session directories (replace timestamp)
 bash(mkdir -p .workflow/WFS-docs-{timestamp}/.{task,process,summaries} && touch .workflow/.active-WFS-docs-{timestamp})
 
-# Create workflow-session.json (replace values)
-bash(echo '{"session_id":"WFS-docs-{timestamp}","project":"{project} documentation","status":"planning","timestamp":"2024-01-20T14:30:22+08:00","path":".","target_path":"{target_path}","project_root":"{project_root}","project_name":"{project_name}","mode":"full","tool":"gemini","cli_execute":false}' | jq '.' > .workflow/WFS-docs-{timestamp}/workflow-session.json)
+# Create workflow-session.toon (replace values)
+bash(~/.claude/scripts/encode-toon.sh '{"session_id":"WFS-docs-{timestamp}","project":"{project} documentation","status":"planning","timestamp":"2024-01-20T14:30:22+08:00","path":".","target_path":"{target_path}","project_root":"{project_root}","project_name":"{project_name}","mode":"full","tool":"gemini","cli_execute":false}' > .workflow/WFS-docs-{timestamp}/workflow-session.toon)
 ```
 
 ### Phase 2: Analyze Structure
@@ -89,7 +89,7 @@ bash(if [ -d .workflow/docs/\${project_name} ]; then find .workflow/docs/\${proj
 bash(if [ -d .workflow/docs/\${project_name} ]; then find .workflow/docs/\${project_name} -type f -name "*.md" ! -path "*/README.md" ! -path "*/ARCHITECTURE.md" ! -path "*/EXAMPLES.md" ! -path "*/api/*" 2>/dev/null | xargs cat 2>/dev/null; fi)
 ```
 
-**Data Processing**: Parse bash outputs, calculate statistics, use **Write tool** to create `${session_dir}/.process/phase2-analysis.json` with structure:
+**Data Processing**: Parse bash outputs, calculate statistics, use **Write tool** to create `${session_dir}/.process/phase2-analysis.toon` with structure:
 
 ```json
 {
@@ -116,9 +116,9 @@ bash(if [ -d .workflow/docs/\${project_name} ]; then find .workflow/docs/\${proj
 }
 ```
 
-**Then** use **Edit tool** to update `workflow-session.json` adding analysis field.
+**Then** use **Edit tool** to update `workflow-session.toon` adding analysis field.
 
-**Output**: Single `phase2-analysis.json` with all analysis data (no temp files or Python scripts).
+**Output**: Single `phase2-analysis.toon` with all analysis data (no temp files or Python scripts).
 
 **Auto-skipped**: Tests (`**/test/**`, `**/*.test.*`), Build (`**/node_modules/**`, `**/dist/**`), Config (root-level files), Vendor directories.
 
@@ -127,11 +127,11 @@ bash(if [ -d .workflow/docs/\${project_name} ]; then find .workflow/docs/\${proj
 **Commands**:
 
 ```bash
-# Count existing docs from phase2-analysis.json
-bash(cat .workflow/WFS-docs-{timestamp}/.process/phase2-analysis.json | jq '.existing_docs.file_list | length')
+# Count existing docs from phase2-analysis.toon
+bash(~/.claude/scripts/toon-query.sh .workflow/WFS-docs-{timestamp}/.process/phase2-analysis.toon '.existing_docs.file_list | length')
 ```
 
-**Data Processing**: Use count result, then use **Edit tool** to update `workflow-session.json`:
+**Data Processing**: Use count result, then use **Edit tool** to update `workflow-session.toon`:
 - Add `"update_mode": "update"` if count > 0, else `"create"`
 - Add `"existing_docs": <count>`
 
@@ -182,11 +182,11 @@ Large Projects (single dir >10 docs):
 **Commands**:
 
 ```bash
-# 1. Get top-level directories from phase2-analysis.json
-bash(cat .workflow/WFS-docs-{timestamp}/.process/phase2-analysis.json | jq -r '.top_level_dirs[]')
+# 1. Get top-level directories from phase2-analysis.toon
+bash(~/.claude/scripts/toon-query.sh .workflow/WFS-docs-{timestamp}/.process/phase2-analysis.toon '.top_level_dirs[]')
 
-# 2. Get mode from workflow-session.json
-bash(cat .workflow/WFS-docs-{timestamp}/workflow-session.json | jq -r '.mode // "full"')
+# 2. Get mode from workflow-session.toon
+bash(~/.claude/scripts/toon-query.sh .workflow/WFS-docs-{timestamp}/workflow-session.toon '.mode // "full"')
 
 # 3. Check for HTTP API
 bash(grep -r "router\.|@Get\|@Post" src/ 2>/dev/null && echo "API_FOUND" || echo "NO_API")
@@ -201,7 +201,7 @@ bash(grep -r "router\.|@Get\|@Post" src/ 2>/dev/null && echo "API_FOUND" || echo
    - If total ≤10 docs: create group
    - If total >10 docs: split to 1 dir/group or subdivide
    - If single dir >10 docs: split by subdirectories
-3. Use **Edit tool** to update `phase2-analysis.json` adding groups field:
+3. Use **Edit tool** to update `phase2-analysis.toon` adding groups field:
    ```json
    "groups": {
      "count": 3,
@@ -215,7 +215,7 @@ bash(grep -r "router\.|@Get\|@Post" src/ 2>/dev/null && echo "API_FOUND" || echo
 
 **Task ID Calculation**:
 ```bash
-group_count=$(jq '.groups.count' .workflow/WFS-docs-{timestamp}/.process/phase2-analysis.json)
+group_count=$(~/.claude/scripts/toon-query.sh .workflow/WFS-docs-{timestamp}/.process/phase2-analysis.toon '.groups.count')
 readme_id=$((group_count + 1))   # Next ID after groups
 arch_id=$((group_count + 2))
 api_id=$((group_count + 3))
@@ -231,13 +231,13 @@ api_id=$((group_count + 3))
 | **CLI** | true | implementation_approach | write | --approval-mode yolo | Execute CLI commands, validate output |
 
 **Command Patterns**:
-- Gemini/Qwen: `cd dir && gemini -p "..."`
+- Gemini: `cd dir && gemini -p "..."`
 - CLI Mode: `cd dir && gemini --approval-mode yolo -p "..."`
 - Codex: `codex -C dir --full-auto exec "..." --skip-git-repo-check -s danger-full-access`
 
 **Generation Process**:
-1. Read configuration values (tool, cli_execute, mode) from workflow-session.json
-2. Read group assignments from phase2-analysis.json
+1. Read configuration values (tool, cli_execute, mode) from workflow-session.toon
+2. Read group assignments from phase2-analysis.toon
 3. Generate Level 1 tasks (IMPL-001 to IMPL-N, one per group)
 4. Generate Level 2+ tasks if mode=full (README, ARCHITECTURE, HTTP API)
 
@@ -262,14 +262,14 @@ api_id=$((group_count + 3))
   },
   "context": {
     "requirements": [
-      "Process directories from group ${group_number} in phase2-analysis.json",
+      "Process directories from group ${group_number} in phase2-analysis.toon",
       "Generate docs to .workflow/docs/${project_name}/ (mirrored structure)",
       "Code folders: API.md + README.md; Navigation folders: README.md only",
       "Use pre-analyzed data from Phase 2 (no redundant analysis)"
     ],
     "focus_paths": ["${group_dirs_from_json}"],
     "precomputed_data": {
-      "phase2_analysis": "${session_dir}/.process/phase2-analysis.json"
+      "phase2_analysis": "${session_dir}/.process/phase2-analysis.toon"
     }
   },
   "flow_control": {
@@ -278,8 +278,8 @@ api_id=$((group_count + 3))
         "step": "load_precomputed_data",
         "action": "Load Phase 2 analysis and extract group directories",
         "commands": [
-          "bash(cat ${session_dir}/.process/phase2-analysis.json)",
-          "bash(jq '.groups.assignments[] | select(.group_id == \"${group_number}\") | .directories' ${session_dir}/.process/phase2-analysis.json)"
+          "bash(cat ${session_dir}/.process/phase2-analysis.toon)",
+          "bash(~/.claude/scripts/toon-query.sh ${session_dir}/.process/phase2-analysis.toon '.groups.assignments[] | select(.group_id == \"${group_number}\") | .directories')"
         ],
         "output_to": "phase2_context",
         "note": "Single JSON file contains all Phase 2 analysis results"
@@ -324,7 +324,7 @@ api_id=$((group_count + 3))
 {
   "step": 2,
   "title": "Batch generate documentation via CLI",
-  "command": "bash(dirs=$(jq -r '.groups.assignments[] | select(.group_id == \"${group_number}\") | .directories[]' ${session_dir}/.process/phase2-analysis.json); for dir in $dirs; do cd \"$dir\" && gemini --approval-mode yolo -p \"PURPOSE: Generate module docs\\nTASK: Create documentation\\nMODE: write\\nCONTEXT: @**/* [phase2_context]\\nEXPECTED: API.md and README.md\\nRULES: Mirror structure\" || echo \"Failed: $dir\"; cd -; done)",
+  "command": "bash(dirs=$(~/.claude/scripts/toon-query.sh ${session_dir}/.process/phase2-analysis.toon '.groups.assignments[] | select(.group_id == \"${group_number}\") | .directories[]'); for dir in $dirs; do cd \"$dir\" && gemini --approval-mode yolo -p \"PURPOSE: Generate module docs\\nTASK: Create documentation\\nMODE: write\\nCONTEXT: @**/* [phase2_context]\\nEXPECTED: API.md and README.md\\nRULES: Mirror structure\" || echo \"Failed: $dir\"; cd -; done)",
   "depends_on": [1],
   "output": "generated_docs"
 }
@@ -461,20 +461,20 @@ api_id=$((group_count + 3))
 .workflow/
 ├── .active-WFS-docs-{timestamp}
 └── WFS-docs-{timestamp}/
-    ├── workflow-session.json            # Session metadata
+    ├── workflow-session.toon            # Session metadata
     ├── IMPL_PLAN.md
     ├── TODO_LIST.md
     ├── .process/
-    │   └── phase2-analysis.json         # All Phase 2 analysis data (replaces 7+ files)
+    │   └── phase2-analysis.toon         # All Phase 2 analysis data (replaces 7+ files)
     └── .task/
-        ├── IMPL-001.json                # Small: all modules | Large: group 1
-        ├── IMPL-00N.json                # (Large only: groups 2-N)
-        ├── IMPL-{N+1}.json              # README (full mode)
-        ├── IMPL-{N+2}.json              # ARCHITECTURE+EXAMPLES (full mode)
-        └── IMPL-{N+3}.json              # HTTP API (optional)
+        ├── IMPL-001.toon                # Small: all modules | Large: group 1
+        ├── IMPL-00N.toon                # (Large only: groups 2-N)
+        ├── IMPL-{N+1}.toon              # README (full mode)
+        ├── IMPL-{N+2}.toon              # ARCHITECTURE+EXAMPLES (full mode)
+        └── IMPL-{N+3}.toon              # HTTP API (optional)
 ```
 
-**phase2-analysis.json Structure**:
+**phase2-analysis.toon Structure**:
 ```json
 {
   "metadata": {
@@ -510,7 +510,7 @@ api_id=$((group_count + 3))
 }
 ```
 
-**Workflow Session Structure** (workflow-session.json):
+**Workflow Session Structure** (workflow-session.toon):
 ```json
 {
   "session_id": "WFS-docs-{timestamp}",

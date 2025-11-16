@@ -382,7 +382,7 @@ Use `analysis_results.complexity` or task count to determine structure:
 - **Add MCP integration**: Include MCP tool steps in flow_control.pre_analysis when capabilities available
 - **Validate task count**: Maximum 10 tasks hard limit, request re-scope if exceeded
 - **Use session paths**: Construct all paths using provided session_id
-- **Link documents properly**: Use correct linking format (📋 for JSON, ✅ for summaries)
+- **Link documents properly**: Use correct linking format (📋 for TOON, ✅ for summaries)
 - **Run validation checklist**: Verify all quantification requirements before finalizing task TOON files
 
 **NEVER:**

@@ -150,7 +150,7 @@ bash(codex -C {path} --full-auto exec "..." --skip-git-repo-check -s danger-full
 bash(codex --full-auto exec "..." resume --last --skip-git-repo-check -s danger-full-access)
 ```
 
-### Gemini/Qwen Commands (Analysis/Documentation)
+### Gemini Commands (Analysis/Documentation)
 ```bash
 bash(gemini "PURPOSE: {purpose} TASK: {task} MODE: analysis CONTEXT: @{synthesis_spec_path} EXPECTED: {expected} RULES: {rules}")
 
@@ -179,4 +179,4 @@ bash(gemini --approval-mode yolo "PURPOSE: {purpose} TASK: {task} MODE: write CO
 5. **Step Dependencies**: Use `depends_on: [1, 2]` to specify execution order
 6. **Parameter Position**:
    - Codex: `--skip-git-repo-check -s danger-full-access` at END
-   - Gemini/Qwen: `--approval-mode yolo` BEFORE the prompt
+   - Gemini: `--approval-mode yolo` BEFORE the prompt

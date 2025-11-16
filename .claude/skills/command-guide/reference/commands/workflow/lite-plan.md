@@ -1,7 +1,7 @@
 ---
 name: lite-plan
 description: Lightweight interactive planning and execution workflow with in-memory planning, code exploration, and immediate execution after user confirmation
-argument-hint: "[--tool claude|gemini|qwen|codex] [--quick] \"task description\"|file.md"
+argument-hint: "[--tool claude|gemini|codex] [--quick] \"task description\"|file.md"
 allowed-tools: TodoWrite(*), Task(*), Bash(*), AskUserQuestion(*)
 timeout: 180000
 color: cyan
@@ -56,7 +56,7 @@ Intelligent lightweight planning and execution command with dynamic workflow ada
 /workflow:lite-plan [FLAGS] <TASK_DESCRIPTION>
 
 # Flags
---tool <tool-name>         Preset CLI tool (claude|gemini|qwen|codex); if not provided, user selects during confirmation
+--tool <tool-name>         Preset CLI tool (claude|gemini|codex); if not provided, user selects during confirmation
 --quick                    Skip code exploration phase (fast mode, completes within 60 seconds)
 
 # Arguments
@@ -445,7 +445,7 @@ Ask user to select execution method:
 - Options:
   - "Direct - Execute with Agent" (@code-developer)
   - "CLI - Gemini" (gemini-2.5-pro)
-  - "CLI - Codex" (gpt-5)
+  - "CLI - Codex" (gpt-5.1-codex)
   - "CLI - Qwen" (coder-model)
 - Store selection for Phase 5 execution
 
@@ -472,7 +472,7 @@ AskUserQuestion({
     options: [
       { label: "Direct - Agent", description: "Interactive execution" },
       { label: "CLI - Gemini", description: "gemini-2.5-pro" },
-      { label: "CLI - Codex", description: "gpt-5" },
+      { label: "CLI - Codex", description: "gpt-5.1-codex" },
       { label: "CLI - Qwen", description: "coder-model" }
     ]
   }]
@@ -490,7 +490,7 @@ Execution Method Selection:
   ├─ Direct - Execute with Agent → Launch @code-developer
   ├─ CLI - Gemini → Build and execute Gemini command
   ├─ CLI - Codex → Build and execute Codex command
-  └─ CLI - Qwen → Build and execute Qwen command
+  └─ CLI - Gemini → Build and execute Gemini command
 ```
 
 **Progress Tracking**:
@@ -684,7 +684,7 @@ ${planObject.risks ? `\n## Risks to Handle\n${planObject.risks.join('\n')}` : ''
 - Create session for potential resume if needed
 
 Complexity: ${planObject.complexity}
-" -m gpt-5 --skip-git-repo-check -s danger-full-access
+" -m gpt-5.1-codex --skip-git-repo-check -s danger-full-access
 ```
 
 **Subsequent Executions (Resume if needed)**:
@@ -697,7 +697,7 @@ Remaining tasks:
 ${remaining_tasks.map((t, i) => `${i+1}. ${t}`).join('\n')}
 
 Maintain context from previous execution.
-" resume --last -m gpt-5 --skip-git-repo-check -s danger-full-access
+" resume --last -m gpt-5.1-codex --skip-git-repo-check -s danger-full-access
 ```
 
 **Codex Session Strategy**:

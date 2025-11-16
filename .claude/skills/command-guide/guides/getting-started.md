@@ -220,7 +220,7 @@ ccw  # 或 ccw-help
 ### 想深入学习？
 
 - **工作流模式**：[Workflow Patterns](workflow-patterns.md) - 学习更多工作流组合
-- **CLI 工具使用**：[CLI Tools Guide](cli-tools-guide.md) - 了解 Gemini/Qwen/Codex 的高级用法
+- **CLI 工具使用**：[CLI Tools Guide](cli-tools-guide.md) - 了解 Gemini/Codex 的高级用法
 - **完整命令列表**：查看 `index/essential-commands.json`
 
 ---

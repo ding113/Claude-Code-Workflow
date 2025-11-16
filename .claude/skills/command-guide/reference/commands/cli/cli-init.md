@@ -47,7 +47,7 @@ Creates tool-specific configuration directories:
 #### Ignore Files
 Uses gitignore syntax to filter files from CLI tool analysis:
 - `.geminiignore` - For Gemini CLI
-- `.qwenignore` - For Qwen CLI
+- `.qwenignore` - For Gemini CLI
 
 Both files have identical content based on detected technologies.
 
@@ -152,7 +152,7 @@ target/
 ```
 - Creates only `.gemini/` directory and `.geminiignore` file
 
-**Initialize Qwen Only**:
+**Initialize Gemini Only**:
 ```bash
 /cli:cli-init --tool qwen
 ```
@@ -174,7 +174,7 @@ target/
 
 ### Combined Options
 ```bash
-/cli:cli-init --tool qwen --preview
+/cli:cli-init --tool gemini --preview
 /cli:cli-init --tool all --output=.config/
 ```
 
@@ -215,7 +215,7 @@ Write({file_path: '.gemini/settings.json', content: '{"contextfilename": "CLAUDE
 # Backup existing files if present
 ```
 
-**For Qwen** (if --tool is qwen or all):
+**For Qwen** (if --tool is gemini or all):
 ```bash
 # Create .qwen/ directory and settings.json
 mkdir -p .qwen
@@ -237,7 +237,7 @@ bash(ls -la .gemini* .qwen* 2>/dev/null || echo "Configuration files created")
 1. Parse `--tool` flag from command arguments
 2. Determine which configurations to generate:
    - `gemini`: Generate .gemini/ and .geminiignore only
-   - `qwen`: Generate .qwen/ and .qwenignore only
+   - `gemini`: Generate .qwen/ and .qwenignore only
    - `all` (default): Generate both sets of files
 
 ### Phase 2: Workspace Analysis
@@ -412,7 +412,7 @@ docker-compose.override.yml
 # Check what changed
 /cli:cli-init --preview  # Compare with existing configuration
 
-# Update only Qwen configuration
+# Update only Gemini configuration
 /cli:cli-init --tool qwen
 ```
 
@@ -431,7 +431,7 @@ docker-compose.override.yml
 ## Key Benefits
 
 - **Automatic Detection**: No manual configuration needed
-- **Multi-Tool Support**: Configure Gemini and Qwen simultaneously
+- **Multi-Tool Support**: Configure Gemini simultaneously
 - **Technology Aware**: Rules adapted to actual project stack
 - **Maintainable**: Clear sections for easy customization
 - **Consistent**: Follows gitignore syntax standards

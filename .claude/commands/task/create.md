@@ -63,10 +63,10 @@ Status: pending
 3. **Context Inheritance**: Load workflow context
 4. **Implementation Setup**: Initialize implementation field
 5. **Agent Assignment**: Select appropriate agent
-6. **File Creation**: Save JSON to .task/ directory
+6. **File Creation**: Save TOON to .task/ directory
 7. **Session Update**: Update workflow stats
 
-**Task Schema**: See @~/.claude/workflows/task-core.md for complete JSON structure
+**Task Schema**: See @~/.claude/workflows/task-core.md for complete TOON structure
 
 ## Implementation Field Setup
 
@@ -84,7 +84,7 @@ Suggest running: gemini analysis for file locations and dependencies
 
 ## File Management
 
-### JSON Task File
+### Task TOON File
 - **Location**: `.task/IMPL-[N].toon` in active session
 - **Content**: Complete task with implementation field
 - **Updates**: Session stats only
@@ -116,7 +116,7 @@ Based on task type and title keywords:
 1. **Session Check** - Active workflow session required
 2. **Duplicate Check** - Avoid similar task titles
 3. **ID Uniqueness** - Auto-increment task IDs
-4. **Schema Validation** - Ensure proper JSON structure
+4. **Schema Validation** - Ensure proper TOON structure
 
 ## Error Handling
 

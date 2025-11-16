@@ -431,16 +431,16 @@ if [ ! -f "$TEMPLATE_PATH" ]; then
 else
     log_info "📄 Generating compare.html from template..."
 
-    # Convert page array to JSON format
-    PAGES_JSON="["
+    # Convert page array to TOON format
+    PAGES_TOON="["
     for i in "${!PAGE_ARRAY[@]}"; do
         page=$(echo "${PAGE_ARRAY[$i]}" | xargs)
-        PAGES_JSON+="\"$page\""
+        PAGES_TOON+="\"$page\""
         if [ $i -lt $((${#PAGE_ARRAY[@]} - 1)) ]; then
-            PAGES_JSON+=", "
+            PAGES_TOON+=", "
         fi
     done
-    PAGES_JSON+="]"
+    PAGES_TOON+="]"
 
     TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u +%Y-%m-%d)
 
@@ -451,7 +451,7 @@ else
         sed "s|{{timestamp}}|${TIMESTAMP}|g" | \
         sed "s|{{style_variants}}|${STYLE_VARIANTS}|g" | \
         sed "s|{{layout_variants}}|${LAYOUT_VARIANTS}|g" | \
-        sed "s|{{pages_json}}|${PAGES_JSON}|g" \
+        sed "s|{{pages_toon}}|${PAGES_TOON}|g" \
         > compare.html
 
     log_success "Generated: compare.html"
@@ -625,7 +625,7 @@ cat > index.html <<'INDEXEOF'
       <li><strong>Interactive Matrix View:</strong> __STYLE_VARIANTS__×__LAYOUT_VARIANTS__ grid with synchronized scrolling</li>
       <li><strong>Flexible Zoom:</strong> 25%, 50%, 75%, 100% viewport scaling</li>
       <li><strong>Fullscreen Mode:</strong> Detailed view for individual prototypes</li>
-      <li><strong>Selection System:</strong> Mark favorites with export to JSON</li>
+      <li><strong>Selection System:</strong> Mark favorites with export to TOON</li>
       <li><strong>__MODE__ Switcher:</strong> Compare different __MODE__s side-by-side</li>
       <li><strong>Persistent State:</strong> Selections saved in localStorage</li>
     </ul>
@@ -644,7 +644,7 @@ __PAGES_LIST__
       <li>Open <code>compare.html</code> to explore all variants in matrix view</li>
       <li>Use zoom and sync scroll controls to compare details</li>
       <li>Select your preferred style×layout combinations</li>
-      <li>Export selections as JSON for implementation planning</li>
+      <li>Export selections as TOON for implementation planning</li>
       <li>Review implementation notes in <code>*-notes.md</code> files</li>
     </ol>
   </div>
@@ -729,7 +729,7 @@ cat > PREVIEW.md <<PREVIEWEOF
 ### Selection Export
 1. Select preferred prototypes using star icons
 2. Click "Export Selection" button
-3. Downloads JSON file: \`selection-${RUN_ID}.json\`
+3. Downloads TOON file: \`selection-${RUN_ID}.toon\`
 4. Use exported file for implementation planning
 
 ## Design System References
@@ -742,7 +742,7 @@ for s in $(seq 1 "$STYLE_VARIANTS"); do
     cat >> PREVIEW.md <<STYLEEOF
 
 ### Style ${s}
-- **Tokens:** \`../style-extraction/style-${s}/design-tokens.json\`
+- **Tokens:** \`../style-extraction/style-${s}/design-tokens.toon\`
 - **CSS Variables:** \`../style-extraction/style-${s}/tokens.css\`
 - **Style Guide:** \`../style-extraction/style-${s}/style-guide.md\`
 STYLEEOF
@@ -772,7 +772,7 @@ Use browser DevTools responsive mode for testing.
 
 1. **Review:** Open `compare.html` and explore all variants
 2. **Select:** Mark preferred prototypes using star icons
-3. **Export:** Download selection JSON for implementation
+3. **Export:** Download selection TOON for implementation
 4. **Implement:** Use `/workflow:ui-design:update` to integrate selected designs
 5. **Plan:** Run `/workflow:plan` to generate implementation tasks
 

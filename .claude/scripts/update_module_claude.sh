@@ -3,13 +3,12 @@
 # Usage: update_module_claude.sh <strategy> <module_path> [tool] [model]
 #   strategy: single-layer|multi-layer
 #   module_path: Path to the module directory
-#   tool: gemini|qwen|codex (default: gemini)
+#   tool: gemini|codex (default: gemini)
 #   model: Model name (optional, uses tool defaults)
 #
 # Default Models:
 #   gemini: gemini-2.5-flash
-#   qwen: coder-model
-#   codex: gpt5-codex
+#   codex: gpt-5.1-codex
 #
 # Strategies:
 #   single-layer: Upward aggregation
@@ -127,7 +126,7 @@ scan_directory_structure() {
     # Show main file types in current directory
     structure_info+="\nCurrent directory files:\n"
     local code_files=$(eval "find \"$target_path\" -maxdepth 1 -type f \\( -name '*.ts' -o -name '*.tsx' -o -name '*.js' -o -name '*.jsx' -o -name '*.py' -o -name '*.sh' \\) $exclusion_filters 2>/dev/null" | wc -l)
-    local config_files=$(eval "find \"$target_path\" -maxdepth 1 -type f \\( -name '*.json' -o -name '*.yaml' -o -name '*.yml' -o -name '*.toml' \\) $exclusion_filters 2>/dev/null" | wc -l)
+    local config_files=$(eval "find \"$target_path\" -maxdepth 1 -type f \\( -name '*.toon' -o -name '*.yaml' -o -name '*.yml' -o -name '*.toml' \\) $exclusion_filters 2>/dev/null" | wc -l)
     local doc_files=$(eval "find \"$target_path\" -maxdepth 1 -type f -name '*.md' $exclusion_filters 2>/dev/null" | wc -l)
 
     structure_info+="  - Code files: $code_files\n"
@@ -245,7 +244,7 @@ Instructions:
         final_prompt="Directory Structure Analysis:
 $structure_info
 
-Read: @*/CLAUDE.md @*.ts @*.tsx @*.js @*.jsx @*.py @*.sh @*.md @*.json @*.yaml @*.yml
+Read: @*/CLAUDE.md @*.ts @*.tsx @*.js @*.jsx @*.py @*.sh @*.md @*.toon @*.yaml @*.yml
 
 Generate single file: ./CLAUDE.md
 
@@ -272,9 +271,9 @@ Instructions:
             qwen)
                 if [ "$model" = "coder-model" ]; then
                     # coder-model is default, -m is optional
-                    qwen -p "$final_prompt" --yolo 2>&1
+                    gemini -p "$final_prompt" --yolo 2>&1
                 else
-                    qwen -p "$final_prompt" -m "$model" --yolo 2>&1
+                    gemini -p "$final_prompt" -m "$model" --yolo 2>&1
                 fi
                 tool_result=$?
                 ;;

@@ -211,7 +211,7 @@ Complete context-package.toon with:
 
 ## Quality Validation
 Before completion verify:
-- [ ] Valid JSON format with all required fields
+- [ ] Valid TOON format with all required fields
 - [ ] File relevance accuracy >80%
 - [ ] Dependency graph complete (max 2 transitive levels)
 - [ ] Conflict risk level calculated correctly

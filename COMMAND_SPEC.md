@@ -156,7 +156,7 @@ Commands for creating, listing, and managing workflow sessions.
 Direct access to AI tools for analysis and code interaction without a full workflow structure.
 
 ### **/cli:analyze**
-- **Syntax**: `/cli:analyze [--agent] [--tool codex|gemini|qwen] [--enhance] <analysis target>`
+- **Syntax**: `/cli:analyze [--agent] [--tool codex|gemini] [--enhance] <analysis target>`
 - **Responsibilities**: Performs read-only codebase analysis. Can operate in standard mode (direct tool call) or agent mode (`@cli-execution-agent`) for automated context discovery.
 - **Agent Calls**: `@cli-execution-agent` (if `--agent` is used).
 - **Example**:
@@ -165,7 +165,7 @@ Direct access to AI tools for analysis and code interaction without a full workf
   ```
 
 ### **/cli:chat**
-- **Syntax**: `/cli:chat [--agent] [--tool codex|gemini|qwen] [--enhance] <inquiry>`
+- **Syntax**: `/cli:chat [--agent] [--tool codex|gemini] [--enhance] <inquiry>`
 - **Responsibilities**: Provides a direct Q&A interface with AI tools for codebase questions. Read-only.
 - **Agent Calls**: `@cli-execution-agent` (if `--agent` is used).
 - **Example**:
@@ -201,7 +201,7 @@ Direct access to AI tools for analysis and code interaction without a full workf
   ```
 
 ### **/cli:execute**
-- **Syntax**: `/cli:execute [--agent] [--tool codex|gemini|qwen] [--enhance] <description|task-id>`
+- **Syntax**: `/cli:execute [--agent] [--tool codex|gemini] [--enhance] <description|task-id>`
 - **Responsibilities**: Executes implementation tasks with auto-approval (`YOLO` mode). **MODIFIES CODE**.
 - **Agent Calls**: `@cli-execution-agent` (if `--agent` is used).
 - **Example**:
@@ -293,7 +293,7 @@ Commands for managing individual tasks within a workflow session.
 ## 7. Memory and Versioning Commands
 
 ### **/memory:update-full**
-- **Syntax**: `/memory:update-full [--tool gemini|qwen|codex] [--path <directory>]`
+- **Syntax**: `/memory:update-full [--tool gemini|codex] [--path <directory>]`
 - **Responsibilities**: Orchestrates a complete, project-wide update of all `CLAUDE.md` documentation files.
 - **Agent Calls**: None directly, but orchestrates CLI tools (`gemini-wrapper`, etc.).
 - **Example**:
@@ -311,7 +311,7 @@ Commands for managing individual tasks within a workflow session.
   1. Analyzes project structure and documentation
   2. Extracts keywords from task description
   3. Discovers relevant files using ripgrep/find search tools
-  4. Executes Gemini/Qwen CLI for deep analysis
+  4. Executes Gemini CLI for deep analysis
   5. Generates structured TOON content package
 - **Core Philosophy**: Read-only analysis, token-efficient (CLI analysis in agent), structured output
 - **Agent Calls**: `@general-purpose` agent.
@@ -319,11 +319,11 @@ Commands for managing individual tasks within a workflow session.
 - **Example**:
   ```bash
   /memory:load "在当前前端基础上开发用户认证功能"
-  /memory:load --tool qwen "重构支付模块API"
+  /memory:load --tool gemini "重构支付模块API"
   ```
 
 ### **/memory:update-related**
-- **Syntax**: `/memory:update-related [--tool gemini|qwen|codex]`
+- **Syntax**: `/memory:update-related [--tool gemini|codex]`
 - **Responsibilities**: Performs a context-aware update of `CLAUDE.md` files for modules affected by recent git changes.
 - **Agent Calls**: None directly, but orchestrates CLI tools.
 - **Example**:
@@ -395,7 +395,7 @@ Specialized workflow for UI/UX design, from style extraction to prototype genera
 
 ### **/workflow:ui-design:style-extract**
 - **Syntax**: `/workflow:ui-design:style-extract [--images "..."] [--prompt "..."] ...`
-- **Responsibilities**: Extracts design styles from images or text prompts and generates production-ready design systems (`design-tokens.json`, `style-guide.md`).
+- **Responsibilities**: Extracts design styles from images or text prompts and generates production-ready design systems (`design-tokens.toon`, `style-guide.md`).
 - **Agent Calls**: `@ui-design-agent`.
 - **Example**:
   ```bash

@@ -1,7 +1,7 @@
 ---
 name: lite-plan
 description: Lightweight interactive planning and execution workflow with in-memory planning, code exploration, and immediate execution after user confirmation
-argument-hint: "[--tool claude|gemini|qwen|codex] [-e|--explore] \"task description\"|file.md"
+argument-hint: "[--tool claude|gemini|codex] [-e|--explore] \"task description\"|file.md"
 allowed-tools: TodoWrite(*), Task(*), Bash(*), AskUserQuestion(*)
 timeout: 180000
 color: cyan
@@ -29,7 +29,7 @@ Intelligent lightweight planning and execution command with dynamic workflow ada
 - **Three-Dimensional Confirmation**: Multi-select interaction for task approval + execution method selection + code review tool selection
 - **Direct Execution**: Immediate dispatch to selected execution method (agent or CLI)
 - **Live Progress Tracking**: Real-time TodoWrite updates during execution
-- **Optional Code Review**: Post-execution quality analysis with claude/gemini/qwen/codex (user selectable)
+- **Optional Code Review**: Post-execution quality analysis with claude/gemini/codex (user selectable)
 
 
 ## Usage
@@ -39,7 +39,7 @@ Intelligent lightweight planning and execution command with dynamic workflow ada
 /workflow:lite-plan [FLAGS] <TASK_DESCRIPTION>
 
 # Flags
---tool <tool-name>         Preset CLI tool (claude|gemini|qwen|codex); if not provided, user selects during confirmation
+--tool <tool-name>         Preset CLI tool (claude|gemini|codex); if not provided, user selects during confirmation
 -e, --explore              Force code exploration phase (overrides auto-detection logic)
 
 # Arguments
@@ -82,7 +82,7 @@ User Input ("/workflow:lite-plan \"task\"")
     -> AskUserQuestion: Three dimensions (all multi-select)
        1. Confirm task: Allow/Modify/Cancel (can supplement via Other)
        2. Execution method: Agent/Provide Plan/CLI (input CLI tool in Other)
-       3. Code review: No/Claude/Gemini/Qwen/Codex
+       3. Code review: No/Claude/Gemini/Codex
     -> Process selections and proceed to Phase 5
     -> If cancel: Exit
     |
@@ -403,7 +403,7 @@ planObject = {
 - Collect three multi-select inputs:
   1. Task confirmation (Allow/Modify/Cancel + optional supplements)
   2. Execution method (Agent/Provide Plan/CLI + CLI tool specification)
-  3. Code review tool (No/Claude/Gemini/Qwen/Codex)
+  3. Code review tool (No/Claude/Gemini/Codex)
 - Support plan supplements and modifications via "Other" input
 
 **Question 1: Task Confirmation (Multi-select)**
@@ -419,7 +419,7 @@ Display plan to user and ask for confirmation:
 
 Ask user to select execution method:
 - Options: "Agent Execution" / "Provide Plan" / "CLI Execution" (multi-select enabled)
-- User inputs CLI tool choice (gemini/qwen/codex) via "Other" option if "CLI Execution" selected
+- User inputs CLI tool choice (gemini/codex) via "Other" option if "CLI Execution" selected
 - Store selection for Phase 5 execution
 
 **Simplified AskUserQuestion Reference**:
@@ -462,7 +462,7 @@ AskUserQuestion({
       { label: "Claude (default)", description: "Current Claude agent review" },
       { label: "Gemini", description: "gemini-2.5-pro analysis" },
       { label: "Qwen", description: "coder-model analysis" },
-      { label: "Codex", description: "gpt-5 analysis" }
+      { label: "Codex", description: "gpt-5.1-codex analysis" }
     ]
   }]
 })
@@ -478,13 +478,13 @@ Task Confirmation (Multi-select):
 Execution Method Selection (Multi-select):
   ├─ Agent Execution → Launch @code-developer
   ├─ Provide Plan → Return plan JSON, skip execution
-  └─ CLI Execution (+ tool name in Other: gemini/qwen/codex) → Build and execute CLI command
+  └─ CLI Execution (+ tool name in Other: gemini/codex) → Build and execute CLI command
 
 Code Review Selection (after execution):
   ├─ No → Skip review, workflow complete
   ├─ Claude (default) → Current Claude agent review
   ├─ Gemini → Run gemini code analysis
-  ├─ Qwen → Run qwen code analysis
+  ├─ Gemini → Run gemini code analysis
   └─ Codex → Run codex code analysis
 ```
 
@@ -681,7 +681,7 @@ ${planObject.risks ? `\n## Risks to Handle\n${planObject.risks.join('\n')}` : ''
 - Create session for potential resume if needed
 
 Complexity: ${planObject.complexity}
-" -m gpt-5 --skip-git-repo-check -s danger-full-access
+" -m gpt-5.1-codex --skip-git-repo-check -s danger-full-access
 ```
 
 **Subsequent Executions (Resume if needed)**:
@@ -694,7 +694,7 @@ Remaining tasks:
 ${remaining_tasks.map((t, i) => `${i+1}. ${t}`).join('\n')}
 
 Maintain context from previous execution.
-" resume --last -m gpt-5 --skip-git-repo-check -s danger-full-access
+" resume --last -m gpt-5.1-codex --skip-git-repo-check -s danger-full-access
 ```
 
 **Codex Session Strategy**:
@@ -827,7 +827,7 @@ TodoWrite({
 
 **Operations**:
 - If Claude: Current agent performs direct code review analysis
-- If CLI tool (gemini/qwen/codex): Execute CLI with code review analysis prompt
+- If CLI tool (gemini/codex): Execute CLI with code review analysis prompt
 - Review all modified files from execution
 - Generate quality assessment and improvement recommendations
 
@@ -836,7 +836,7 @@ TodoWrite({
 # Claude (default): Direct agent review (no CLI command needed)
 # Uses analysis prompt and TodoWrite tools directly
 
-# CLI Tools (gemini/qwen/codex): Execute analysis command
+# CLI Tools (gemini/codex): Execute analysis command
 {selected_tool} -p "
 PURPOSE: Code review for implemented changes
 TASK: • Analyze code quality • Identify potential issues • Suggest improvements

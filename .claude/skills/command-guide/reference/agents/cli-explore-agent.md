@@ -12,7 +12,7 @@ description: |
 
   Integration points:
   - Gemini CLI: Deep semantic understanding, design intent analysis, non-standard pattern discovery
-  - Qwen CLI: Fallback for Gemini, specialized for code analysis tasks
+  - Gemini CLI: Fallback for Gemini, specialized for code analysis tasks
   - Bash tools: rg, tree, find, get_modules_by_depth.sh for rapid structural scanning
   - MCP Code Index: Optional integration for enhanced file discovery and search
 
@@ -127,7 +127,7 @@ You execute 3 distinct analysis modes, each with different depth and output char
 
 **Phase 2: Gemini Semantic Understanding** (Deep & Comprehensive)
 - Purpose: Discover Phase 1 missed patterns and understand design intent
-- Tools: Gemini CLI (Qwen as fallback)
+- Tools: Gemini CLI ()
 - Execution Mode: `analysis` (read-only)
 - Tasks:
   * Identify non-standard naming conventions (helper_, util_, custom prefixes)
@@ -273,7 +273,7 @@ RULES: $(cat ~/.claude/workflows/cli-templates/prompts/analysis/02-analyze-code-
 - Architectural layer identification
 - Code smell detection
 
-**Fallback**: Qwen CLI with same command structure
+**Fallback**: Gemini CLI with same command structure
 
 ### MCP Code Index (Optional Enhancement)
 
@@ -498,7 +498,7 @@ RULES: $(cat ~/.claude/workflows/cli-templates/prompts/analysis/02-analyze-code-
 
 **Common Issues**:
 1. **Tool Unavailable** (rg, tree, Gemini CLI)
-   - Fallback chain: rg → grep, tree → ls -R, Gemini → Qwen → bash-only
+   - Fallback chain: rg → grep, tree → ls -R, Gemini → bash-only
    - Report degraded capabilities in output
 
 2. **Access Denied** (permissions, missing directories)
@@ -553,7 +553,7 @@ RULES: $(cat ~/.claude/workflows/cli-templates/prompts/analysis/02-analyze-code-
 
 **Dual-Source Strategy** (Deep-Scan Mode): ✅ Execute Bash scan first (Phase 1) | ✅ Run Gemini analysis (Phase 2) | ✅ Synthesize with attribution (Phase 3) | ✅ Cross-validate findings
 
-**Tool Chain**: ✅ Prefer Code Index MCP when available | ✅ Fallback to rg/bash tools | ✅ Use Gemini CLI for semantic analysis (Qwen as fallback) | ✅ Handle tool unavailability gracefully
+**Tool Chain**: ✅ Prefer Code Index MCP when available | ✅ Fallback to rg/bash tools | ✅ Use Gemini CLI for semantic analysis () | ✅ Handle tool unavailability gracefully
 
 **Output Standards**: ✅ Include file:line locations | ✅ Attribute findings to source (bash/gemini) | ✅ Provide actionable recommendations | ✅ Use standardized report formats
 

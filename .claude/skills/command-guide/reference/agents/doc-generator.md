@@ -242,7 +242,7 @@ Before completion, verify:
      - Store result in `output` variable for future steps
   5. **CLI Command Execution** (CLI Mode):
      - When step contains `command` field, execute via Bash tool
-     - Commands use gemini/qwen/codex CLI with MODE=write
+     - Commands use gemini/codex CLI with MODE=write
      - CLI directly generates documentation files
      - Agent validates CLI output and ensures completeness
   6. **Agent Generation** (Agent Mode):

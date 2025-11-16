@@ -1,7 +1,7 @@
 ---
 name: code-analysis
-description: Read-only execution path tracing using Gemini/Qwen/Codex with specialized analysis template for call flow and optimization
-argument-hint: "[--tool codex|gemini|qwen] [--enhance] [--cd path] analysis target"
+description: Read-only execution path tracing using Gemini/Codex with specialized analysis template for call flow and optimization
+argument-hint: "[--tool codex|gemini] [--enhance] [--cd path] analysis target"
 allowed-tools: SlashCommand(*), Bash(*), Task(*)
 ---
 
@@ -20,7 +20,7 @@ Systematic code analysis with execution path tracing template (`~/.claude/workfl
 
 ## Parameters
 
-- `--tool <gemini|qwen|codex>` - Tool selection (default: gemini)
+- `--tool <gemini|codex>` - Tool selection (default: gemini)
 - `--enhance` - Enhance analysis target with `/enhance-prompt` first
 - `--cd "path"` - Target directory for focused analysis
 - `<analysis-target>` (Required) - Code analysis target or question
@@ -36,7 +36,7 @@ Systematic code analysis with execution path tracing template (`~/.claude/workfl
 
 **Qwen** (Fallback):
 ```bash
-/cli:mode:code-analysis --tool qwen "trace auth flow"
+/cli:mode:code-analysis --tool gemini "trace auth flow"
 ```
 
 **Codex** (Alternative):

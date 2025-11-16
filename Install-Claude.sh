@@ -1324,7 +1324,7 @@ function show_summary() {
     echo "1. Review CLAUDE.md - Customize guidelines for your project"
     echo "2. Review .codex/Agent.md - Codex agent execution protocol"
     echo "3. Review .gemini/CLAUDE.md - Gemini agent execution protocol"
-    echo "4. Review .qwen/QWEN.md - Qwen agent execution protocol"
+    echo "4. Review .qwen/QWEN.md - Gemini agent execution protocol"
     echo "5. Configure settings - Edit .claude/settings.local.json as needed"
     echo "6. Install TOON dependencies - Run 'npm install' for workflow utilities"
     echo "7. Test TOON wrapper - Try './scripts/toon-wrapper.sh --help'"

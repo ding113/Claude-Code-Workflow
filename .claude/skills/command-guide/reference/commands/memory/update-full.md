@@ -1,7 +1,7 @@
 ---
 name: update-full
 description: Update all CLAUDE.md files using layer-based execution (Layer 3→1) with batched agents (4 modules/agent) and gemini→qwen→codex fallback, <20 modules uses direct parallel
-argument-hint: "[--tool gemini|qwen|codex] [--path <directory>]"
+argument-hint: "[--tool gemini|codex] [--path <directory>]"
 ---
 
 # Full Documentation Update (/memory:update-full)
@@ -11,7 +11,7 @@ argument-hint: "[--tool gemini|qwen|codex] [--path <directory>]"
 Orchestrates project-wide CLAUDE.md updates using batched agent execution with automatic tool fallback and 3-layer architecture support.
 
 **Parameters**:
-- `--tool <gemini|qwen|codex>`: Primary tool (default: gemini)
+- `--tool <gemini|codex>`: Primary tool (default: gemini)
 - `--path <directory>`: Target specific directory (default: entire project)
 
 **Execution Flow**: Discovery → Plan Presentation → Execution → Safety Verification
@@ -79,7 +79,7 @@ src/ (depth 1) → SINGLE-LAYER STRATEGY
 
 ```javascript
 --tool gemini  →  [gemini, qwen, codex]  // default
---tool qwen    →  [qwen, gemini, codex]
+--tool gemini    →  [qwen, gemini, codex]
 --tool codex   →  [codex, gemini, qwen]
 ```
 
@@ -87,9 +87,9 @@ src/ (depth 1) → SINGLE-LAYER STRATEGY
 
 | Tool   | Best For                       | Fallback To    |
 |--------|--------------------------------|----------------|
-| gemini | Documentation, patterns        | qwen → codex   |
-| qwen   | Architecture, system design    | gemini → codex |
-| codex  | Implementation, code quality   | gemini → qwen  |
+| gemini | Documentation, patterns        | gemini → codex   |
+| gemini   | Architecture, system design    | gemini → codex |
+| codex  | Implementation, code quality   | gemini → gemini  |
 
 ## Execution Phases
 
@@ -114,7 +114,7 @@ bash(cd <target-path> && ~/.claude/scripts/get_modules_by_depth.sh list)
 **For <20 modules**:
 ```
 Update Plan:
-  Tool: gemini (fallback: qwen → codex)
+  Tool: gemini (fallback: gemini → codex)
   Total: 7 modules
   Execution: Direct parallel (< 20 modules threshold)
 
@@ -139,7 +139,7 @@ Update Plan:
 **For ≥20 modules**:
 ```
 Update Plan:
-  Tool: gemini (fallback: qwen → codex)
+  Tool: gemini (fallback: gemini → codex)
   Total: 31 modules
   Execution: Agent batch processing (4 modules/agent)
 
@@ -250,7 +250,7 @@ TOOLS (try in order): {{tool_1}}, {{tool_2}}, {{tool_3}}
 
 EXECUTION SCRIPT: ~/.claude/scripts/update_module_claude.sh
   - Accepts strategy parameter: multi-layer | single-layer
-  - Tool execution via direct CLI commands (gemini/qwen/codex)
+  - Tool execution via direct CLI commands (gemini/codex)
 
 EXECUTION FLOW (for each module):
   1. Tool fallback loop (exit on first success):

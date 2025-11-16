@@ -31,7 +31,7 @@ When the `--cli-execute` flag is used, each step in `implementation_approach` **
 - **Execution**: The specified command executes the step directly (e.g., `bash(codex ...)`)
 - **Context Packages**: Each command receives context via the CONTEXT field in the prompt
 - **Multi-Step Support**: Complex tasks can have multiple sequential codex steps with `resume --last`
-- **Benefit**: Leverages specialized CLI tools (codex/gemini/qwen) for complex reasoning and autonomous execution
+- **Benefit**: Leverages specialized CLI tools (codex/gemini) for complex reasoning and autonomous execution
 - **Use Case**: Large-scale features, complex refactoring, or when user explicitly requests CLI tool usage
 
 ## 3. Core Principles

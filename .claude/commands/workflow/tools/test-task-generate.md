@@ -382,7 +382,7 @@ This section provides quick reference for test task TOON structure. For complete
 
 ### Execution Modes
 - **Agent mode** (default): Uses `action-planning-agent` with agent-mode task template
-- **CLI mode** (`--cli-execute`): Uses Gemini/Qwen/Codex with cli-mode task template for IMPL-001
+- **CLI mode** (`--cli-execute`): Uses Gemini/Codex with cli-mode task template for IMPL-001
 - **Codex fixes** (`--use-codex`): Enables automated fixes in IMPL-002 task
 
 ### Flag Behavior

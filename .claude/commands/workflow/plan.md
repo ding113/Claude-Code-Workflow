@@ -96,7 +96,7 @@ CONTEXT: Existing user database schema, REST API endpoints
 
 **Validation**:
 - Context package path extracted
-- File exists and is valid JSON
+- File exists and is valid TOON format
 
 <!-- TodoWrite: When context-gather invoked, INSERT 3 context-gather tasks, mark first as in_progress -->
 

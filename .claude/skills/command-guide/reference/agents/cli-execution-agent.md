@@ -141,12 +141,12 @@ discuss → multi (gemini + codex parallel)
 **Models**:
 - Gemini: `gemini-2.5-pro` (analysis), `gemini-2.5-flash` (docs)
 - Qwen: `coder-model` (default), `vision-model` (image)
-- Codex: `gpt-5` (default), `gpt5-codex` (large context)
+- Codex: `gpt-5.1-codex` (default), `gpt-5.1-codex` (large context)
 - **Position**: `-m` after prompt, before flags
 
 ### Command Templates
 
-**Gemini/Qwen (Analysis)**:
+**Gemini (Analysis)**:
 ```bash
 cd {dir} && gemini -p "
 PURPOSE: {goal}
@@ -157,23 +157,23 @@ EXPECTED: {output}
 RULES: $(cat ~/.claude/workflows/cli-templates/prompts/analysis/pattern.txt)
 " -m gemini-2.5-pro
 
-# Qwen fallback: Replace 'gemini' with 'qwen'
+# Gemini fallback: Replace 'gemini' with 'qwen'
 ```
 
-**Gemini/Qwen (Write)**:
+**Gemini (Write)**:
 ```bash
 cd {dir} && gemini -p "..." -m gemini-2.5-flash --approval-mode yolo
 ```
 
 **Codex (Auto)**:
 ```bash
-codex -C {dir} --full-auto exec "..." -m gpt-5 --skip-git-repo-check -s danger-full-access
+codex -C {dir} --full-auto exec "..." -m gpt-5.1-codex --skip-git-repo-check -s danger-full-access
 
 # Resume: Add 'resume --last' after prompt
-codex --full-auto exec "..." resume --last -m gpt-5 --skip-git-repo-check -s danger-full-access
+codex --full-auto exec "..." resume --last -m gpt-5.1-codex --skip-git-repo-check -s danger-full-access
 ```
 
-**Cross-Directory** (Gemini/Qwen):
+**Cross-Directory** (Gemini):
 ```bash
 cd src/auth && gemini -p "CONTEXT: @**/* @../shared/**/*" --include-directories ../shared
 ```
@@ -218,7 +218,7 @@ find .workflow/ -name '.active-*' -type f
 **Tool Fallback**:
 ```
 Gemini unavailable → Qwen
-Codex unavailable → Gemini/Qwen write mode
+Codex unavailable → Gemini write mode
 ```
 
 **Gemini 429**: Check results exist → success (ignore error) | no results → retry → Qwen

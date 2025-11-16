@@ -1,6 +1,6 @@
 ---
 name: conflict-resolution
-description: Detect and resolve conflicts between plan and existing codebase using CLI-powered analysis with Gemini/Qwen
+description: Detect and resolve conflicts between plan and existing codebase using CLI-powered analysis with Gemini
 argument-hint: "--session WFS-session-id --context path/to/context-package.json"
 examples:
   - /workflow:tools:conflict-resolution --session WFS-auth --context .workflow/WFS-auth/.process/context-package.json
@@ -22,7 +22,7 @@ Analyzes conflicts between implementation plans and existing codebase, generatin
 |---------------|-------------|
 | **Detect Conflicts** | Analyze plan vs existing code inconsistencies |
 | **Generate Strategies** | Provide 2-4 resolution options per conflict |
-| **CLI Analysis** | Use Gemini/Qwen (Claude fallback) |
+| **CLI Analysis** | Use Gemini (Claude fallback) |
 | **User Decision** | Present options, never auto-apply |
 | **Direct Text Output** | Output questions via text directly, NEVER use bash echo/printf |
 | **Single Output** | `CONFLICT_RESOLUTION.md` with findings |
@@ -92,7 +92,7 @@ Task(subagent_type="cli-execution-agent", prompt=`
   RULES: Focus on breaking changes and migration needs
   "
 
-  Fallback: Qwen (same prompt) → Claude (manual analysis)
+  Fallback: Gemini (same prompt) → Claude (manual analysis)
 
   ### 3. Generate Strategies (2-4 per conflict)
 

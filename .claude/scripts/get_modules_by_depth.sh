@@ -1,7 +1,7 @@
 #!/bin/bash
 # Get modules organized by directory depth (deepest first)
 # Usage: get_modules_by_depth.sh [format]
-#   format: list|grouped|json (default: list)
+#   format: list|grouped|toon (default: list)
 
 # Parse .gitignore patterns and build exclusion filters
 build_exclusion_filters() {
@@ -118,10 +118,11 @@ get_modules_by_depth() {
             done
             ;;
             
-        "json")
-            echo "{"
-            echo "  \"max_depth\": $max_depth,"
-            echo "  \"modules\": {"
+        "toon")
+            # Generate TOON format
+            echo "max_depth: $max_depth"
+            echo ""
+            echo "modules:"
             for depth in $(seq $max_depth -1 0); do
                 local dirs=$(eval "find . -mindepth $depth -maxdepth $depth -type d $exclusion_filters 2>/dev/null" | \
                            while read dir; do
@@ -133,12 +134,10 @@ get_modules_by_depth() {
                            done | tr '\n' ',')
                 if [ -n "$dirs" ]; then
                     dirs=${dirs%,}  # Remove trailing comma
-                    echo "    \"$depth\": [$dirs]"
-                    [ $depth -gt 0 ] && echo ","
+                    echo "  $depth:"
+                    echo "    items[N]: [$dirs]"
                 fi
             done
-            echo "  }"
-            echo "}"
             ;;
             
         "list"|*)

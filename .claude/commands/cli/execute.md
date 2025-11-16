@@ -1,7 +1,7 @@
 ---
 name: execute
-description: Autonomous code implementation with YOLO auto-approval using Gemini/Qwen/Codex, supports task ID or description input with automatic file pattern detection
-argument-hint: "[--tool codex|gemini|qwen] [--enhance] description or task-id"
+description: Autonomous code implementation with YOLO auto-approval using Gemini/Codex, supports task ID or description input with automatic file pattern detection
+argument-hint: "[--tool codex|gemini] [--enhance] description or task-id"
 allowed-tools: SlashCommand(*), Bash(*), Task(*)
 ---
 
@@ -12,7 +12,7 @@ allowed-tools: SlashCommand(*), Bash(*), Task(*)
 Execute implementation tasks with **YOLO permissions** (auto-approves all confirmations). **MODIFIES CODE**.
 
 **Intent**: Autonomous code implementation, modification, and generation
-**Supported Tools**: codex, gemini (default), qwen
+**Supported Tools**: codex, gemini (default)
 **Key Feature**: Automatic context inference and file pattern detection
 
 ## Core Behavior
@@ -68,7 +68,7 @@ Use `resume --last` when current task extends/relates to previous execution. See
 
 ## Parameters
 
-- `--tool <codex|gemini|qwen>` - Select CLI tool (default: auto-select by agent based on complexity)
+- `--tool <codex|gemini>` - Select CLI tool (default: auto-select by agent based on complexity)
 - `--enhance` - Enhance input with `/enhance-prompt` first (Description Mode only)
 - `<description|task-id>` - Natural language description or task identifier
 - `--debug` - Verbose logging
@@ -114,7 +114,7 @@ Task(
 
     3. Tool Selection & Execution:
        - Complexity assessment:
-         * Simple/Medium → Gemini/Qwen (MODE=write, --approval-mode yolo)
+         * Simple/Medium → Gemini (MODE=write, --approval-mode yolo)
          * Complex → Codex (MODE=auto, --skip-git-repo-check -s danger-full-access)
        - Tool preference: ${tool_flag || 'auto-select based on complexity'}
        - Apply appropriate implementation template
@@ -185,9 +185,9 @@ Task(
 # Result: MODIFIED query code, new indexes, updated tests
 ```
 
-**Qwen Code Generation** (modifies code):
+**Gemini Code Generation** (modifies code):
 ```bash
-/cli:execute --tool qwen --enhance "refactor auth module"
+/cli:execute --tool gemini --enhance "refactor auth module"
 # Step 1: Enhanced refactoring plan
 # Step 2: Execute with MODE=write
 # Result: REFACTORED auth code with structural changes

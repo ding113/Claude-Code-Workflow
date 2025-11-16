@@ -1,9 +1,9 @@
 #!/bin/bash
-# Convert design-tokens.json to tokens.css with Google Fonts import and global font rules
-# Usage: cat design-tokens.json | ./convert_tokens_to_css.sh > tokens.css
-# Or: ./convert_tokens_to_css.sh < design-tokens.json > tokens.css
+# Convert design-tokens.toon to tokens.css with Google Fonts import and global font rules
+# Usage: cat design-tokens.toon | ./convert_tokens_to_css.sh > tokens.css
+# Or: ./convert_tokens_to_css.sh < design-tokens.toon > tokens.css
 
-# Read JSON from stdin
+# Read TOON from stdin
 json_input=$(cat)
 
 # Extract metadata for header comment
@@ -13,7 +13,7 @@ style_name=$(echo "$json_input" | jq -r '.meta.name // "Unknown Style"' 2>/dev/n
 cat <<EOF
 /* ========================================
    Design Tokens: ${style_name}
-   Auto-generated from design-tokens.json
+   Auto-generated from design-tokens.toon
    ======================================== */
 
 EOF

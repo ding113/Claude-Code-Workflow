@@ -115,9 +115,9 @@ echo "  Output: $discovery_file"
 - **Supported file types**: CSS, SCSS, JavaScript, TypeScript, HTML
 - **Smart filtering**: Finds theme-related JS/TS files (e.g., tailwind.config.js, theme.js, styled-components)
 - **Exclusions**: Automatically excludes `node_modules/`, `dist/`, `.git/`, and build directories
-- **Output**: Single JSON file `discovered-files.toon` in `.intermediates/import-analysis/`
+- **Output**: Single TOON file `discovered-files.toon` in `.intermediates/import-analysis/`
   - Structure: `{ "css": [...], "js": [...], "html": [...], "counts": {...}, "discovery_time": "..." }`
-  - Generated via bash commands using `find` + JSON formatting
+  - Generated via bash commands using `find` + TOON encoding
 
 <!-- TodoWrite: Update Phase 0 → completed, Phase 1.1-1.3 → in_progress (all 3 agents in parallel) -->
 
@@ -473,7 +473,7 @@ ${base_path}/
 │   └── layout-templates.toon        # Layout patterns with code snippets
 └── .intermediates/
     └── import-analysis/
-        └── discovered-files.toon    # All discovered files (JSON format)
+        └── discovered-files.toon    # All discovered files (TOON format)
 ```
 
 **Files**:
@@ -496,7 +496,7 @@ ${base_path}/
    - **Code snippets**: Complete component/structure code (HTML, CSS utilities, React components)
 
 **Intermediate Files**: `.intermediates/import-analysis/`
-- `discovered-files.toon` - All discovered files in JSON format with counts and metadata
+- `discovered-files.toon` - All discovered files in TOON format with counts and metadata
 
 ---
 

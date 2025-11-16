@@ -208,7 +208,7 @@ Beyond the full workflow mode, CCW provides standalone CLI tools and commands su
 
 ### Direct CLI Tool Invocation
 
-CCW supports direct invocation of external AI tools (Gemini, Qwen, Codex) through a unified CLI interface without creating workflow sessions.
+CCW supports direct invocation of external AI tools (Gemini, Codex) through a unified CLI interface without creating workflow sessions.
 
 #### Code Analysis
 
@@ -219,7 +219,7 @@ Quickly analyze project code structure and architectural patterns:
 /cli:analyze --tool gemini "Analyze authentication module architecture"
 
 # Code quality analysis with Qwen
-/cli:analyze --tool qwen "Review database model design for best practices"
+/cli:analyze --tool gemini "Review database model design for best practices"
 ```
 
 #### Interactive Chat
@@ -243,7 +243,7 @@ Use specific analysis modes for in-depth exploration:
 /cli:mode:plan --tool gemini "Design a scalable microservices architecture"
 
 # Deep code analysis
-/cli:mode:code-analysis --tool qwen "Analyze utility functions in src/utils/"
+/cli:mode:code-analysis --tool gemini "Analyze utility functions in src/utils/"
 
 # Bug analysis mode
 /cli:mode:bug-index --tool gemini "Analyze potential causes of memory leak"
@@ -295,7 +295,7 @@ Suitable for large-scale refactoring, architectural changes, or first-time CCW u
 
 # Use specific tool for indexing
 /memory:update-full --tool gemini   # Comprehensive analysis (recommended)
-/memory:update-full --tool qwen     # Architecture focus
+/memory:update-full --tool gemini     # Architecture focus
 /memory:update-full --tool codex    # Implementation details
 ```
 
@@ -314,13 +314,13 @@ When you need immediate, task-specific context without updating documentation:
 /memory:load "在当前前端基础上开发用户认证功能"
 
 # Use alternative CLI tool for analysis
-/memory:load --tool qwen "重构支付模块API"
+/memory:load --tool gemini "重构支付模块API"
 ```
 
 **How It Works**:
 - Delegates to an AI agent for autonomous project analysis
 - Discovers relevant files and extracts task-specific keywords
-- Uses CLI tools (Gemini/Qwen) for deep analysis to save tokens
+- Uses CLI tools (Gemini) for deep analysis to save tokens
 - Returns a structured "Core Content Pack" loaded into memory
 - Provides context for subsequent agent operations
 

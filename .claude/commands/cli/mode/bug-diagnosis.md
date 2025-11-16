@@ -1,7 +1,7 @@
 ---
 name: bug-diagnosis
-description: Read-only bug root cause analysis using Gemini/Qwen/Codex with systematic diagnosis template for fix suggestions
-argument-hint: "[--tool codex|gemini|qwen] [--enhance] [--cd path] bug description"
+description: Read-only bug root cause analysis using Gemini/Codex with systematic diagnosis template for fix suggestions
+argument-hint: "[--tool codex|gemini] [--enhance] [--cd path] bug description"
 allowed-tools: SlashCommand(*), Bash(*), Task(*)
 ---
 
@@ -18,7 +18,7 @@ Systematic bug diagnosis with root cause analysis template (`~/.claude/workflows
 
 ## Parameters
 
-- `--tool <gemini|qwen|codex>` - Tool selection (default: gemini)
+- `--tool <gemini|codex>` - Tool selection (default: gemini)
 - `--enhance` - Enhance bug description with `/enhance-prompt`
 - `--cd "path"` - Target directory for focused diagnosis
 - `<bug-description>` (Required) - Bug description or error details

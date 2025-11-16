@@ -15,7 +15,7 @@ Execute depth-parallel updates for all modules using `~/.claude/scripts/update_m
 You will receive:
 ```
 - Total modules: [count]
-- Tool: [gemini|qwen|codex]
+- Tool: [gemini|codex]
 - Module list (depth|path|files|types|has_claude format)
 ```
 
@@ -70,7 +70,7 @@ git status --short
 
 Examples:
 - Layer 3 (depth ≥3): `update_module_claude.sh "multi-layer" "./.claude/agents" "gemini" &`
-- Layer 2 (depth 1-2): `update_module_claude.sh "single-layer" "./src/api" "qwen" &`
+- Layer 2 (depth 1-2): `update_module_claude.sh "single-layer" "./src/api" "gemini" &`
 - Layer 1 (depth 0): `update_module_claude.sh "single-layer" "./tests" "codex" &`
 
 ## Execution Rules

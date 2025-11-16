@@ -428,7 +428,7 @@ The `[FLOW_CONTROL]` marker indicates that a task or prompt contains flow contro
 - **Bash commands**: `bash(command)` - Any shell command
 - **Tool calls**: `Read(file)`, `Glob(pattern)`, `Grep(pattern)`
 - **MCP tools**: `mcp__exa__get_code_context_exa()`, `mcp__exa__web_search_exa()`
-- **CLI commands**: `gemini`, `qwen`, `codex --full-auto exec`
+- **CLI commands**: `gemini`, `gemini`, `codex --full-auto exec`
 
 **Example**:
 ```json
@@ -469,7 +469,7 @@ The `[FLOW_CONTROL]` marker indicates that a task or prompt contains flow contro
 
 **Command Field Usage**:
 - **Default approach**: Omit command field - let agent execute autonomously
-- **CLI tools (codex/gemini/qwen)**: Add ONLY when user explicitly requests CLI tool usage
+- **CLI tools (codex/gemini)**: Add ONLY when user explicitly requests CLI tool usage
 - **Simple commands**: Can include bash commands, test commands, validation scripts
 - **Complex workflows**: Use command for multi-step operations or tool coordination
 
@@ -491,7 +491,7 @@ The `[FLOW_CONTROL]` marker indicates that a task or prompt contains flow contro
 // Gemini (user requested)
 "command": "gemini \"analyze [context]\""
 
-// Qwen (fallback for Gemini)
+// Gemini (fallback for Gemini)
 "command": "qwen \"analyze [context]\""
 ```
 
