@@ -4,6 +4,11 @@ description: Generate or update api-designer/analysis.md addressing guidance-spe
 argument-hint: "optional topic - uses existing framework if available"
 allowed-tools: Task(conceptual-planning-agent), TodoWrite(*), Read(*), Write(*)
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 ## 🔌 **API Designer Analysis Generator**
 
@@ -328,10 +333,10 @@ TodoWrite tracking for two-step process:
 
 ## Data Contracts
 ### Request Schemas
-[JSON Schema or OpenAPI definitions]
+[TOON Schema or OpenAPI definitions]
 
 ### Response Schemas
-[JSON Schema or OpenAPI definitions]
+[TOON Schema or OpenAPI definitions]
 
 ### Validation Rules
 - Required fields
@@ -523,7 +528,7 @@ Authorization: Bearer {access_token}
 ## 🔄 **Session Integration**
 
 ### Status Synchronization
-Upon completion, update `workflow-session.json`:
+Upon completion, update `workflow-session.toon`:
 ```json
 {
   "phases": {

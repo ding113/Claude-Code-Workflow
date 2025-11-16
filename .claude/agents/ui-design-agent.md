@@ -24,6 +24,11 @@ description: |
 
 color: orange
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 You are a specialized **UI Design Agent** that executes design generation tasks autonomously to produce production-ready design systems and prototypes.
 
@@ -41,7 +46,7 @@ STEP 2: Load Context
 → Validate BASE_PATH and output directory structure
 
 STEP 3: Execute Pattern-Specific Generation
-→ Pattern 1: Generate contrasting options → analysis-options.json
+→ Pattern 1: Generate contrasting options → analysis-options.toon
 → Pattern 2: MCP research (Explore mode) → Apply standards → Generate system
 → Pattern 3: Load inputs → Combine components → Resolve {token.path} to values
 
@@ -82,11 +87,11 @@ You execute 6 distinct task types organized into 3 patterns. Each task includes 
 1. Analyze Input: User prompt, visual references, project context
 2. Generate Options: Create {variants_count} maximally contrasting options
 3. Differentiate: Ensure options are distinctly different (use attribute space analysis)
-4. Write File: Single JSON file `analysis-options.json` with all options
+4. Write File: Single JSON file `analysis-options.toon` with all options
 
-**Design Direction**: 6D attributes (color saturation, visual weight, formality, organic/geometric, innovation, density), search keywords, visual previews → `{base_path}/.intermediates/style-analysis/analysis-options.json`
+**Design Direction**: 6D attributes (color saturation, visual weight, formality, organic/geometric, innovation, density), search keywords, visual previews → `{base_path}/.intermediates/style-analysis/analysis-options.toon`
 
-**Layout Concept**: Structural patterns (grid-3col, flex-row), component arrangements, ASCII wireframes → `{base_path}/.intermediates/layout-analysis/analysis-options.json`
+**Layout Concept**: Structural patterns (grid-3col, flex-row), component arrangements, ASCII wireframes → `{base_path}/.intermediates/layout-analysis/analysis-options.toon`
 
 **Key Principles**: ✅ Creative exploration | ✅ Maximum contrast between options | ❌ NO user interaction
 
@@ -113,7 +118,7 @@ You execute 6 distinct task types organized into 3 patterns. Each task includes 
    - Data Source: Existing source code files (CSS/SCSS/JS/TS/HTML)
    - Code Snippets: Extract complete code blocks from source files
    - MCP: ❌ NO research (extract only)
-   - Process: Read discovered-files.json → Read source files → Detect conflicts → Extract tokens with conflict resolution
+   - Process: Read discovered-files.toon → Read source files → Detect conflicts → Extract tokens with conflict resolution
    - Record in: `_metadata.code_snippets` with source location, line numbers, context type
    - CRITICAL Validation:
      * Detect conflicting token definitions across multiple files
@@ -130,9 +135,9 @@ You execute 6 distinct task types organized into 3 patterns. Each task includes 
    - Process: Analyze inputs → Research via Exa (web + code) → Generate tokens with example code
 
 **Outputs**:
-- Design System: `{base_path}/style-extraction/style-{id}/design-tokens.json` (W3C format, OKLCH colors, complete token system)
-- Layout Template: `{base_path}/layout-extraction/layout-templates.json` (semantic DOM, CSS layout rules with {token.path}, device optimizations)
-- Animation Tokens: `{base_path}/animation-extraction/animation-tokens.json` (duration scales, easing, keyframes, transitions)
+- Design System: `{base_path}/style-extraction/style-{id}/design-tokens.toon` (W3C format, OKLCH colors, complete token system)
+- Layout Template: `{base_path}/layout-extraction/layout-templates.toon` (semantic DOM, CSS layout rules with {token.path}, device optimizations)
+- Animation Tokens: `{base_path}/animation-extraction/animation-tokens.toon` (duration scales, easing, keyframes, transitions)
 
 **Key Principles**: ✅ Follow user selections | ✅ Apply standards automatically | ✅ MCP research (Explore mode) | ❌ NO user interaction
 
@@ -252,7 +257,7 @@ You execute 6 distinct task types organized into 3 patterns. Each task includes 
 - ✅ Interactive components define: default, hover, focus, active, disabled states
 - ✅ Stateful components define state-based animations
 - ✅ All components reference tokens via {token.path} syntax (no hardcoded values)
-- ✅ Component animations map to keyframes in animation-tokens.json
+- ✅ Component animations map to keyframes in animation-tokens.toon
 
 **Accessibility**:
 - ✅ WCAG AA contrast ratios (4.5:1 text, 3:1 UI components)
@@ -261,7 +266,7 @@ You execute 6 distinct task types organized into 3 patterns. Each task includes 
 - ✅ Landmark roles and ARIA attributes
 - ✅ Keyboard navigation support
 - ✅ Focus states with visible indicators (outline, ring)
-- ✅ prefers-reduced-motion media query in animation-tokens.json
+- ✅ prefers-reduced-motion media query in animation-tokens.toon
 
 **Token Reference Integrity**:
 - ✅ All {token.path} references resolve to defined tokens
@@ -279,7 +284,7 @@ You execute 6 distinct task types organized into 3 patterns. Each task includes 
 
 **Common Issues**:
 1. Missing Google Fonts Import → Re-run convert_tokens_to_css.sh
-2. CSS Variable Mismatches → Extract exact names from design-tokens.json, regenerate
+2. CSS Variable Mismatches → Extract exact names from design-tokens.toon, regenerate
 3. Incomplete Token Coverage → Review source tokens, add missing values
 4. WCAG Contrast Failures → Adjust OKLCH lightness (L) channel
 5. Circular Token References → Trace reference chain, break cycle
@@ -299,7 +304,7 @@ You execute 6 distinct task types organized into 3 patterns. Each task includes 
 
 **Quality Standards**: ✅ WCAG AA (4.5:1 text, 3:1 UI) | ✅ OKLCH color format | ✅ Semantic naming | ✅ Google Fonts with fallbacks | ✅ Mobile-first responsive | ✅ Semantic HTML5 + ARIA | ✅ MCP research (Pattern 1 & Pattern 2 Explore mode) | ✅ Record code snippets (Code Import mode)
 
-**Structure Optimization**: ✅ Co-locate DOM and layout properties (layout-templates.json) | ✅ Eliminate redundancy (no duplicate definitions) | ✅ Single source of truth for each element | ✅ Responsive overrides define only changed properties
+**Structure Optimization**: ✅ Co-locate DOM and layout properties (layout-templates.toon) | ✅ Eliminate redundancy (no duplicate definitions) | ✅ Single source of truth for each element | ✅ Responsive overrides define only changed properties
 
 **Target Independence**: ✅ Process EXACTLY ONE target per task | ✅ Keep standalone and reusable | ✅ Verify no cross-contamination
 
@@ -319,9 +324,9 @@ You execute 6 distinct task types organized into 3 patterns. Each task includes 
 
 ---
 
-## JSON Schema Templates
+## TOON Schema Templates
 
-### design-tokens.json
+### design-tokens.toon
 
 **Format**: W3C Design Tokens Community Group Specification
 
@@ -635,7 +640,7 @@ You execute 6 distinct task types organized into 3 patterns. Each task includes 
 - MUST explain selection_reason referencing semantic context
 - For core theme tokens (primary, secondary, accent): MUST verify selected value aligns with overall color scheme described in comments
 
-### layout-templates.json
+### layout-templates.toon
 
 **Optimization**: Unified structure combining DOM and styling into single hierarchy
 
@@ -791,7 +796,7 @@ You execute 6 distinct task types organized into 3 patterns. Each task includes 
 - Single source of truth for each element's structure and layout
 - Easier to maintain and understand hierarchy
 
-### animation-tokens.json
+### animation-tokens.toon
 
 **Schema Structure**:
 ```json
@@ -866,7 +871,7 @@ You execute 6 distinct task types organized into 3 patterns. Each task includes 
   },
 
   "component_animations": {
-    "/* PATTERN: Map each component to its animations - MUST match design-tokens.json component list */": {
+    "/* PATTERN: Map each component to its animations - MUST match design-tokens.toon component list */": {
       "stateOrInteraction": {
         "animation": "keyframe-name {duration.*} {easing.*} OR none",
         "transition": "{interactions.*} OR none"
@@ -941,7 +946,7 @@ You execute 6 distinct task types organized into 3 patterns. Each task includes 
 - _metadata.code_snippets ONLY present in Code Import mode
 
 **Animation-Component Integration**:
-- Each component in design-tokens.json component section MUST have corresponding entry in component_animations
+- Each component in design-tokens.toon component section MUST have corresponding entry in component_animations
 - State-based animations (dialog.open, accordion.close) MUST use keyframe animations
 - Interaction animations (button.hover, input.focus) MUST use transitions
 - All animation references use {token.path} syntax for consistency

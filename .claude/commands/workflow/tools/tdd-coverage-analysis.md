@@ -4,6 +4,11 @@ description: Analyze test coverage and TDD cycle execution with Red-Green-Refact
 argument-hint: "--session WFS-session-id"
 allowed-tools: Read(*), Write(*), Bash(*)
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 # TDD Coverage Analysis Command
 
@@ -21,7 +26,7 @@ Analyze test coverage and verify Red-Green-Refactor cycle execution for TDD work
 
 ### Phase 1: Extract Test Tasks
 ```bash
-find .workflow/{session_id}/.task/ -name 'TEST-*.json' -exec jq -r '.context.focus_paths[]' {} \;
+find .workflow/{session_id}/.task/ -name 'TEST-*.toon' -exec jq -r '.context.focus_paths[]' {} \;
 ```
 
 **Output**: List of test directories/files from all TEST tasks
@@ -29,20 +34,20 @@ find .workflow/{session_id}/.task/ -name 'TEST-*.json' -exec jq -r '.context.foc
 ### Phase 2: Run Test Suite
 ```bash
 # Node.js/JavaScript
-npm test -- --coverage --json > .workflow/{session_id}/.process/test-results.json
+npm test -- --coverage --json > .workflow/{session_id}/.process/test-results.toon
 
 # Python
-pytest --cov --json-report > .workflow/{session_id}/.process/test-results.json
+pytest --cov --json-report > .workflow/{session_id}/.process/test-results.toon
 
 # Other frameworks (detect from project)
-[test_command] --coverage --json-output .workflow/{session_id}/.process/test-results.json
+[test_command] --coverage --json-output .workflow/{session_id}/.process/test-results.toon
 ```
 
-**Output**: test-results.json with coverage data
+**Output**: test-results.toon with coverage data
 
 ### Phase 3: Parse Coverage Data
 ```bash
-jq '.coverage' .workflow/{session_id}/.process/test-results.json > .workflow/{session_id}/.process/coverage-report.json
+jq '.coverage' .workflow/{session_id}/.process/test-results.toon > .workflow/{session_id}/.process/coverage-report.toon
 ```
 
 **Extract**:
@@ -148,8 +153,8 @@ Create `.workflow/{session_id}/.process/tdd-cycle-report.md`:
 ```
 .workflow/{session-id}/
 └── .process/
-    ├── test-results.json         # Raw test execution results
-    ├── coverage-report.json      # Parsed coverage data
+    ├── test-results.toon         # Raw test execution results
+    ├── coverage-report.toon      # Parsed coverage data
     └── tdd-cycle-report.md       # TDD cycle analysis
 ```
 
@@ -219,10 +224,10 @@ For each feature N:
 ## Coverage Metrics Calculation
 
 ```bash
-# Parse coverage from test-results.json
-line_coverage=$(jq '.coverage.lineCoverage' test-results.json)
-branch_coverage=$(jq '.coverage.branchCoverage' test-results.json)
-function_coverage=$(jq '.coverage.functionCoverage' test-results.json)
+# Parse coverage from test-results.toon
+line_coverage=$(jq '.coverage.lineCoverage' test-results.toon)
+branch_coverage=$(jq '.coverage.branchCoverage' test-results.toon)
+function_coverage=$(jq '.coverage.functionCoverage' test-results.toon)
 
 # Calculate overall score
 overall_score=$(echo "($line_coverage + $branch_coverage + $function_coverage) / 3" | bc)

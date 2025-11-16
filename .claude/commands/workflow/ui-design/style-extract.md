@@ -4,6 +4,11 @@ description: Extract design style from reference images or text prompts using Cl
 argument-hint: "[--design-id <id>] [--session <id>] [--images "<glob>"] [--urls "<list>"] [--prompt "<desc>"] [--variants <count>] [--interactive] [--refine]"
 allowed-tools: TodoWrite(*), Read(*), Write(*), Glob(*), AskUserQuestion(*), mcp__chrome-devtools__navigate_page(*), mcp__chrome-devtools__evaluate_script(*)
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 # Style Extraction Command
 
@@ -14,7 +19,7 @@ Extract design style from reference images or text prompts using Claude's built-
 
 **Strategy**: AI-Driven Design Space Exploration
 - **Claude-Native**: 100% Claude analysis, no external tools
-- **Direct Output**: Complete design systems (design-tokens.json)
+- **Direct Output**: Complete design systems (design-tokens.toon)
 - **Flexible Input**: Images, text prompts, or both (hybrid mode)
 - **Dual Mode**: Exploration (multiple contrasting variants) or Refinement (single design fine-tuning)
 - **Production-Ready**: WCAG AA compliant, OKLCH colors, semantic naming
@@ -90,8 +95,8 @@ IF has_urls:
     url_source = "--urls parameter"
 
 # Priority 2: Check for URL metadata from capture phase
-ELSE IF exists({base_path}/.metadata/capture-urls.json):
-    capture_urls = Read({base_path}/.metadata/capture-urls.json)
+ELSE IF exists({base_path}/.metadata/capture-urls.toon):
+    capture_urls = Read({base_path}/.metadata/capture-urls.toon)
     url_to_extract = capture_urls[0]  # Use first URL
     url_source = "capture metadata"
 ELSE:
@@ -113,7 +118,7 @@ IF url_to_extract AND mcp_chrome_devtools_available:
 
     # Save computed styles to intermediates directory
     bash(mkdir -p {base_path}/.intermediates/style-analysis)
-    Write({base_path}/.intermediates/style-analysis/computed-styles.json, result)
+    Write({base_path}/.intermediates/style-analysis/computed-styles.toon, result)
 
     computed_styles_available = true
     REPORT: "   ✅ Computed styles extracted and saved"
@@ -155,7 +160,7 @@ bash(mkdir -p {base_path}/style-extraction/)
 IF session_has_inputs: SKIP Step 2 file reading
 
 # 2. Check if output already exists
-bash(test -f {base_path}/style-extraction/style-1/design-tokens.json && echo "exists")
+bash(test -f {base_path}/style-extraction/style-1/design-tokens.toon && echo "exists")
 IF exists: SKIP to completion
 ```
 
@@ -172,7 +177,7 @@ bash(test -f {base_path}/.brainstorming/role analysis documents && cat it)
 
 # Load existing design system if refinement mode
 IF refine_mode:
-    existing_tokens = Read({base_path}/style-extraction/style-1/design-tokens.json)
+    existing_tokens = Read({base_path}/style-extraction/style-1/design-tokens.toon)
 ```
 
 ### Step 2: Generate Options (Agent Task 1 - Mode-Specific)
@@ -219,9 +224,9 @@ IF NOT refine_mode:
          - mood_description (1-2 sentences describing the feel)
 
       ## Output
-      Write single JSON file: {base_path}/.intermediates/style-analysis/analysis-options.json
+      Write single JSON file: {base_path}/.intermediates/style-analysis/analysis-options.toon
 
-      Use schema from INTERACTIVE-DATA-SPEC.md (Style Extract: analysis-options.json)
+      Use schema from INTERACTIVE-DATA-SPEC.md (Style Extract: analysis-options.toon)
 
       CRITICAL: Use Write() tool immediately after generating complete JSON
     `
@@ -234,7 +239,7 @@ ELSE:
       SESSION: {session_id} | MODE: refine | BASE_PATH: {base_path}
 
       ## Existing Design System
-      - design-tokens.json: {existing_tokens}
+      - design-tokens.toon: {existing_tokens}
 
       ## Input Guidance
       - User prompt: {prompt_guidance}
@@ -274,7 +279,7 @@ ELSE:
       - impact_scope: Which tokens affected
 
       ## Output
-      Write single JSON file: {base_path}/.intermediates/style-analysis/analysis-options.json
+      Write single JSON file: {base_path}/.intermediates/style-analysis/analysis-options.toon
 
       Use refinement schema:
       {
@@ -289,13 +294,13 @@ ELSE:
 
 ### Step 3: Verify Options File Created
 ```bash
-bash(test -f {base_path}/.intermediates/style-analysis/analysis-options.json && echo "created")
+bash(test -f {base_path}/.intermediates/style-analysis/analysis-options.toon && echo "created")
 
 # Quick validation
-bash(cat {base_path}/.intermediates/style-analysis/analysis-options.json | grep -q "design_directions" && echo "valid")
+bash(cat {base_path}/.intermediates/style-analysis/analysis-options.toon | grep -q "design_directions" && echo "valid")
 ```
 
-**Output**: `analysis-options.json` with design direction options
+**Output**: `analysis-options.toon` with design direction options
 
 ---
 
@@ -323,7 +328,7 @@ REPORT: "🎯 Interactive mode enabled: User selection required"
 ### Step 2: Load and Present Options (Mode-Specific)
 ```bash
 # Read options file
-options = Read({base_path}/.intermediates/style-analysis/analysis-options.json)
+options = Read({base_path}/.intermediates/style-analysis/analysis-options.toon)
 
 # Branch based on mode
 IF NOT refine_mode:
@@ -428,14 +433,14 @@ FOR each selected_option_text IN selected_options:
 
 REPORT: "✅ Selected {selected_indices.length} design direction(s)"
 
-// Update analysis-options.json
-options_file = Read({base_path}/.intermediates/style-analysis/analysis-options.json)
+// Update analysis-options.toon
+options_file = Read({base_path}/.intermediates/style-analysis/analysis-options.toon)
 options_file.user_selection = {
   "selected_at": NOW(),
   "selected_indices": selected_indices,
   "selection_count": selected_indices.length
 }
-Write({base_path}/.intermediates/style-analysis/analysis-options.json, JSON.stringify(options_file, indent=2))
+Write({base_path}/.intermediates/style-analysis/analysis-options.toon, encodeTOON(options_file, { indent: 2 }))
 ```
 
 **Refinement Mode Interaction**:
@@ -473,14 +478,14 @@ FOR each selected_text IN selected_refinements:
 
 REPORT: "✅ Selected {selected_option_ids.length} refinement(s)"
 
-// Update analysis-options.json
-options_file = Read({base_path}/.intermediates/style-analysis/analysis-options.json)
+// Update analysis-options.toon
+options_file = Read({base_path}/.intermediates/style-analysis/analysis-options.toon)
 options_file.user_selection = {
   "selected_at": NOW(),
   "selected_option_ids": selected_option_ids,
   "selection_count": selected_option_ids.length
 }
-Write({base_path}/.intermediates/style-analysis/analysis-options.json, JSON.stringify(options_file, indent=2))
+Write({base_path}/.intermediates/style-analysis/analysis-options.toon, encodeTOON(options_file, { indent: 2 }))
 ```
 
 ### Step 5: Confirmation Message (Mode-Specific)
@@ -509,7 +514,7 @@ You selected {selected_option_ids.length} refinement(s):
 Proceeding to apply refinements and generate updated design system...
 ```
 
-**Output**: Updated `analysis-options.json` with user's selection embedded
+**Output**: Updated `analysis-options.toon` with user's selection embedded
 
 ## Phase 2: Design System Generation (Agent Task 2)
 
@@ -517,8 +522,8 @@ Proceeding to apply refinements and generate updated design system...
 
 ### Step 1: Load User Selection or Default to All
 ```bash
-# Read analysis-options.json which may contain user_selection
-options = Read({base_path}/.intermediates/style-analysis/analysis-options.json)
+# Read analysis-options.toon which may contain user_selection
+options = Read({base_path}/.intermediates/style-analysis/analysis-options.toon)
 
 # Check if user_selection field exists (interactive mode)
 IF options.user_selection AND options.user_selection.selected_indices:
@@ -562,7 +567,7 @@ FOR variant_index IN 1..actual_variants_count:
 
       USER SELECTION:
       - Selected Direction: ${selected_direction.philosophy_name}
-      - Design Attributes: ${JSON.stringify(selected_direction.design_attributes)}
+      - Design Attributes: ${encodeTOON(selected_direction.design_attributes)}
       - Search Keywords: ${selected_direction.search_keywords.join(", ")}
       - Anti-keywords: ${selected_direction.anti_keywords.join(", ")}
       - Rationale: ${selected_direction.rationale}
@@ -573,7 +578,7 @@ FOR variant_index IN 1..actual_variants_count:
       ## Input Analysis
       - Input mode: {input_mode} (image/text/hybrid${has_urls ? "/url" : ""})
       - Visual references: {loaded_images OR prompt_guidance}
-      ${computed_styles_available ? "- Computed styles: Use as ground truth (Read from .intermediates/style-analysis/computed-styles.json)" : ""}
+      ${computed_styles_available ? "- Computed styles: Use as ground truth (Read from .intermediates/style-analysis/computed-styles.toon)" : ""}
 
       ## Generation Rules
       - Develop the selected design direction into a complete design system
@@ -593,7 +598,7 @@ FOR variant_index IN 1..actual_variants_count:
       ## Generate
       Create complete design system in {base_path}/style-extraction/style-{variant_index}/
 
-  1. **design-tokens.json**:
+  1. **design-tokens.toon**:
      - Complete token structure with ALL fields:
        * colors (brand, surface, semantic, text, border) - OKLCH format
        * typography (families, sizes, weights, line heights, letter spacing, combinations)
@@ -617,17 +622,17 @@ FOR variant_index IN 1..actual_variants_count:
     `
 ```
 
-**Output**: {actual_variants_count} parallel agent tasks generate design-tokens.json for each variant
+**Output**: {actual_variants_count} parallel agent tasks generate design-tokens.toon for each variant
 
 ## Phase 3: Verify Output
 
 ### Step 1: Check Files Created
 ```bash
 # Verify all design systems created
-bash(ls {base_path}/style-extraction/style-*/design-tokens.json | wc -l)
+bash(ls {base_path}/style-extraction/style-*/design-tokens.toon | wc -l)
 
 # Validate structure
-bash(cat {base_path}/style-extraction/style-1/design-tokens.json | grep -q "colors" && echo "valid")
+bash(cat {base_path}/style-extraction/style-1/design-tokens.toon | grep -q "colors" && echo "valid")
 ```
 
 ### Step 2: Verify File Sizes
@@ -675,14 +680,14 @@ Design Direction Selection:
 
 Generated Files:
 {base_path}/style-extraction/
-└── style-1/design-tokens.json
+└── style-1/design-tokens.toon
 
 {IF computed_styles_available:
 Intermediate Analysis:
-{base_path}/.intermediates/style-analysis/computed-styles.json (extracted from {primary_url})
+{base_path}/.intermediates/style-analysis/computed-styles.toon (extracted from {primary_url})
 }
 {IF extraction_mode == "explore":
-{base_path}/.intermediates/style-analysis/analysis-options.json (design direction options + user selection)
+{base_path}/.intermediates/style-analysis/analysis-options.toon (design direction options + user selection)
 }
 
 Next: /workflow:ui-design:layout-extract --session {session_id} --targets "..."
@@ -706,13 +711,13 @@ bash(mkdir -p {base_path}/style-extraction/)
 ### Validation Commands
 ```bash
 # Check if already extracted
-bash(test -f {base_path}/style-extraction/style-1/design-tokens.json && echo "exists")
+bash(test -f {base_path}/style-extraction/style-1/design-tokens.toon && echo "exists")
 
 # Count variants
 bash(ls {base_path}/style-extraction/style-* -d | wc -l)
 
 # Validate JSON structure
-bash(cat {base_path}/style-extraction/style-1/design-tokens.json | grep -q "colors" && echo "valid")
+bash(cat {base_path}/style-extraction/style-1/design-tokens.toon | grep -q "colors" && echo "valid")
 ```
 
 ### File Operations
@@ -727,7 +732,7 @@ bash(mkdir -p {base_path}/style-extraction/style-3)
 
 # Verify output
 bash(ls {base_path}/style-extraction/style-1/)
-bash(test -f {base_path}/.intermediates/style-analysis/analysis-options.json && echo "saved")
+bash(test -f {base_path}/.intermediates/style-analysis/analysis-options.toon && echo "saved")
 ```
 
 ## Output Structure
@@ -736,14 +741,14 @@ bash(test -f {base_path}/.intermediates/style-analysis/analysis-options.json && 
 {base_path}/
 ├── .intermediates/                  # Intermediate analysis files
 │   └── style-analysis/
-│       ├── computed-styles.json     # Extracted CSS values from DOM (if URL available)
-│       └── analysis-options.json    # Design direction options + user selection (explore mode only)
+│       ├── computed-styles.toon     # Extracted CSS values from DOM (if URL available)
+│       └── analysis-options.toon    # Design direction options + user selection (explore mode only)
 └── style-extraction/                # Final design system
     └── style-1/
-        └── design-tokens.json       # Production-ready design tokens
+        └── design-tokens.toon       # Production-ready design tokens
 ```
 
-## design-tokens.json Format
+## design-tokens.toon Format
 
 ```json
 {
@@ -812,7 +817,7 @@ ERROR: Claude JSON parsing error
 ## Key Features
 
 - **Auto-Trigger URL Mode** - Automatically extracts computed styles when --urls provided (no manual flag needed)
-- **Direct Design System Generation** - Complete design-tokens.json + style-guide.md in one step
+- **Direct Design System Generation** - Complete design-tokens.toon + style-guide.md in one step
 - **Hybrid Extraction Strategy** - Combines computed CSS values (ground truth) with AI visual analysis
 - **Pixel-Perfect Accuracy** - Chrome DevTools extracts exact border-radius, shadows, spacing values
 - **AI-Driven Design Space Exploration** - 6D attribute space analysis for maximum contrast
@@ -822,5 +827,4 @@ ERROR: Claude JSON parsing error
 - **Graceful Fallback** - Falls back to pure visual inference if Chrome DevTools unavailable
 - **Production-Ready** - OKLCH colors, WCAG AA compliance, semantic naming
 - **Agent-Driven** - Autonomous multi-file generation with ui-design-agent
-
 

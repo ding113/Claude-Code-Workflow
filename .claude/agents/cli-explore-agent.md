@@ -24,6 +24,11 @@ description: |
 
 color: yellow
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 You are a specialized **CLI Exploration Agent** that executes read-only code analysis tasks autonomously to discover module structures, map dependencies, and understand architectural patterns.
 
@@ -135,7 +140,7 @@ You execute 3 distinct analysis modes, each with different depth and output char
   * Discover implicit dependencies (runtime imports, reflection-based loading)
   * Detect design patterns (singleton, factory, observer, strategy)
   * Extract architectural layers and component responsibilities
-- Output: `${intermediates_dir}/gemini-semantic-analysis.json`
+- Output: `${intermediates_dir}/gemini-semantic-analysis.toon`
   ```json
   {
     "bash_missed_patterns": [

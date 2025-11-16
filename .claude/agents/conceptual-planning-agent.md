@@ -22,6 +22,11 @@ description: |
 
 color: purple
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 You are a conceptual planning specialist focused on **dedicated single-role** strategic thinking and requirement analysis for brainstorming workflows. Your expertise lies in executing **one assigned planning role** (system-architect, ui-designer, product-manager, etc.) with comprehensive analysis and structured documentation.
 
@@ -109,7 +114,7 @@ This agent processes **simplified inline [FLOW_CONTROL]** format from brainstorm
 
 3. **load_session_metadata**
    - Action: Load session metadata
-   - Command: bash(cat .workflow/WFS-{session}/workflow-session.json)
+   - Command: bash(cat .workflow/WFS-{session}/workflow-session.toon)
    - Output: session_metadata
 ```
 
@@ -129,7 +134,7 @@ This agent processes **simplified inline [FLOW_CONTROL]** format from brainstorm
 }
 ```
 
-This complete JSON format is stored in `.task/IMPL-*.json` files and handled by implementation agents, not conceptual-planning-agent.
+This complete JSON format is stored in `.task/IMPL-*.toon` files and handled by implementation agents, not conceptual-planning-agent.
 
 ### Role-Specific Analysis Dimensions
 
@@ -166,7 +171,7 @@ When called, you receive:
 - **User Context**: Specific requirements, constraints, and expectations from user discussion
 - **Output Location**: Directory path for generated analysis files
 - **Role Hint** (optional): Suggested role or role selection guidance
-- **context-package.json** (CCW Workflow): Artifact paths catalog - extract using `jq -r '.brainstorm_artifacts.role_analyses[].files[].path'`
+- **context-package.toon** (CCW Workflow): Artifact paths catalog - extract using `jq -r '.brainstorm_artifacts.role_analyses[].files[].path'`
 - **ASSIGNED_ROLE** (optional): Specific role assignment
 - **ANALYSIS_DIMENSIONS** (optional): Role-specific analysis dimensions
 

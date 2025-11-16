@@ -4,6 +4,11 @@ description: Create independent test-fix workflow session from completed impleme
 argument-hint: "[--use-codex] [--cli-execute] source-session-id"
 allowed-tools: SlashCommand(*), TodoWrite(*), Read(*), Bash(*)
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 # Workflow Test Generation Command (/workflow:test-gen)
 
@@ -14,7 +19,7 @@ allowed-tools: SlashCommand(*), TodoWrite(*), Read(*), Bash(*)
 **Core Principles**:
 - **Session Isolation**: Creates new `WFS-test-[source]` session to keep verification separate from implementation
 - **Context-First**: Prioritizes gathering code changes and summaries from source session
-- **Format Reuse**: Creates standard `IMPL-*.json` task, using `meta.type: "test-fix"` for agent assignment
+- **Format Reuse**: Creates standard `IMPL-*.toon` task, using `meta.type: "test-fix"` for agent assignment
 - **Parameter Simplification**: Tools auto-detect test session type via metadata, no manual cross-session parameters needed
 - **Manual First**: Default to manual fixes, use `--use-codex` flag for automated Codex fix application
 
@@ -62,7 +67,7 @@ allowed-tools: SlashCommand(*), TodoWrite(*), Read(*), Bash(*)
 
 **Expected Behavior**:
 - Creates new session with pattern `WFS-test-[source-slug]` (e.g., `WFS-test-user-auth`)
-- Writes metadata to `workflow-session.json`:
+- Writes metadata to `workflow-session.toon`:
   - `workflow_type: "test_session"`
   - `source_session_id: "[sourceSessionId]"`
 - Returns new session ID for subsequent phases
@@ -91,11 +96,11 @@ allowed-tools: SlashCommand(*), TodoWrite(*), Read(*), Bash(*)
 - Analyze test coverage using MCP tools (find existing tests)
 - Identify files requiring tests (coverage gaps)
 - Detect test framework and conventions
-- Generate `test-context-package.json`
+- Generate `test-context-package.toon`
 
 **Parse Output**:
 - Extract: test context package path (store as `testContextPath`)
-- Pattern: `.workflow/[testSessionId]/.process/test-context-package.json`
+- Pattern: `.workflow/[testSessionId]/.process/test-context-package.toon`
 
 **Validation**:
 - Test context package created
@@ -215,19 +220,19 @@ allowed-tools: SlashCommand(*), TodoWrite(*), Read(*), Bash(*)
 **Expected Behavior**:
 - Parse TEST_ANALYSIS_RESULTS.md from Phase 3
 - Extract test requirements and generation strategy
-- Generate **TWO task JSON files**:
-  - **IMPL-001.json**: Test Generation task (calls @code-developer)
-  - **IMPL-002.json**: Test Execution and Fix Cycle task (calls @test-fix-agent)
+- Generate **TWO task TOON files**:
+  - **IMPL-001.toon**: Test Generation task (calls @code-developer)
+  - **IMPL-002.toon**: Test Execution and Fix Cycle task (calls @test-fix-agent)
 - Generate IMPL_PLAN.md with test generation and execution strategy
 - Generate TODO_LIST.md with both tasks
 
 **Parse Output**:
-- Verify `.workflow/[testSessionId]/.task/IMPL-001.json` exists (test generation)
-- Verify `.workflow/[testSessionId]/.task/IMPL-002.json` exists (test execution & fix)
+- Verify `.workflow/[testSessionId]/.task/IMPL-001.toon` exists (test generation)
+- Verify `.workflow/[testSessionId]/.task/IMPL-002.toon` exists (test execution & fix)
 - Verify `.workflow/[testSessionId]/IMPL_PLAN.md` created
 - Verify `.workflow/[testSessionId]/TODO_LIST.md` created
 
-**Validation - IMPL-001.json (Test Generation)**:
+**Validation - IMPL-001.toon (Test Generation)**:
 - Task ID: `IMPL-001`
 - `meta.type: "test-gen"`
 - `meta.agent: "@code-developer"`
@@ -236,7 +241,7 @@ allowed-tools: SlashCommand(*), TodoWrite(*), Read(*), Bash(*)
 - `flow_control.implementation_approach`: Test generation steps
 - `flow_control.target_files`: Test files to create from analysis section 5
 
-**Validation - IMPL-002.json (Test Execution & Fix)**:
+**Validation - IMPL-002.toon (Test Execution & Fix)**:
 - Task ID: `IMPL-002`
 - `meta.type: "test-fix"`
 - `meta.agent: "@test-fix-agent"`
@@ -261,7 +266,7 @@ allowed-tools: SlashCommand(*), TodoWrite(*), Read(*), Bash(*)
   {"content": "Gather test coverage context", "status": "completed", "activeForm": "Gathering test coverage context"},
   {"content": "Analyze test requirements with Gemini", "status": "completed", "activeForm": "Analyzing test requirements"},
   {"content": "Phase 4.1: Parse TEST_ANALYSIS_RESULTS.md (test-task-generate)", "status": "in_progress", "activeForm": "Parsing test analysis"},
-  {"content": "Phase 4.2: Generate IMPL-001.json and IMPL-002.json (test-task-generate)", "status": "pending", "activeForm": "Generating task JSONs"},
+  {"content": "Phase 4.2: Generate IMPL-001.toon and IMPL-002.toon (test-task-generate)", "status": "pending", "activeForm": "Generating task TOON files"},
   {"content": "Phase 4.3: Generate IMPL_PLAN.md and TODO_LIST.md (test-task-generate)", "status": "pending", "activeForm": "Generating plan documents"},
   {"content": "Return workflow summary", "status": "pending", "activeForm": "Returning workflow summary"}
 ]
@@ -377,7 +382,7 @@ Test-Gen Workflow Orchestrator
 │     ├─ Phase 2.1: Load source session summaries
 │     ├─ Phase 2.2: Analyze test coverage with MCP tools
 │     └─ Phase 2.3: Identify coverage gaps and framework
-│     └─ Returns: test-context-package.json               ← COLLAPSED
+│     └─ Returns: test-context-package.toon               ← COLLAPSED
 │
 ├─ Phase 3: Test Generation Analysis                      ← ATTACHED (3 tasks)
 │  └─ /workflow:tools:test-concept-enhanced
@@ -389,23 +394,23 @@ Test-Gen Workflow Orchestrator
 ├─ Phase 4: Generate Test Tasks                           ← ATTACHED (3 tasks)
 │  └─ /workflow:tools:test-task-generate
 │     ├─ Phase 4.1: Parse TEST_ANALYSIS_RESULTS.md
-│     ├─ Phase 4.2: Generate IMPL-001.json and IMPL-002.json
+│     ├─ Phase 4.2: Generate IMPL-001.toon and IMPL-002.toon
 │     └─ Phase 4.3: Generate IMPL_PLAN.md and TODO_LIST.md
-│     └─ Returns: Task JSONs and plans                    ← COLLAPSED
+│     └─ Returns: Task TOON files and plans                    ← COLLAPSED
 │
 └─ Phase 5: Return Summary
    └─ Command ends, control returns to user
 
 Artifacts Created:
 ├── .workflow/WFS-test-[session]/
-│   ├── workflow-session.json
+│   ├── workflow-session.toon
 │   ├── IMPL_PLAN.md
 │   ├── TODO_LIST.md
 │   ├── .task/
-│   │   ├── IMPL-001.json (test generation task)
-│   │   └── IMPL-002.json (test execution task)
+│   │   ├── IMPL-001.toon (test generation task)
+│   │   └── IMPL-002.toon (test execution task)
 │   └── .process/
-│       ├── test-context-package.json
+│       ├── test-context-package.toon
 │       └── TEST_ANALYSIS_RESULTS.md
 
 Key Points:
@@ -420,17 +425,17 @@ Test session includes `workflow_type: "test_session"` and `source_session_id` fo
 ## Task Output
 
 Generates two task definition files:
-- **IMPL-001.json**: Test generation task specification
+- **IMPL-001.toon**: Test generation task specification
   - Agent: @code-developer
   - Input: TEST_ANALYSIS_RESULTS.md
   - Output: Test files based on analysis
-- **IMPL-002.json**: Test execution and fix cycle specification
+- **IMPL-002.toon**: Test execution and fix cycle specification
   - Agent: @test-fix-agent
   - Dependency: IMPL-001 must complete first
   - Max iterations: 5
   - Fix mode: Manual or Codex (based on --use-codex flag)
 
-See `/workflow:tools:test-task-generate` for complete task JSON schemas.
+See `/workflow:tools:test-task-generate` for complete task TOON schemas.
 
 ## Error Handling
 
@@ -445,24 +450,24 @@ See `/workflow:tools:test-task-generate` for complete task JSON schemas.
 ## Output Files
 
 Created in `.workflow/WFS-test-[session]/`:
-- `workflow-session.json` - Session metadata
-- `.process/test-context-package.json` - Coverage analysis
+- `workflow-session.toon` - Session metadata
+- `.process/test-context-package.toon` - Coverage analysis
 - `.process/TEST_ANALYSIS_RESULTS.md` - Test requirements
-- `.task/IMPL-001.json` - Test generation task
-- `.task/IMPL-002.json` - Test execution & fix task
+- `.task/IMPL-001.toon` - Test generation task
+- `.task/IMPL-002.toon` - Test execution & fix task
 - `IMPL_PLAN.md` - Test plan
 - `TODO_LIST.md` - Task checklist
 
 ## Task Specifications
 
-**IMPL-001.json Structure**:
+**IMPL-001.toon Structure**:
 - `meta.type: "test-gen"`
 - `meta.agent: "@code-developer"`
 - `context.requirements`: Generate tests based on TEST_ANALYSIS_RESULTS.md
 - `flow_control.target_files`: Test files to create
 - `flow_control.implementation_approach`: Test generation strategy
 
-**IMPL-002.json Structure**:
+**IMPL-002.toon Structure**:
 - `meta.type: "test-fix"`
 - `meta.agent: "@test-fix-agent"`
 - `meta.use_codex`: true/false (based on --use-codex flag)
@@ -473,7 +478,7 @@ Created in `.workflow/WFS-test-[session]/`:
   - Max iterations: 5
 - `flow_control.implementation_approach.modification_points`: 3-phase flow
 
-See `/workflow:tools:test-task-generate` for complete JSON schemas.
+See `/workflow:tools:test-task-generate` for complete TOON schemas.
 
 ## Best Practices
 
@@ -491,7 +496,7 @@ See `/workflow:tools:test-task-generate` for complete JSON schemas.
 - `/workflow:session:start` - Phase 1: Create independent test workflow session
 - `/workflow:tools:test-context-gather` - Phase 2: Analyze test coverage and gather source session context
 - `/workflow:tools:test-concept-enhanced` - Phase 3: Generate test requirements and strategy using Gemini
-- `/workflow:tools:test-task-generate` - Phase 4: Generate test task JSONs using action-planning-agent (autonomous, default)
+- `/workflow:tools:test-task-generate` - Phase 4: Generate test task TOON files using action-planning-agent (autonomous, default)
 - `/workflow:tools:test-task-generate --use-codex` - Phase 4: With automated Codex fixes for IMPL-002 (when `--use-codex` flag used)
 - `/workflow:tools:test-task-generate --cli-execute` - Phase 4: With CLI execution mode for IMPL-001 test generation (when `--cli-execute` flag used)
 

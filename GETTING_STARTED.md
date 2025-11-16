@@ -3,7 +3,7 @@
 
 Welcome to Claude Code Workflow (CCW) v5.0! This guide will help you get up and running in 5 minutes and experience AI-driven automated software development with our streamlined, dependency-free workflow system.
 
-**Project Repository**: [catlog22/Claude-Code-Workflow](https://github.com/catlog22/Claude-Code-Workflow)
+**Project Repository**: [ding113/Claude-Code-Workflow](https://github.com/ding113/Claude-Code-Workflow)
 
 > **🎉 What's New in v5.0**: Less is more! We've removed external MCP dependencies and simplified workflows. CCW now uses standard tools (ripgrep/find) for better stability and performance. The brainstorming workflow focuses on role analysis for clearer planning.
 
@@ -30,7 +30,7 @@ Now, tell CCW what you want to do. CCW will analyze your request and automatical
 This command kicks off a fully automated planning process, which includes:
 1.  **Context Gathering**: Analyzing your project environment.
 2.  **Agent Analysis**: AI agents think about the best implementation path.
-3.  **Task Generation**: Creating specific task files (in `.json` format).
+3.  **Task Generation**: Creating specific task files in TOON format (e.g., `.toon` files).
 
 ### Step 3: Execute the Plan
 
@@ -62,7 +62,20 @@ Understanding these concepts will help you use CCW more effectively:
     > Like an independent sandbox or project space, used to isolate the context, files, and history of different tasks. All related files are stored in the `.workflow/WFS-<session-name>/` directory.
 
 -   **Task**
-    > An atomic unit of work, such as "create API route" or "write test case." Each task is a `.json` file that defines the goal, context, and execution steps in detail.
+    > An atomic unit of work, such as "create API route" or "write test case." Each task is stored in TOON format (e.g., `.toon`) to capture the goal, context, and execution steps in a compact, human-friendly layout.
+
+    TOON task example:
+    ```toon
+    id: IMPL-001
+    title: Create Hello World endpoint
+    agent: @code-developer
+    priority: medium
+    status: pending
+    steps[3]{name,status}:
+      Analyze project context,pending
+      Implement GET / handler,pending
+      Add request tests,pending
+    ```
 
 -   **Agent**
     > An AI assistant specialized in a specific domain. For example:

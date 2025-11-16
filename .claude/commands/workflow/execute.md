@@ -3,6 +3,11 @@ name: execute
 description: Coordinate agent execution for workflow tasks with automatic session discovery, parallel task processing, and status tracking
 argument-hint: "[--resume-session=\"session-id\"]"
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 # Workflow Execute Command
 
@@ -13,11 +18,11 @@ Orchestrates autonomous workflow execution through systematic task discovery, ag
 
 ## Performance Optimization Strategy
 
-**Lazy Loading**: Task JSONs read **on-demand** during execution, not upfront. TODO_LIST.md + IMPL_PLAN.md provide metadata for planning.
+**Lazy Loading**: Task TOON files read **on-demand** during execution, not upfront. TODO_LIST.md + IMPL_PLAN.md provide metadata for planning.
 
 | Metric | Before | After | Improvement |
 |--------|--------|-------|-------------|
-| **Initial Load** | All task JSONs (~2,300 lines) | TODO_LIST.md only (~650 lines) | **72% reduction** |
+| **Initial Load** | All task TOON files (~2,300 lines) | TODO_LIST.md only (~650 lines) | **72% reduction** |
 | **Startup Time** | Seconds | Milliseconds | **~90% faster** |
 | **Memory** | All tasks | 1-2 tasks | **90% less** |
 | **Scalability** | 10-20 tasks | 100+ tasks | **5-10x** |
@@ -25,7 +30,7 @@ Orchestrates autonomous workflow execution through systematic task discovery, ag
 **Loading Strategy**:
 - **TODO_LIST.md**: Read in Phase 2 (task metadata, status, dependencies)
 - **IMPL_PLAN.md**: Read existence in Phase 2, parse execution strategy when needed
-- **Task JSONs**: Complete lazy loading (read only during execution)
+- **Task TOON files**: Complete lazy loading (read only during execution)
 
 ## Core Rules
 **Complete entire workflow autonomously without user interruption, using TodoWrite for comprehensive progress tracking.**
@@ -37,7 +42,7 @@ Orchestrates autonomous workflow execution through systematic task discovery, ag
 - **Execution Strategy Parsing**: Extract execution model from IMPL_PLAN.md
 - **TodoWrite Progress Tracking**: Maintain real-time execution status throughout entire workflow
 - **Agent Orchestration**: Coordinate specialized agents with complete context
-- **Status Synchronization**: Update task JSON files and workflow state
+- **Status Synchronization**: Update task TOON files and workflow state
 - **Autonomous Completion**: Continue execution until all tasks complete or reach blocking state
 - **Session Auto-Complete**: Call `/workflow:session:complete` when all workflow tasks finished
 
@@ -45,7 +50,7 @@ Orchestrates autonomous workflow execution through systematic task discovery, ag
 - **IMPL_PLAN-driven**: Follow execution strategy from IMPL_PLAN.md Section 4
 - **Discovery-first**: Auto-discover existing plans and tasks
 - **Status-aware**: Execute only ready tasks with resolved dependencies
-- **Context-rich**: Provide complete task JSON and accumulated context to agents
+- **Context-rich**: Provide complete task TOON and accumulated context to agents
 - **Progress tracking**: Continuous TodoWrite updates throughout entire workflow execution
 - **Autonomous completion**: Execute all tasks without user interruption until workflow complete
 
@@ -57,15 +62,15 @@ Orchestrates autonomous workflow execution through systematic task discovery, ag
 **Process**:
 1. **Check Active Sessions**: Find `.workflow/.active-*` markers
 2. **Select Session**: If multiple found, prompt user selection
-3. **Load Session Metadata**: Read `workflow-session.json` ONLY (minimal context)
-4. **DO NOT read task JSONs yet** - defer until execution phase
+3. **Load Session Metadata**: Read `workflow-session.toon` ONLY (minimal context)
+4. **DO NOT read task TOON files yet** - defer until execution phase
 
 **Resume Mode**: This phase is completely skipped when `--resume-session="session-id"` flag is provided.
 
 ### Phase 2: Planning Document Analysis
 **Applies to**: Normal mode only (skipped in resume mode)
 
-**Optimized to avoid reading all task JSONs upfront**
+**Optimized to avoid reading all task TOON files upfront**
 
 **Process**:
 1. **Read IMPL_PLAN.md**: Check existence, understand overall strategy
@@ -73,7 +78,7 @@ Orchestrates autonomous workflow execution through systematic task discovery, ag
 3. **Extract Task Metadata**: Parse task IDs, titles, and dependency relationships from TODO_LIST.md
 4. **Build Execution Queue**: Determine ready tasks based on TODO_LIST.md status and dependencies
 
-**Key Optimization**: Use IMPL_PLAN.md (existence check only) and TODO_LIST.md as primary sources instead of reading all task JSONs
+**Key Optimization**: Use IMPL_PLAN.md (existence check only) and TODO_LIST.md as primary sources instead of reading all task TOON files
 
 **Resume Mode**: This phase is skipped when `--resume-session` flag is provided (session already known).
 
@@ -81,7 +86,7 @@ Orchestrates autonomous workflow execution through systematic task discovery, ag
 **Applies to**: Both normal and resume modes (resume mode entry point)
 
 **Process**:
-1. **Create TodoWrite List**: Generate task list from TODO_LIST.md (not from task JSONs)
+1. **Create TodoWrite List**: Generate task list from TODO_LIST.md (not from task TOON files)
    - Parse TODO_LIST.md to extract all tasks with current statuses
    - Identify first pending task with met dependencies
    - Generate comprehensive TodoWrite covering entire workflow
@@ -112,13 +117,13 @@ If IMPL_PLAN.md lacks execution strategy, use intelligent fallback (analyze task
 
 **Step 4B: Execute Tasks with Lazy Loading**
 
-**Key Optimization**: Read task JSON **only when needed** for execution
+**Key Optimization**: Read task TOON **only when needed** for execution
 
 **Execution Loop Pattern**:
 ```
 while (TODO_LIST.md has pending tasks) {
   next_task_id = getTodoWriteInProgressTask()
-  task_json = Read(.workflow/{session}/.task/{next_task_id}.json)  // Lazy load
+  task_json = Read(.workflow/{session}/.task/{next_task_id}.toon)  // Lazy load
   executeTaskWithAgent(task_json)
   updateTodoListMarkCompleted(next_task_id)
   advanceTodoWriteToNextTask()
@@ -127,7 +132,7 @@ while (TODO_LIST.md has pending tasks) {
 
 **Execution Process per Task**:
 1. **Identify Next Task**: From TodoWrite, get the next `in_progress` task ID
-2. **Load Task JSON on Demand**: Read `.task/{task-id}.json` for current task ONLY
+2. **Load Task TOON on Demand**: Read `.task/{task-id}.toon` for current task ONLY
 3. **Validate Task Structure**: Ensure all 5 required fields exist (id, title, status, meta, context, flow_control)
 4. **Launch Agent**: Invoke specialized agent with complete context including flow control steps
 5. **Monitor Progress**: Track agent execution and handle errors without user interruption
@@ -137,7 +142,7 @@ while (TODO_LIST.md has pending tasks) {
 
 **Benefits**:
 - Reduces initial context loading by ~90%
-- Only reads task JSON when actually executing
+- Only reads task TOON when actually executing
 - Scales better for workflows with many tasks
 - Faster startup time for workflow execution
 
@@ -168,7 +173,7 @@ while (TODO_LIST.md has pending tasks) {
 
 **Intelligent Fallback (When IMPL_PLAN lacks execution details)**:
 1. **Analyze task structure**:
-   - Check `meta.execution_group` in task JSONs
+   - Check `meta.execution_group` in task TOON files
    - Analyze `depends_on` relationships
    - Understand task complexity and risk
 2. **Apply smart defaults**:
@@ -286,7 +291,7 @@ TodoWrite({
 ## Agent Context Management
 
 ### Context Sources (Priority Order)
-1. **Complete Task JSON**: Full task definition including all fields and artifacts
+1. **Complete Task TOON**: Full task definition including all fields and artifacts
 2. **Artifacts Context**: Brainstorming outputs and role analyses from task.context.artifacts
 3. **Flow Control Context**: Accumulated outputs from pre_analysis steps (including artifact loading)
 4. **Dependency Summaries**: Previous task completion summaries
@@ -295,7 +300,7 @@ TodoWrite({
 
 ### Context Assembly Process
 ```
-1. Load Task JSON → Base context (including artifacts array)
+1. Load Task TOON → Base context (including artifacts array)
 2. Load Artifacts → Synthesis specifications and brainstorming outputs
 3. Execute Flow Control → Accumulated context (with artifact loading steps)
 4. Load Dependencies → Dependency context
@@ -306,12 +311,12 @@ TodoWrite({
 ### Agent Context Package Structure
 ```json
 {
-  "task": { /* Complete task JSON with artifacts array */ },
+  "task": { /* Complete task TOON with artifacts array */ },
   "artifacts": {
-    "synthesis_specification": { "path": "{{from context-package.json → brainstorm_artifacts.synthesis_output.path}}", "priority": "highest" },
-    "guidance_specification": { "path": "{{from context-package.json → brainstorm_artifacts.guidance_specification.path}}", "priority": "medium" },
-    "role_analyses": [ /* From context-package.json → brainstorm_artifacts.role_analyses[] */ ],
-    "conflict_resolution": { "path": "{{from context-package.json → brainstorm_artifacts.conflict_resolution.path}}", "conditional": true }
+    "synthesis_specification": { "path": "{{from context-package.toon → brainstorm_artifacts.synthesis_output.path}}", "priority": "highest" },
+    "guidance_specification": { "path": "{{from context-package.toon → brainstorm_artifacts.guidance_specification.path}}", "priority": "medium" },
+    "role_analyses": [ /* From context-package.toon → brainstorm_artifacts.role_analyses[] */ ],
+    "conflict_resolution": { "path": "{{from context-package.toon → brainstorm_artifacts.conflict_resolution.path}}", "conditional": true }
   },
   "flow_context": {
     "step_outputs": {
@@ -323,10 +328,10 @@ TodoWrite({
   },
   "session": {
     "workflow_dir": ".workflow/WFS-session/",
-    "context_package_path": ".workflow/WFS-session/.process/context-package.json",
+    "context_package_path": ".workflow/WFS-session/.process/context-package.toon",
     "todo_list_path": ".workflow/WFS-session/TODO_LIST.md",
     "summaries_dir": ".workflow/WFS-session/.summaries/",
-    "task_json_path": ".workflow/WFS-session/.task/IMPL-1.1.json"
+    "task_json_path": ".workflow/WFS-session/.task/IMPL-1.1.toon"
   },
   "dependencies": [ /* Task summaries from depends_on */ ],
   "inherited": { /* Parent task context */ }
@@ -334,20 +339,20 @@ TodoWrite({
 ```
 
 ### Context Validation Rules
-- **Task JSON Complete**: All 5 fields present and valid, including artifacts array in context
-- **Artifacts Available**: All artifacts loaded from context-package.json
+- **Task TOON Complete**: All 5 fields present and valid, including artifacts array in context
+- **Artifacts Available**: All artifacts loaded from context-package.toon
 - **Flow Control Ready**: All pre_analysis steps completed including artifact loading steps
 - **Dependencies Loaded**: All depends_on summaries available
-- **Session Paths Valid**: All workflow paths exist and accessible (verified via context-package.json)
+- **Session Paths Valid**: All workflow paths exist and accessible (verified via context-package.toon)
 - **Agent Assignment**: Valid agent type specified in meta.agent
 
 ## Agent Execution Pattern
 
 ### Flow Control Execution
-**[FLOW_CONTROL]** marker indicates task JSON contains `flow_control.pre_analysis` steps for context preparation.
+**[FLOW_CONTROL]** marker indicates task TOON contains `flow_control.pre_analysis` steps for context preparation.
 
 **Orchestrator Responsibility**:
-- Pass complete task JSON to agent (including `flow_control` block)
+- Pass complete task TOON to agent (including `flow_control` block)
 - Provide session paths for artifact access
 - Monitor agent completion
 
@@ -365,18 +370,18 @@ TodoWrite({
 Task(subagent_type="{meta.agent}",
      prompt="**EXECUTE TASK FROM JSON**
 
-     ## Task JSON Location
+     ## Task TOON Location
      {session.task_json_path}
 
      ## Instructions
-     1. **Load Complete Task JSON**: Read and validate all fields (id, title, status, meta, context, flow_control)
+     1. **Load Complete Task TOON**: Read and validate all fields (id, title, status, meta, context, flow_control)
      2. **Execute Flow Control**: If `flow_control.pre_analysis` exists, execute steps sequentially:
         - Load artifacts (role analysis documents, role analyses) using commands in each step
         - Accumulate context from step outputs using variable substitution [variable_name]
         - Handle errors per step.on_error (skip_optional | fail | retry_once)
      3. **Implement Solution**: Follow `flow_control.implementation_approach` using accumulated context
      4. **Complete Task**:
-        - Update task status: `jq '.status = \"completed\"' {session.task_json_path} > temp.json && mv temp.json {session.task_json_path}`
+        - Update task status: `jq '.status = \"completed\"' {session.task_json_path} > temp.toon && mv temp.toon {session.task_json_path}`
         - Update TODO_LIST.md: Mark task as [x] completed in {session.todo_list_path}
         - Generate summary: {session.summaries_dir}/{task.id}-summary.md
         - Check workflow completion and call `/workflow:session:complete` if all tasks done
@@ -431,15 +436,15 @@ Task(subagent_type="{meta.agent}",
     "artifacts": [
       {
         "type": "synthesis_specification",
-        "source": "context-package.json → brainstorm_artifacts.synthesis_output",
-        "path": "{{loaded dynamically from context-package.json}}",
+        "source": "context-package.toon → brainstorm_artifacts.synthesis_output",
+        "path": "{{loaded dynamically from context-package.toon}}",
         "priority": "highest",
         "contains": "complete_integrated_specification"
       },
       {
         "type": "individual_role_analysis",
-        "source": "context-package.json → brainstorm_artifacts.role_analyses[]",
-        "path": "{{loaded dynamically from context-package.json}}",
+        "source": "context-package.toon → brainstorm_artifacts.role_analyses[]",
+        "path": "{{loaded dynamically from context-package.toon}}",
         "note": "Supports analysis*.md pattern (analysis.md, analysis-01.md, analysis-api.md, etc.)",
         "priority": "low",
         "contains": "role_specific_analysis_fallback"
@@ -450,9 +455,9 @@ Task(subagent_type="{meta.agent}",
     "pre_analysis": [
       {
         "step": "load_synthesis_specification",
-        "action": "Load synthesis specification from context-package.json",
+        "action": "Load synthesis specification from context-package.toon",
         "commands": [
-          "Read(.workflow/WFS-[session]/.process/context-package.json)",
+          "Read(.workflow/WFS-[session]/.process/context-package.toon)",
           "Extract(brainstorm_artifacts.synthesis_output.path)",
           "Read(extracted path)"
         ],
@@ -494,7 +499,7 @@ Task(subagent_type="{meta.agent}",
 ```
 
 ### Execution Flow
-1. **Load Task JSON**: Agent reads and validates complete JSON structure
+1. **Load Task TOON**: Agent reads and validates complete JSON structure
 2. **Execute Flow Control**: Agent runs pre_analysis steps if present
 3. **Prepare Implementation**: Agent uses implementation_approach from JSON
 4. **Launch Implementation**: Agent follows focus_paths and target_files
@@ -515,17 +520,17 @@ meta.agent missing → Infer from meta.type:
 ## Workflow File Structure Reference
 ```
 .workflow/WFS-[topic-slug]/
-├── workflow-session.json     # Session state and metadata
+├── workflow-session.toon     # Session state and metadata
 ├── IMPL_PLAN.md             # Planning document and requirements
 ├── TODO_LIST.md             # Progress tracking (auto-updated)
 ├── .task/                   # Task definitions (JSON only)
-│   ├── IMPL-1.json          # Main task definitions
-│   └── IMPL-1.1.json        # Subtask definitions
+│   ├── IMPL-1.toon          # Main task definitions
+│   └── IMPL-1.1.toon        # Subtask definitions
 ├── .summaries/              # Task completion summaries
 │   ├── IMPL-1-summary.md    # Task completion details
 │   └── IMPL-1.1-summary.md  # Subtask completion details
 └── .process/                # Planning artifacts
-    ├── context-package.json # Smart context package
+    ├── context-package.toon # Smart context package
     └── ANALYSIS_RESULTS.md  # Planning analysis results
 ```
 
@@ -563,20 +568,20 @@ find .workflow -name ".active-*" | while read marker; do
 done
 
 # Recreate corrupted session files
-[ ! -f ".workflow/$session/workflow-session.json" ] && \
-  echo '{"session_id":"'$session'","status":"active"}' > ".workflow/$session/workflow-session.json"
+[ ! -f ".workflow/$session/workflow-session.toon" ] && \
+  echo '{"session_id":"'$session'","status":"active"}' > ".workflow/$session/workflow-session.toon"
 ```
 
 **Task Recovery**:
 ```bash
-# Validate task JSON integrity
-for task_file in .workflow/$session/.task/*.json; do
+# Validate task TOON integrity
+for task_file in .workflow/$session/.task/*.toon; do
   jq empty "$task_file" 2>/dev/null || echo "Corrupted: $task_file"
 done
 
 # Fix missing dependencies
-missing_deps=$(jq -r '.context.depends_on[]?' .workflow/$session/.task/*.json | sort -u)
+missing_deps=$(jq -r '.context.depends_on[]?' .workflow/$session/.task/*.toon | sort -u)
 for dep in $missing_deps; do
-  [ ! -f ".workflow/$session/.task/$dep.json" ] && echo "Missing dependency: $dep"
+  [ ! -f ".workflow/$session/.task/$dep.toon" ] && echo "Missing dependency: $dep"
 done
 ```

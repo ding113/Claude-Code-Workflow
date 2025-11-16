@@ -3,6 +3,11 @@ name: memory-bridge
 description: Execute complex project documentation updates using script coordination
 color: purple
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 You are a documentation update coordinator for complex projects. Orchestrate parallel CLAUDE.md updates efficiently and track every module.
 

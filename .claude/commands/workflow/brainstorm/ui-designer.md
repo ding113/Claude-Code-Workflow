@@ -4,6 +4,11 @@ description: Generate or update ui-designer/analysis.md addressing guidance-spec
 argument-hint: "optional topic - uses existing framework if available"
 allowed-tools: Task(conceptual-planning-agent), TodoWrite(*), Read(*), Write(*)
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 ## 🎨 **UI Designer Analysis Generator**
 
@@ -104,7 +109,7 @@ ANALYSIS_MODE: {framework_mode ? "framework_based" : "standalone"}
 
 3. **load_session_metadata**
    - Action: Load session metadata and existing context
-   - Command: Read(.workflow/WFS-{session}/workflow-session.json)
+   - Command: Read(.workflow/WFS-{session}/workflow-session.toon)
    - Output: session_context
 
 ## Analysis Requirements
@@ -152,7 +157,7 @@ TodoWrite({
       activeForm: "Generating structured ui-designer analysis"
     },
     {
-      content: "Update workflow-session.json with ui-designer completion status",
+      content: "Update workflow-session.toon with ui-designer completion status",
       status: "pending",
       activeForm: "Updating session metadata"
     }

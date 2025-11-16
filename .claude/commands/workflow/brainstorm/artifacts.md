@@ -4,6 +4,11 @@ description: Interactive clarification generating confirmed guidance specificati
 argument-hint: "topic or challenge description [--count N]"
 allowed-tools: TodoWrite(*), Read(*), Write(*), Glob(*)
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 ## Overview
 
@@ -136,7 +141,7 @@ b) {role-name} ({中文名})
 - Check `.workflow/.active-*` markers first
 - Multiple sessions → Prompt selection | Single → Use it | None → Create `WFS-[topic-slug]`
 - Parse `--count N` parameter from user input (default: 3 if not specified)
-- Store decisions in `workflow-session.json` including count parameter
+- Store decisions in `workflow-session.toon` including count parameter
 
 ### Phase 0: Automatic Project Context Collection
 
@@ -145,7 +150,7 @@ b) {role-name} ({中文名})
 **Detection Mechanism** (execute first):
 ```javascript
 // Check if context-package already exists
-const contextPackagePath = `.workflow/WFS-{session-id}/.process/context-package.json`;
+const contextPackagePath = `.workflow/WFS-{session-id}/.process/context-package.toon`;
 
 if (file_exists(contextPackagePath)) {
   // Validate package
@@ -172,7 +177,7 @@ You are executing as context-search-agent (.claude/agents/context-search-agent.m
 ## Session Information
 - **Session ID**: ${session_id}
 - **Task Description**: ${task_description}
-- **Output Path**: .workflow/${session_id}/.process/context-package.json
+- **Output Path**: .workflow/${session_id}/.process/context-package.toon
 
 ## Mission
 Execute complete context-search-agent workflow for implementation planning:
@@ -193,10 +198,10 @@ Execute all 3 discovery tracks:
 2. Synthesize 3-source data (docs > code > web)
 3. Integrate brainstorm artifacts (if .brainstorming/ exists, read content)
 4. Perform conflict detection with risk assessment
-5. Generate and validate context-package.json
+5. Generate and validate context-package.toon
 
 ## Output Requirements
-Complete context-package.json with:
+Complete context-package.toon with:
 - **metadata**: task_description, keywords, complexity, tech_stack, session_id
 - **project_context**: architecture_patterns, coding_conventions, tech_stack
 - **assets**: {documentation[], source_code[], config[], tests[]} with relevance scores
@@ -229,7 +234,7 @@ Report completion with statistics.
 
 **Steps**:
 1. **Load Phase 0 context** (if available):
-   - Read `.workflow/WFS-{session-id}/.process/context-package.json`
+   - Read `.workflow/WFS-{session-id}/.process/context-package.toon`
    - Extract: tech_stack, existing modules, conflict_risk, relevant files
 
 2. **Deep topic analysis** (context-aware):
@@ -433,19 +438,19 @@ FOR each selected role:
 1. Load all decisions: `intent_context` + `selected_roles` + `role_decisions` + `cross_role_decisions`
 2. Transform Q&A pairs to declarative: Questions → Headers, Answers → CONFIRMED/SELECTED statements
 3. Generate guidance-specification.md (template below) - **PRIMARY OUTPUT FILE**
-4. Update workflow-session.json with **METADATA ONLY**:
+4. Update workflow-session.toon with **METADATA ONLY**:
    - session_id (e.g., "WFS-topic-slug")
    - selected_roles[] (array of role names, e.g., ["system-architect", "ui-designer", "product-manager"])
    - topic (original user input string)
    - timestamp (ISO-8601 format)
    - phase_completed: "artifacts"
    - count_parameter (number from --count flag)
-5. Validate: No interrogative sentences in .md file, all decisions traceable, no content duplication in .json
+5. Validate: No interrogative sentences in .md file, all decisions traceable, no content duplication in .toon (legacy `.json` still readable)
 
 **⚠️ CRITICAL OUTPUT SEPARATION**:
 - **guidance-specification.md**: Full guidance content (decisions, rationale, integration points)
-- **workflow-session.json**: Session metadata ONLY (no guidance content, no decisions, no Q&A pairs)
-- **NO content duplication**: Guidance stays in .md, metadata stays in .json
+- **workflow-session.toon**: Session metadata ONLY (no guidance content, no decisions, no Q&A pairs)
+- **NO content duplication**: Guidance stays in .md, metadata stays in .toon (legacy `.json` reference only when reading old sessions)
 
 ## Output Document Template
 
@@ -578,7 +583,7 @@ ELSE:
 
 ## Storage Validation
 
-**workflow-session.json** (metadata only):
+**workflow-session.toon** (metadata only):
 ```json
 {
   "session_id": "WFS-{topic-slug}",
@@ -598,8 +603,7 @@ ELSE:
 ```
 .workflow/WFS-[topic]/
 ├── .active-brainstorming
-├── workflow-session.json              # Session metadata ONLY
+├── workflow-session.toon              # Session metadata ONLY
 └── .brainstorming/
     └── guidance-specification.md      # Full guidance content
 ```
-

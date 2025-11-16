@@ -8,12 +8,12 @@ Interactive installation guide for Claude Code with Agent workflow coordination 
 
 **Windows (PowerShell):**
 ```powershell
-Invoke-Expression (Invoke-WebRequest -Uri "https://raw.githubusercontent.com/catlog22/Claude-Code-Workflow/main/install-remote.ps1" -UseBasicParsing).Content
+Invoke-Expression (Invoke-WebRequest -Uri "https://raw.githubusercontent.com/ding113/Claude-Code-Workflow/main/install-remote.ps1" -UseBasicParsing).Content
 ```
 
 **Linux/macOS (Bash/Zsh):**
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/catlog22/Claude-Code-Workflow/main/install-remote.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/ding113/Claude-Code-Workflow/main/install-remote.sh)
 ```
 
 ### Interactive Version Selection
@@ -152,7 +152,7 @@ While CCW works with Claude alone, installing these tools provides enhanced anal
 | Tool | Purpose | Installation |
 |------|---------|--------------|
 | **ripgrep (rg)** | Fast code search | **macOS**: `brew install ripgrep`<br>**Linux**: `apt install ripgrep` (Ubuntu) / `dnf install ripgrep` (Fedora)<br>**Windows**: `winget install ripgrep` / `choco install ripgrep` / `scoop install ripgrep`<br>**Verify**: `rg --version` |
-| **jq** | JSON processing | **macOS**: `brew install jq`<br>**Linux**: `apt install jq` (Ubuntu) / `dnf install jq` (Fedora)<br>**Windows**: `winget install jq` / `choco install jq` / `scoop install jq`<br>**Verify**: `jq --version` |
+| **TOON CLI 工具链** | Inspect/convert `.toon` 任务文件并替代 jq | **Bundled**: 已包含在仓库中，运行 `npm install` 后使用 `npm run toon -- [encode|decode|detect|auto]` 或直接执行 `./scripts/toon-wrapper.sh`。需要 Node.js 18+ 与 `npx tsx`。<br>**Verify**: `npm run toon -- detect path/to/IMPL-004.toon` |
 
 #### External AI Tools
 
@@ -199,6 +199,6 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 ## Support
 
-- **Issues**: [GitHub Issues](https://github.com/catlog22/Claude-Code-Workflow/issues)
+- **Issues**: [GitHub Issues](https://github.com/ding113/Claude-Code-Workflow/issues)
 - **Getting Started**: [Quick Start Guide](GETTING_STARTED.md)
 - **Documentation**: [Main README](README.md)

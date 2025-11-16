@@ -6,11 +6,16 @@ examples:
   - /workflow:tools:task-generate-tdd --session WFS-auth
   - /workflow:tools:task-generate-tdd --session WFS-auth --cli-execute
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 # Autonomous TDD Task Generation Command
 
 ## Overview
-Autonomous TDD task JSON and IMPL_PLAN.md generation using action-planning-agent with two-phase execution: discovery and document generation. Supports both agent-driven execution (default) and CLI tool execution modes. Generates complete Red-Green-Refactor cycles contained within each task.
+Autonomous TDD task TOON and IMPL_PLAN.md generation using action-planning-agent with two-phase execution: discovery and document generation. Supports both agent-driven execution (default) and CLI tool execution modes. Generates complete Red-Green-Refactor cycles contained within each task.
 
 ## Core Philosophy
 - **Agent-Driven**: Delegate execution to action-planning-agent for autonomous operation
@@ -74,10 +79,10 @@ Autonomous TDD task JSON and IMPL_PLAN.md generation using action-planning-agent
   "workflow_type": "tdd",
   "session_metadata": {
     // If in memory: use cached content
-    // Else: Load from .workflow/{session-id}/workflow-session.json
+    // Else: Load from .workflow/{session-id}/workflow-session.toon
   },
   "brainstorm_artifacts": {
-    // Loaded from context-package.json → brainstorm_artifacts section
+    // Loaded from context-package.toon → brainstorm_artifacts section
     "role_analyses": [
       {
         "role": "system-architect",
@@ -88,12 +93,12 @@ Autonomous TDD task JSON and IMPL_PLAN.md generation using action-planning-agent
     "synthesis_output": {"path": "...", "exists": true},
     "conflict_resolution": {"path": "...", "exists": true}  // if conflict_risk >= medium
   },
-  "context_package_path": ".workflow/{session-id}/.process/context-package.json",
+  "context_package_path": ".workflow/{session-id}/.process/context-package.toon",
   "context_package": {
     // If in memory: use cached content
-    // Else: Load from .workflow/{session-id}/.process/context-package.json
+    // Else: Load from .workflow/{session-id}/.process/context-package.toon
   },
-  "test_context_package_path": ".workflow/{session-id}/.process/test-context-package.json",
+  "test_context_package_path": ".workflow/{session-id}/.process/test-context-package.toon",
   "test_context_package": {
     // Existing test patterns and coverage analysis
   },
@@ -108,26 +113,26 @@ Autonomous TDD task JSON and IMPL_PLAN.md generation using action-planning-agent
 **Discovery Actions**:
 1. **Load Session Context** (if not in memory)
    ```javascript
-   if (!memory.has("workflow-session.json")) {
-     Read(.workflow/{session-id}/workflow-session.json)
+   if (!memory.has("workflow-session.toon")) {
+     Read(.workflow/{session-id}/workflow-session.toon)
    }
    ```
 
 2. **Load Context Package** (if not in memory)
    ```javascript
-   if (!memory.has("context-package.json")) {
-     Read(.workflow/{session-id}/.process/context-package.json)
+   if (!memory.has("context-package.toon")) {
+     Read(.workflow/{session-id}/.process/context-package.toon)
    }
    ```
 
 3. **Load Test Context Package** (if not in memory)
    ```javascript
-   if (!memory.has("test-context-package.json")) {
-     Read(.workflow/{session-id}/.process/test-context-package.json)
+   if (!memory.has("test-context-package.toon")) {
+     Read(.workflow/{session-id}/.process/test-context-package.toon)
    }
    ```
 
-4. **Extract & Load Role Analyses** (from context-package.json)
+4. **Extract & Load Role Analyses** (from context-package.toon)
    ```javascript
    // Extract role analysis paths from context package
    const roleAnalysisPaths = contextPackage.brainstorm_artifacts.role_analyses
@@ -137,7 +142,7 @@ Autonomous TDD task JSON and IMPL_PLAN.md generation using action-planning-agent
    roleAnalysisPaths.forEach(path => Read(path));
    ```
 
-5. **Load Conflict Resolution** (from context-package.json, if exists)
+5. **Load Conflict Resolution** (from context-package.toon, if exists)
    ```javascript
    if (contextPackage.brainstorm_artifacts.conflict_resolution?.exists) {
      Read(contextPackage.brainstorm_artifacts.conflict_resolution.path)
@@ -174,14 +179,14 @@ const templatePath = hasCliExecuteFlag
 ```javascript
 Task(
   subagent_type="action-planning-agent",
-  description="Generate TDD task JSON and implementation plan",
+  description="Generate TDD task TOON and implementation plan",
   prompt=`
 ## Execution Context
 
 **Session ID**: WFS-{session-id}
 **Workflow Type**: TDD
 **Execution Mode**: {agent-mode | cli-execute-mode}
-**Task JSON Template Path**: {template_path}
+**Task TOON Template Path**: {template_path}
 
 ## Phase 1: Discovery Results (Provided Context)
 
@@ -208,7 +213,7 @@ Task(
 If conflict_risk was medium/high, modifications have been applied to:
 - **guidance-specification.md**: Design decisions updated to resolve conflicts
 - **Role analyses (*.md)**: Recommendations adjusted for compatibility
-- **context-package.json**: Marked as "resolved" with conflict IDs
+- **context-package.toon**: Marked as "resolved" with conflict IDs
 - NO separate CONFLICT_RESOLUTION.md file (conflicts resolved in-place)
 
 ### MCP Analysis Results (Optional)
@@ -223,7 +228,7 @@ Refer to: @.claude/agents/action-planning-agent.md for:
 - TDD Task Decomposition Standards
 - Red-Green-Refactor Cycle Requirements
 - Quantification Requirements (MANDATORY)
-- 5-Field Task JSON Schema
+- 5-Field Task TOON Schema
 - IMPL_PLAN.md Structure (TDD variant)
 - TODO_LIST.md Format
 - TDD Execution Flow & Quality Validation
@@ -244,7 +249,7 @@ Refer to: @.claude/agents/action-planning-agent.md for:
 
 #### Required Outputs Summary
 
-##### 1. TDD Task JSON Files (.task/IMPL-*.json)
+##### 1. TDD Task TOON Files (.task/IMPL-*.toon)
 - **Location**: `.workflow/{session-id}/.task/`
 - **Template**: Read from `{template_path}` (pre-selected by command based on `--cli-execute` flag)
 - **Schema**: 5-field structure with TDD-specific metadata
@@ -256,7 +261,7 @@ Refer to: @.claude/agents/action-planning-agent.md for:
     1. Red Phase (`tdd_phase: "red"`): Write failing tests
     2. Green Phase (`tdd_phase: "green"`): Implement to pass tests
     3. Refactor Phase (`tdd_phase: "refactor"`): Improve code quality
-- **Details**: See action-planning-agent.md § TDD Task JSON Generation
+- **Details**: See action-planning-agent.md § TDD Task TOON Generation
 
 ##### 2. IMPL_PLAN.md (TDD Variant)
 - **Location**: `.workflow/{session-id}/IMPL_PLAN.md`
@@ -296,9 +301,9 @@ Refer to: @.claude/agents/action-planning-agent.md for:
 ### Agent Execution Summary
 
 **Key Steps** (Detailed instructions in action-planning-agent.md):
-1. Load task JSON template from provided path
+1. Load task TOON template from provided path
 2. Extract and decompose features with TDD cycles
-3. Generate TDD task JSON files enforcing quantification requirements
+3. Generate TDD task TOON files enforcing quantification requirements
 4. Create IMPL_PLAN.md using TDD template variant
 5. Generate TODO_LIST.md with TDD phase indicators
 6. Update session state with TDD metadata
@@ -316,7 +321,7 @@ Refer to: @.claude/agents/action-planning-agent.md for:
 ## Output
 
 Generate all three documents and report completion status:
-- TDD task JSON files created: N files (IMPL-*.json)
+- TDD task TOON files created: N files (IMPL-*.toon)
 - TDD cycles configured: N cycles with quantified test cases
 - Artifacts integrated: synthesis-spec, guidance-specification, N role analyses
 - Test context integrated: existing patterns and coverage
@@ -336,21 +341,21 @@ const agentContext = {
   workflow_type: "tdd",
 
   // Use memory if available, else load
-  session_metadata: memory.has("workflow-session.json")
-    ? memory.get("workflow-session.json")
-    : Read(.workflow/WFS-[id]/workflow-session.json),
+  session_metadata: memory.has("workflow-session.toon")
+    ? memory.get("workflow-session.toon")
+    : Read(.workflow/WFS-[id]/workflow-session.toon),
 
-  context_package_path: ".workflow/WFS-[id]/.process/context-package.json",
+  context_package_path: ".workflow/WFS-[id]/.process/context-package.toon",
 
-  context_package: memory.has("context-package.json")
-    ? memory.get("context-package.json")
-    : Read(".workflow/WFS-[id]/.process/context-package.json"),
+  context_package: memory.has("context-package.toon")
+    ? memory.get("context-package.toon")
+    : Read(".workflow/WFS-[id]/.process/context-package.toon"),
 
-  test_context_package_path: ".workflow/WFS-[id]/.process/test-context-package.json",
+  test_context_package_path: ".workflow/WFS-[id]/.process/test-context-package.toon",
 
-  test_context_package: memory.has("test-context-package.json")
-    ? memory.get("test-context-package.json")
-    : Read(".workflow/WFS-[id]/.process/test-context-package.json"),
+  test_context_package: memory.has("test-context-package.toon")
+    ? memory.get("test-context-package.toon")
+    : Read(".workflow/WFS-[id]/.process/test-context-package.toon"),
 
   // Extract brainstorm artifacts from context package
   brainstorm_artifacts: extractBrainstormArtifacts(context_package),
@@ -372,7 +377,7 @@ const agentContext = {
 
 ## TDD Task Structure Reference
 
-This section provides quick reference for TDD task JSON structure. For complete implementation details, see the agent invocation prompt in Phase 2 above.
+This section provides quick reference for TDD task TOON structure. For complete implementation details, see the agent invocation prompt in Phase 2 above.
 
 **Quick Reference**:
 - Each TDD task contains complete Red-Green-Refactor cycle
@@ -388,23 +393,23 @@ This section provides quick reference for TDD task JSON structure. For complete 
 ├── IMPL_PLAN.md                     # Unified plan with TDD Implementation Tasks section
 ├── TODO_LIST.md                     # Progress tracking with internal TDD phase indicators
 ├── .task/
-│   ├── IMPL-1.json                  # Complete TDD task (Red-Green-Refactor internally)
-│   ├── IMPL-2.json                  # Complete TDD task
-│   ├── IMPL-3.json                  # Complex feature container (if needed)
-│   ├── IMPL-3.1.json                # Complex feature subtask (if needed)
-│   ├── IMPL-3.2.json                # Complex feature subtask (if needed)
+│   ├── IMPL-1.toon                  # Complete TDD task (Red-Green-Refactor internally)
+│   ├── IMPL-2.toon                  # Complete TDD task
+│   ├── IMPL-3.toon                  # Complex feature container (if needed)
+│   ├── IMPL-3.1.toon                # Complex feature subtask (if needed)
+│   ├── IMPL-3.2.toon                # Complex feature subtask (if needed)
 │   └── ...
 └── .process/
     ├── CONFLICT_RESOLUTION.md       # Conflict resolution strategies (if conflict_risk ≥ medium)
-    ├── test-context-package.json    # Test coverage analysis
-    ├── context-package.json         # Input from context-gather
+    ├── test-context-package.toon    # Test coverage analysis
+    ├── context-package.toon         # Input from context-gather
     ├── context_package_path         # Path to smart context package
     └── green-fix-iteration-*.md     # Fix logs from Green phase test-fix cycles
 ```
 
 **File Count**:
-- **Old approach**: 5 features = 15 task JSON files (TEST/IMPL/REFACTOR × 5)
-- **New approach**: 5 features = 5 task JSON files (IMPL-N × 5)
+- **Old approach**: 5 features = 15 task TOON files (TEST/IMPL/REFACTOR × 5)
+- **New approach**: 5 features = 5 task TOON files (IMPL-N × 5)
 - **Complex feature**: 1 feature = 1 container + M subtasks (IMPL-N + IMPL-N.M)
 
 ## Validation Rules
@@ -468,7 +473,7 @@ This section provides quick reference for TDD task JSON structure. For complete 
 - **CLI mode** (`--cli-execute`): Uses Gemini/Qwen with cli-mode task template
 
 **Output**:
-- TDD task JSON files in `.task/` directory (IMPL-N.json format)
+- TDD task TOON files in `.task/` directory (IMPL-N.toon format)
 - IMPL_PLAN.md with TDD Implementation Tasks section
 - TODO_LIST.md with internal TDD phase indicators
 - Session state updated with task count and TDD metadata

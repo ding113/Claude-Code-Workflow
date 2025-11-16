@@ -1,9 +1,14 @@
 ---
 name: replan
-description: Update task JSON with new requirements or batch-update multiple tasks from verification report, tracks changes in task-changes.json
+description: Update task TOON with new requirements or batch-update multiple tasks from verification report, tracks changes in task-changes.toon
 argument-hint: "task-id [\"text\"|file.md] | --batch [verification-report.md]"
 allowed-tools: Read(*), Write(*), Edit(*), TodoWrite(*), Glob(*), Bash(*)
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 # Task Replan Command (/task:replan)
 
@@ -39,7 +44,7 @@ Replans individual tasks or batch processes multiple tasks with change tracking 
 ```bash
 /task:replan IMPL-1 updated-specs.md
 ```
-Supports: .md, .txt, .json, .yaml
+Supports: .md, .txt, .toon (legacy `.json` inputs auto-decoded), .yaml
 
 #### Interactive Mode
 ```bash
@@ -66,7 +71,7 @@ Guided step-by-step modification process with validation
 
 ### Single Task Process
 
-1. **Load & Validate**: Read task JSON and validate session
+1. **Load & Validate**: Read task TOON and validate session
 2. **Parse Input**: Process changes from input source
 3. **Create Backup**: Save previous version to backup folder
 4. **Update Task**: Modify JSON structure and relationships
@@ -79,7 +84,7 @@ Guided step-by-step modification process with validation
 2. **Initialize TodoWrite**: Create task list for tracking
 3. **For Each Task**:
    - Mark todo as in_progress
-   - Load and validate task JSON
+   - Load and validate task TOON
    - Create backup
    - Apply recommended changes
    - Save updated task
@@ -99,7 +104,7 @@ Tasks maintain backup history:
       "version": "1.2",
       "reason": "Add OAuth2 support",
       "input_source": "direct_text",
-      "backup_location": ".task/backup/IMPL-1-v1.1.json",
+      "backup_location": ".task/backup/IMPL-1-v1.1.toon",
       "timestamp": "2025-10-17T10:30:00Z"
     }
   ]
@@ -111,15 +116,15 @@ Tasks maintain backup history:
 ### File Structure
 ```
 .task/
-├── IMPL-1.json                    # Current version
+├── IMPL-1.toon                    # Current version
 ├── backup/
-│   ├── IMPL-1-v1.0.json          # Original version
-│   ├── IMPL-1-v1.1.json          # Previous backup
-│   └── IMPL-1-v1.2.json          # Latest backup
+│   ├── IMPL-1-v1.0.toon          # Original version
+│   ├── IMPL-1-v1.1.toon          # Previous backup
+│   └── IMPL-1-v1.2.toon          # Latest backup
 └── [new subtasks as needed]
 ```
 
-**Backup Naming**: `{task-id}-v{version}.json`
+**Backup Naming**: `{task-id}-v{version}.toon`
 
 ## Implementation Updates
 
@@ -159,7 +164,7 @@ Generates brief change log with:
 
 ## Session Updates
 
-Updates workflow-session.json with:
+Updates workflow-session.toon with:
 - Modified task tracking
 - Task count changes (if subtasks added/removed)
 - Last modification timestamps
@@ -170,7 +175,7 @@ Updates workflow-session.json with:
 /task:replan IMPL-1 --rollback v1.1
 
 Rollback to version 1.1:
-- Restore task from backup/.../IMPL-1-v1.1.json
+- Restore task from backup/.../IMPL-1-v1.1.toon
 - Remove new subtasks if any
 - Update session stats
 
@@ -221,9 +226,9 @@ After completion, generates summary:
 - IMPL-004 v1.0 → v1.1: Added FR-09 explicit coverage
 
 ### Backups Created
-- .task/backup/IMPL-002-v1.0.json
-- .task/backup/IMPL-003-v1.0.json
-- .task/backup/IMPL-004-v1.0.json
+- .task/backup/IMPL-002-v1.0.toon
+- .task/backup/IMPL-003-v1.0.toon
+- .task/backup/IMPL-004-v1.0.toon
 
 ### Errors
 - IMPL-008: File not found (task may have been renamed)
@@ -257,7 +262,7 @@ User selected: "Yes, apply"
 
 Version 1.2 created
 Context updated
-Backup saved to .task/backup/IMPL-1-v1.1.json
+Backup saved to .task/backup/IMPL-1-v1.1.toon
 ```
 
 ### Single Task - File Input
@@ -269,7 +274,7 @@ Applying specification changes...
 
 Task updated with new requirements
 Version 1.1 created
-Backup saved to .task/backup/IMPL-2-v1.0.json
+Backup saved to .task/backup/IMPL-2-v1.0.toon
 ```
 
 ### Batch Mode - From Verification Report
@@ -286,19 +291,19 @@ Found 4 tasks requiring replanning:
 Creating task tracking list...
 
 Processing IMPL-002...
-Backup created: .task/backup/IMPL-002-v1.0.json
+Backup created: .task/backup/IMPL-002-v1.0.toon
 Updated to v1.1
 
 Processing IMPL-003...
-Backup created: .task/backup/IMPL-003-v1.0.json
+Backup created: .task/backup/IMPL-003-v1.0.toon
 Updated to v1.1
 
 Processing IMPL-004...
-Backup created: .task/backup/IMPL-004-v1.0.json
+Backup created: .task/backup/IMPL-004-v1.0.toon
 Updated to v1.1
 
 Processing IMPL-008...
-Backup created: .task/backup/IMPL-008-v1.0.json
+Backup created: .task/backup/IMPL-008-v1.0.toon
 Updated to v1.1
 
 Batch replan completed: 4/4 successful
@@ -393,9 +398,9 @@ Add performance testing:
 ### Backup Management
 ```typescript
 // Backup file naming convention
-const backupPath = `.task/backup/${taskId}-v${previousVersion}.json`;
+const backupPath = `.task/backup/${taskId}-v${previousVersion}.toon`;
 
-// Backup metadata in task JSON
+// Backup metadata in task TOON
 {
   "replan_history": [
     {
@@ -403,7 +408,7 @@ const backupPath = `.task/backup/${taskId}-v${previousVersion}.json`;
       "timestamp": "2025-10-17T10:30:00Z",
       "reason": "Add FR-09 explicit coverage",
       "input_source": "batch_verification_report",
-      "backup_location": ".task/backup/IMPL-004-v1.1.json"
+      "backup_location": ".task/backup/IMPL-004-v1.1.toon"
     }
   ]
 }

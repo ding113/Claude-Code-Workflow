@@ -60,7 +60,7 @@
     .\install-remote.ps1 -Global -Force
 
 .LINK
-    https://github.com/catlog22/Claude-Code-Workflow
+    https://github.com/ding113/Claude-Code-Workflow
 #>
 
 [CmdletBinding()]
@@ -186,7 +186,7 @@ function Get-TempDirectory {
 
 function Get-LatestRelease {
     try {
-        $apiUrl = "https://api.github.com/repos/catlog22/Claude-Code-Workflow/releases/latest"
+        $apiUrl = "https://api.github.com/repos/ding113/Claude-Code-Workflow/releases/latest"
         $response = Invoke-RestMethod -Uri $apiUrl -UseBasicParsing -TimeoutSec 10
         return $response.tag_name
     } catch {
@@ -205,7 +205,7 @@ function Download-Repository {
         [string]$Tag = ""
     )
 
-    $repoUrl = "https://github.com/catlog22/Claude-Code-Workflow"
+    $repoUrl = "https://github.com/ding113/Claude-Code-Workflow"
 
     # Determine download URL based on version type
     if ($Version -eq "stable") {
@@ -501,7 +501,7 @@ function Get-UserVersionChoice {
 
     try {
         # Get latest release info
-        $apiUrl = "https://api.github.com/repos/catlog22/Claude-Code-Workflow/releases/latest"
+        $apiUrl = "https://api.github.com/repos/ding113/Claude-Code-Workflow/releases/latest"
         $response = Invoke-RestMethod -Uri $apiUrl -UseBasicParsing -TimeoutSec 5
         $latestVersion = $response.tag_name
 
@@ -518,7 +518,7 @@ function Get-UserVersionChoice {
 
     try {
         # Get latest commit info from main branch
-        $commitUrl = "https://api.github.com/repos/catlog22/Claude-Code-Workflow/commits/main"
+        $commitUrl = "https://api.github.com/repos/ding113/Claude-Code-Workflow/commits/main"
         $commitResponse = Invoke-RestMethod -Uri $commitUrl -UseBasicParsing -TimeoutSec 5
         $latestCommitId = $commitResponse.sha.Substring(0, 7)
 
@@ -618,7 +618,7 @@ function Main {
     if (-not $NonInteractive -and -not $Force) {
         Write-Host ""
         Write-ColorOutput "INSTALLATION DETAILS:" $ColorInfo
-        Write-Host "- Repository: https://github.com/catlog22/Claude-Code-Workflow"
+        Write-Host "- Repository: https://github.com/ding113/Claude-Code-Workflow"
         Write-Host "- Version: $versionInfo"
         Write-Host "- Features: Intelligent workflow orchestration with multi-agent coordination"
         Write-Host ""
@@ -685,7 +685,7 @@ function Main {
         if (-not $commitSha) {
             try {
                 Write-ColorOutput "Fetching version from GitHub API..." $ColorInfo
-                $commitUrl = "https://api.github.com/repos/catlog22/Claude-Code-Workflow/commits/$Branch"
+                $commitUrl = "https://api.github.com/repos/ding113/Claude-Code-Workflow/commits/$Branch"
                 $commitResponse = Invoke-RestMethod -Uri $commitUrl -UseBasicParsing -TimeoutSec 10 -ErrorAction Stop
 
                 if ($commitResponse.sha) {

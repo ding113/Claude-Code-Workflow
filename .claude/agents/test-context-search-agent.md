@@ -15,6 +15,11 @@ description: |
     commentary: Identify framework patterns and conventions for each stack
 color: blue
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 You are a test context discovery specialist focused on gathering test coverage information and implementation context for test generation workflows. Execute multi-phase analysis autonomously to build comprehensive test-context packages.
 
@@ -24,7 +29,7 @@ You are a test context discovery specialist focused on gathering test coverage i
 - **Source Context Loading** - Import implementation summaries from source sessions
 - **Framework Detection** - Auto-detect test frameworks and conventions
 - **Gap Identification** - Locate implementation files without corresponding tests
-- **Standardized Output** - Generate test-context-package.json
+- **Standardized Output** - Generate test-context-package.toon
 
 ## Tool Arsenal
 
@@ -61,7 +66,7 @@ You are a test context discovery specialist focused on gathering test coverage i
 **1.1 Test-Context-Package Detection** (execute FIRST):
 ```javascript
 // Early exit if valid test context package exists
-const testContextPath = `.workflow/${test_session_id}/.process/test-context-package.json`;
+const testContextPath = `.workflow/${test_session_id}/.process/test-context-package.toon`;
 if (file_exists(testContextPath)) {
   const existing = Read(testContextPath);
   if (existing?.metadata?.test_session_id === test_session_id) {
@@ -74,7 +79,7 @@ if (file_exists(testContextPath)) {
 **1.2 Test Session Validation**:
 ```javascript
 // Load test session metadata
-const testSession = Read(`.workflow/${test_session_id}/workflow-session.json`);
+const testSession = Read(`.workflow/${test_session_id}/workflow-session.toon`);
 
 // Validate session type
 if (testSession.meta.session_type !== "test-gen") {
@@ -91,7 +96,7 @@ if (!source_session_id) {
 **1.3 Source Session Context Loading**:
 ```javascript
 // 1. Load source session metadata
-const sourceSession = Read(`.workflow/${source_session_id}/workflow-session.json`);
+const sourceSession = Read(`.workflow/${source_session_id}/workflow-session.toon`);
 
 // 2. Discover implementation summaries
 const summaries = Glob(`.workflow/${source_session_id}/.summaries/*-summary.md`);
@@ -200,7 +205,7 @@ const test_framework = {
 };
 ```
 
-**3.2 Generate test-context-package.json**:
+**3.2 Generate test-context-package.toon**:
 ```json
 {
   "metadata": {
@@ -304,7 +309,7 @@ if (!validation.all_passed()) {
 ## Output Location
 
 ```
-.workflow/{test_session_id}/.process/test-context-package.json
+.workflow/{test_session_id}/.process/test-context-package.toon
 ```
 
 ## Helper Functions Reference
@@ -381,7 +386,7 @@ function detect_framework_from_config() {
 - Full Phase 1-3 execution
 - Comprehensive coverage analysis
 - Complete framework detection
-- Generate full test-context-package.json
+- Generate full test-context-package.toon
 
 ### Quick Mode (Future)
 - Skip framework detection if already known
@@ -393,7 +398,7 @@ function detect_framework_from_config() {
 - ✅ Source session context loaded successfully
 - ✅ Test coverage gaps identified
 - ✅ Test framework detected and documented
-- ✅ Valid test-context-package.json generated
+- ✅ Valid test-context-package.toon generated
 - ✅ All missing tests catalogued with priority
 - ✅ Execution time < 30 seconds (< 60s for large codebases)
 

@@ -6,6 +6,11 @@ allowed-tools: TodoWrite(*), Task(*), Bash(*), AskUserQuestion(*)
 timeout: 180000
 color: cyan
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 # Workflow Lite-Plan Command (/workflow:lite-plan)
 
@@ -291,10 +296,10 @@ Task(
   Task: ${task_description}
 
   Exploration Context:
-  ${JSON.stringify(explorationContext, null, 2)}
+  ${encodeTOON(explorationContext, { indent: 2 })}
 
   User Clarifications:
-  ${JSON.stringify(clarificationContext, null, 2) || "None provided"}
+  ${encodeTOON(clarificationContext, { indent: 2 }) || "None provided"}
 
   Complexity Level: ${complexity}
 
@@ -982,4 +987,3 @@ RULES: $(cat ~/.claude/workflows/cli-templates/prompts/analysis/02-review-code-q
 - No file artifacts generated during planning phase
 - Execution starts immediately after user confirmation
 - Tool/agent handles implementation and any necessary file operations
-

@@ -5,6 +5,11 @@ description: Verify TDD workflow compliance against Red-Green-Refactor cycles, g
 argument-hint: "[optional: WFS-session-id]"
 allowed-tools: SlashCommand(*), TodoWrite(*), Read(*), Bash(gemini:*)
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 # TDD Verification Command (/workflow:tdd-verify)
 
@@ -43,19 +48,19 @@ find .workflow/ -name '.active-*' | head -1 | sed 's/.*active-//'
 **Validate TDD structure using bash commands**
 
 ```bash
-# Load all task JSONs
-find .workflow/{sessionId}/.task/ -name '*.json'
+# Load all task TOON files
+find .workflow/{sessionId}/.task/ -name '*.toon'
 
 # Extract task IDs
-find .workflow/{sessionId}/.task/ -name '*.json' -exec jq -r '.id' {} \;
+find .workflow/{sessionId}/.task/ -name '*.toon' -exec jq -r '.id' {} \;
 
 # Check dependencies
-find .workflow/{sessionId}/.task/ -name 'IMPL-*.json' -exec jq -r '.context.depends_on[]?' {} \;
-find .workflow/{sessionId}/.task/ -name 'REFACTOR-*.json' -exec jq -r '.context.depends_on[]?' {} \;
+find .workflow/{sessionId}/.task/ -name 'IMPL-*.toon' -exec jq -r '.context.depends_on[]?' {} \;
+find .workflow/{sessionId}/.task/ -name 'REFACTOR-*.toon' -exec jq -r '.context.depends_on[]?' {} \;
 
 # Check meta fields
-find .workflow/{sessionId}/.task/ -name '*.json' -exec jq -r '.meta.tdd_phase' {} \;
-find .workflow/{sessionId}/.task/ -name '*.json' -exec jq -r '.meta.agent' {} \;
+find .workflow/{sessionId}/.task/ -name '*.toon' -exec jq -r '.meta.tdd_phase' {} \;
+find .workflow/{sessionId}/.task/ -name '*.toon' -exec jq -r '.meta.agent' {} \;
 ```
 
 **Validation**:
@@ -82,8 +87,8 @@ find .workflow/{sessionId}/.task/ -name '*.json' -exec jq -r '.meta.agent' {} \;
 - Compliance score
 
 **Validation**:
-- `.workflow/{sessionId}/.process/test-results.json` exists
-- `.workflow/{sessionId}/.process/coverage-report.json` exists
+- `.workflow/{sessionId}/.process/test-results.toon` exists
+- `.workflow/{sessionId}/.process/coverage-report.toon` exists
 - `.workflow/{sessionId}/.process/tdd-cycle-report.md` exists
 
 **TodoWrite**: Mark phase 3 completed, phase 4 in_progress
@@ -97,7 +102,7 @@ find .workflow/{sessionId}/.task/ -name '*.json' -exec jq -r '.meta.agent' {} \;
 cd project-root && gemini -p "
 PURPOSE: Generate TDD compliance report
 TASK: Analyze TDD workflow execution and generate quality report
-CONTEXT: @{.workflow/{sessionId}/.task/*.json,.workflow/{sessionId}/.summaries/*,.workflow/{sessionId}/.process/tdd-cycle-report.md}
+CONTEXT: @{.workflow/{sessionId}/.task/*.toon,.workflow/{sessionId}/.summaries/*,.workflow/{sessionId}/.process/tdd-cycle-report.md}
 EXPECTED:
 - TDD compliance score (0-100)
 - Chain completeness verification
@@ -168,7 +173,7 @@ TodoWrite({todos: [
 
 ### Chain Validation Algorithm
 ```
-1. Load all task JSONs from .workflow/{sessionId}/.task/
+1. Load all task TOON files from .workflow/{sessionId}/.task/
 2. Extract task IDs and group by feature number
 3. For each feature:
    - Check TEST-N.M exists
@@ -205,8 +210,8 @@ Final Score: Max(0, Base Score - Deductions)
 .workflow/{session-id}/
 ├── TDD_COMPLIANCE_REPORT.md     # Comprehensive compliance report ⭐
 └── .process/
-    ├── test-results.json         # From tdd-coverage-analysis
-    ├── coverage-report.json      # From tdd-coverage-analysis
+    ├── test-results.toon         # From tdd-coverage-analysis
+    ├── coverage-report.toon      # From tdd-coverage-analysis
     └── tdd-cycle-report.md       # From tdd-coverage-analysis
 ```
 

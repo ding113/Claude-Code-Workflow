@@ -75,22 +75,22 @@ Installed: 2025-10-03T12:00:00Z
 
 ### Call GitHub API for latest release (with timeout)
 ```bash
-bash(curl -fsSL "https://api.github.com/repos/catlog22/Claude-Code-Workflow/releases/latest" 2>/dev/null, timeout: 30000)
+bash(curl -fsSL "https://api.github.com/repos/ding113/Claude-Code-Workflow/releases/latest" 2>/dev/null, timeout: 30000)
 ```
 
 ### Extract tag name (version)
 ```bash
-bash(curl -fsSL "https://api.github.com/repos/catlog22/Claude-Code-Workflow/releases/latest" 2>/dev/null | grep -o '"tag_name": *"[^"]*"' | head -1 | cut -d'"' -f4, timeout: 30000)
+bash(curl -fsSL "https://api.github.com/repos/ding113/Claude-Code-Workflow/releases/latest" 2>/dev/null | grep -o '"tag_name": *"[^"]*"' | head -1 | cut -d'"' -f4, timeout: 30000)
 ```
 
 ### Extract release name
 ```bash
-bash(curl -fsSL "https://api.github.com/repos/catlog22/Claude-Code-Workflow/releases/latest" 2>/dev/null | grep -o '"name": *"[^"]*"' | head -1 | cut -d'"' -f4, timeout: 30000)
+bash(curl -fsSL "https://api.github.com/repos/ding113/Claude-Code-Workflow/releases/latest" 2>/dev/null | grep -o '"name": *"[^"]*"' | head -1 | cut -d'"' -f4, timeout: 30000)
 ```
 
 ### Extract published date
 ```bash
-bash(curl -fsSL "https://api.github.com/repos/catlog22/Claude-Code-Workflow/releases/latest" 2>/dev/null | grep -o '"published_at": *"[^"]*"' | cut -d'"' -f4, timeout: 30000)
+bash(curl -fsSL "https://api.github.com/repos/ding113/Claude-Code-Workflow/releases/latest" 2>/dev/null | grep -o '"published_at": *"[^"]*"' | cut -d'"' -f4, timeout: 30000)
 ```
 
 **Output Format**:
@@ -104,22 +104,22 @@ Published: 2025-10-03T04:10:08Z
 
 ### Call GitHub API for latest commit on main (with timeout)
 ```bash
-bash(curl -fsSL "https://api.github.com/repos/catlog22/Claude-Code-Workflow/commits/main" 2>/dev/null, timeout: 30000)
+bash(curl -fsSL "https://api.github.com/repos/ding113/Claude-Code-Workflow/commits/main" 2>/dev/null, timeout: 30000)
 ```
 
 ### Extract commit SHA (short)
 ```bash
-bash(curl -fsSL "https://api.github.com/repos/catlog22/Claude-Code-Workflow/commits/main" 2>/dev/null | grep -o '"sha": *"[^"]*"' | head -1 | cut -d'"' -f4 | cut -c1-7, timeout: 30000)
+bash(curl -fsSL "https://api.github.com/repos/ding113/Claude-Code-Workflow/commits/main" 2>/dev/null | grep -o '"sha": *"[^"]*"' | head -1 | cut -d'"' -f4 | cut -c1-7, timeout: 30000)
 ```
 
 ### Extract commit message (first line only)
 ```bash
-bash(curl -fsSL "https://api.github.com/repos/catlog22/Claude-Code-Workflow/commits/main" 2>/dev/null | grep '"message":' | cut -d'"' -f4 | cut -d'\' -f1, timeout: 30000)
+bash(curl -fsSL "https://api.github.com/repos/ding113/Claude-Code-Workflow/commits/main" 2>/dev/null | grep '"message":' | cut -d'"' -f4 | cut -d'\' -f1, timeout: 30000)
 ```
 
 ### Extract commit date
 ```bash
-bash(curl -fsSL "https://api.github.com/repos/catlog22/Claude-Code-Workflow/commits/main" 2>/dev/null | grep -o '"date": *"[^"]*"' | head -1 | cut -d'"' -f4, timeout: 30000)
+bash(curl -fsSL "https://api.github.com/repos/ding113/Claude-Code-Workflow/commits/main" 2>/dev/null | grep -o '"date": *"[^"]*"' | head -1 | cut -d'"' -f4, timeout: 30000)
 ```
 
 **Output Format**:
@@ -161,8 +161,8 @@ A newer stable version is available: v3.2.2
 Your version: 3.2.1
 
 To upgrade:
-PowerShell: iex (iwr -useb https://raw.githubusercontent.com/catlog22/Claude-Code-Workflow/main/install-remote.ps1)
-Bash: bash <(curl -fsSL https://raw.githubusercontent.com/catlog22/Claude-Code-Workflow/main/install-remote.sh)
+PowerShell: iex (iwr -useb https://raw.githubusercontent.com/ding113/Claude-Code-Workflow/main/install-remote.ps1)
+Bash: bash <(curl -fsSL https://raw.githubusercontent.com/ding113/Claude-Code-Workflow/main/install-remote.sh)
 ```
 
 **Scenario 3: Development version**
@@ -188,22 +188,22 @@ bash(cat version.json | grep -o '"version": *"[^"]*"' | cut -d'"' -f4)
 bash(cat version.json | grep -o '"installation_date_utc": *"[^"]*"' | cut -d'"' -f4)
 
 # Fetch latest release (with timeout)
-bash(curl -fsSL "https://api.github.com/repos/catlog22/Claude-Code-Workflow/releases/latest" 2>/dev/null, timeout: 30000)
+bash(curl -fsSL "https://api.github.com/repos/ding113/Claude-Code-Workflow/releases/latest" 2>/dev/null, timeout: 30000)
 
 # Extract tag name
-bash(curl -fsSL "https://api.github.com/repos/catlog22/Claude-Code-Workflow/releases/latest" 2>/dev/null | grep -o '"tag_name": *"[^"]*"' | cut -d'"' -f4, timeout: 30000)
+bash(curl -fsSL "https://api.github.com/repos/ding113/Claude-Code-Workflow/releases/latest" 2>/dev/null | grep -o '"tag_name": *"[^"]*"' | cut -d'"' -f4, timeout: 30000)
 
 # Extract release name
-bash(curl -fsSL "https://api.github.com/repos/catlog22/Claude-Code-Workflow/releases/latest" 2>/dev/null | grep -o '"name": *"[^"]*"' | head -1 | cut -d'"' -f4, timeout: 30000)
+bash(curl -fsSL "https://api.github.com/repos/ding113/Claude-Code-Workflow/releases/latest" 2>/dev/null | grep -o '"name": *"[^"]*"' | head -1 | cut -d'"' -f4, timeout: 30000)
 
 # Fetch latest commit (with timeout)
-bash(curl -fsSL "https://api.github.com/repos/catlog22/Claude-Code-Workflow/commits/main" 2>/dev/null, timeout: 30000)
+bash(curl -fsSL "https://api.github.com/repos/ding113/Claude-Code-Workflow/commits/main" 2>/dev/null, timeout: 30000)
 
 # Extract commit SHA
-bash(curl -fsSL "https://api.github.com/repos/catlog22/Claude-Code-Workflow/commits/main" 2>/dev/null | grep -o '"sha": *"[^"]*"' | head -1 | cut -d'"' -f4 | cut -c1-7, timeout: 30000)
+bash(curl -fsSL "https://api.github.com/repos/ding113/Claude-Code-Workflow/commits/main" 2>/dev/null | grep -o '"sha": *"[^"]*"' | head -1 | cut -d'"' -f4 | cut -c1-7, timeout: 30000)
 
 # Extract commit message (first line)
-bash(curl -fsSL "https://api.github.com/repos/catlog22/Claude-Code-Workflow/commits/main" 2>/dev/null | grep '"message":' | cut -d'"' -f4 | cut -d'\' -f1, timeout: 30000)
+bash(curl -fsSL "https://api.github.com/repos/ding113/Claude-Code-Workflow/commits/main" 2>/dev/null | grep '"message":' | cut -d'"' -f4 | cut -d'\' -f1, timeout: 30000)
 
 # Compare versions
 bash(printf "%s\n%s" "3.2.1" "3.2.2" | sort -V | tail -n 1)
@@ -218,7 +218,7 @@ bash(echo "v3.2.1" | sed 's/^v//')
 ```
 WARNING: Claude Code Workflow not installed
 Install using:
-PowerShell: iex (iwr -useb https://raw.githubusercontent.com/catlog22/Claude-Code-Workflow/main/install-remote.ps1)
+PowerShell: iex (iwr -useb https://raw.githubusercontent.com/ding113/Claude-Code-Workflow/main/install-remote.ps1)
 ```
 
 ### Network error
@@ -245,9 +245,9 @@ ERROR: version.json is invalid or corrupted
 ## API Endpoints
 
 ### GitHub API Used
-- **Latest Release**: `https://api.github.com/repos/catlog22/Claude-Code-Workflow/releases/latest`
+- **Latest Release**: `https://api.github.com/repos/ding113/Claude-Code-Workflow/releases/latest`
   - Fields: `tag_name`, `name`, `published_at`
-- **Latest Commit**: `https://api.github.com/repos/catlog22/Claude-Code-Workflow/commits/main`
+- **Latest Commit**: `https://api.github.com/repos/ding113/Claude-Code-Workflow/commits/main`
   - Fields: `sha`, `commit.message`, `commit.author.date`
 
 ### Timeout Configuration

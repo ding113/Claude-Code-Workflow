@@ -4,6 +4,11 @@ description: Synchronize finalized design system references to brainstorming art
 argument-hint: --session <session_id> [--selected-prototypes "<list>"]
 allowed-tools: Read(*), Write(*), Edit(*), TodoWrite(*), Glob(*), Bash(*)
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 # Design Sync Command
 
@@ -31,8 +36,8 @@ CHECK: .workflow/.active-* marker files; VALIDATE: session_id matches active ses
 latest_design = find_latest_path_matching(".workflow/WFS-{session}/design-run-*")
 
 # Detect design system structure
-IF exists({latest_design}/style-extraction/style-1/design-tokens.json):
-    design_system_mode = "separate"; design_tokens_path = "style-extraction/style-1/design-tokens.json"; style_guide_path = "style-extraction/style-1/style-guide.md"
+IF exists({latest_design}/style-extraction/style-1/design-tokens.toon):
+    design_system_mode = "separate"; design_tokens_path = "style-extraction/style-1/design-tokens.toon"; style_guide_path = "style-extraction/style-1/style-guide.md"
 ELSE:
     ERROR: "No design tokens found. Run /workflow:ui-design:style-extract first"
 
@@ -75,7 +80,7 @@ IF exists(.workflow/WFS-{session}/.brainstorming/ui-designer/analysis.md): Read(
 FOR each selected_prototype IN selected_list:
     Read({latest_design}/prototypes/{selected_prototype}-notes.md)  # Extract: layout_strategy, page_name only
 
-# Note: Do NOT read design-tokens.json, style-guide.md, or prototype HTML. Only verify existence and generate @ references.
+# Note: Do NOT read design-tokens.toon, style-guide.md, or prototype HTML. Only verify existence and generate @ references.
 ```
 
 ### Phase 3: Update Synthesis Specification
@@ -95,7 +100,7 @@ Update `.brainstorming/role analysis documents` with design system references.
 
 ### Implementation Requirements
 **Token Adherence**: All UI implementations MUST use design token CSS custom properties
-**Accessibility**: WCAG AA compliance validated in design-tokens.json
+**Accessibility**: WCAG AA compliance validated in design-tokens.toon
 **Responsive**: Mobile-first design using token-based breakpoints
 **Component Patterns**: Follow patterns documented in style-guide.md
 
@@ -131,8 +136,8 @@ IF section not found:
 ui_designer_files = Glob(".workflow/WFS-{session}/.brainstorming/ui-designer/analysis*.md")
 
 # Conditionally update other roles
-has_animations = exists({latest_design}/animation-extraction/animation-tokens.json)
-has_layouts = exists({latest_design}/layout-extraction/layout-templates.json)
+has_animations = exists({latest_design}/animation-extraction/animation-tokens.toon)
+has_layouts = exists({latest_design}/layout-extraction/layout-templates.toon)
 
 IF has_animations: ux_expert_files = Glob(".workflow/WFS-{session}/.brainstorming/ux-expert/analysis*.md")
 IF has_layouts: architect_files = Glob(".workflow/WFS-{session}/.brainstorming/system-architect/analysis*.md")
@@ -156,7 +161,7 @@ IF selected_list: pm_files = Glob(".workflow/WFS-{session}/.brainstorming/produc
 ```markdown
 ## Animation & Interaction Reference
 
-**Animations**: @../../{design_id}/animation-extraction/animation-tokens.json
+**Animations**: @../../{design_id}/animation-extraction/animation-tokens.toon
 **Prototypes**: {FOR each: @../../{design_id}/prototypes/{prototype}.html}
 
 *Reference added by /workflow:ui-design:update*
@@ -166,7 +171,7 @@ IF selected_list: pm_files = Glob(".workflow/WFS-{session}/.brainstorming/produc
 ```markdown
 ## Layout Structure Reference
 
-**Layout Templates**: @../../{design_id}/layout-extraction/layout-templates.json
+**Layout Templates**: @../../{design_id}/layout-extraction/layout-templates.toon
 
 *Reference added by /workflow:ui-design:update*
 ```
@@ -249,7 +254,7 @@ Updated artifacts:
 ✓ ui-designer/design-system-reference.md - Design system reference guide
 
 Design system assets ready for /workflow:plan:
-- design-tokens.json | style-guide.md | {prototype_count} reference prototypes
+- design-tokens.toon | style-guide.md | {prototype_count} reference prototypes
 
 Next: /workflow:plan [--agent] "<task description>"
       The plan phase will automatically discover and utilize the design system.
@@ -271,23 +276,23 @@ Next: /workflow:plan [--agent] "<task description>"
 
 **@ Reference Format** (role analysis documents):
 ```
-@../{design_id}/style-extraction/style-1/design-tokens.json
+@../{design_id}/style-extraction/style-1/design-tokens.toon
 @../{design_id}/style-extraction/style-1/style-guide.md
 @../{design_id}/prototypes/{prototype}.html
 ```
 
 **@ Reference Format** (ui-designer/design-system-reference.md):
 ```
-@../../{design_id}/style-extraction/style-1/design-tokens.json
+@../../{design_id}/style-extraction/style-1/design-tokens.toon
 @../../{design_id}/style-extraction/style-1/style-guide.md
 @../../{design_id}/prototypes/{prototype}.html
 ```
 
 **@ Reference Format** (role analysis.md files):
 ```
-@../../{design_id}/style-extraction/style-1/design-tokens.json
-@../../{design_id}/animation-extraction/animation-tokens.json
-@../../{design_id}/layout-extraction/layout-templates.json
+@../../{design_id}/style-extraction/style-1/design-tokens.toon
+@../../{design_id}/animation-extraction/animation-tokens.toon
+@../../{design_id}/layout-extraction/layout-templates.toon
 @../../{design_id}/prototypes/{prototype}.html
 ```
 
@@ -299,15 +304,15 @@ After this update, `/workflow:plan` will discover design assets through:
 - Reads role analysis documents → Discovers @ references → Includes design system context in ANALYSIS_RESULTS.md
 
 **Phase 4: Task Generation** (`/workflow:tools:task-generate`)
-- Reads ANALYSIS_RESULTS.md → Discovers design assets → Includes design system paths in task JSON files
+- Reads ANALYSIS_RESULTS.md → Discovers design assets → Includes design system paths in task TOON files
 
-**Example Task JSON** (generated by task-generate):
+**Example Task TOON** (generated by task-generate):
 ```json
 {
   "task_id": "IMPL-001",
   "context": {
     "design_system": {
-      "tokens": "{design_id}/style-extraction/style-1/design-tokens.json",
+      "tokens": "{design_id}/style-extraction/style-1/design-tokens.toon",
       "style_guide": "{design_id}/style-extraction/style-1/style-guide.md",
       "prototypes": ["{design_id}/prototypes/dashboard-variant-1.html"]
     }

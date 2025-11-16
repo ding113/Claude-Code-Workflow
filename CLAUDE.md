@@ -3,6 +3,60 @@
 ## Overview
 
 This document defines project-specific coding standards and development principles.
+
+### TOON Format (Token-Oriented Object Notation)
+
+This project uses **TOON format** for LLM interactions to achieve 30-60% token savings compared to JSON. TOON is a compact, human-readable serialization format optimized for structured data.
+
+**What is TOON?**
+TOON combines YAML's indentation-based structure with CSV's tabular format, optimized for LLM token efficiency. It excels with uniform arrays of objects (same fields, primitive values), which are common in workflow tasks, configuration data, and structured logs.
+
+**Basic Syntax Examples:**
+```toon
+# Simple object
+id: 123
+name: Ada
+active: true
+
+# Nested object
+user:
+  id: 123
+  name: Ada
+
+# Uniform array (tabular format) - declares length [N] and fields {field1,field2}
+users[2]{id,name,role}:
+  1,Alice,admin
+  2,Bob,user
+
+# Primitive array (inline)
+tags[3]: admin,ops,dev
+```
+
+**Key Benefits:**
+- 30-60% fewer tokens vs formatted JSON (benchmarked: 73.9% LLM accuracy vs JSON's 69.7%)
+- Explicit structure with `[N]` length declarations and `{fields}` headers improves LLM reliability
+- Self-documenting format reduces parsing errors
+- Minimal syntax: no redundant braces, brackets, or repeated keys
+
+**Using TOON in This Project:**
+- Use `encodeTOON(data)` to convert JavaScript objects to TOON format (see `src/utils/toon.ts`)
+- Use `decodeTOON(input)` to parse TOON back to JavaScript
+- Use `autoDecode(input)` for automatic format detection (supports both JSON and TOON)
+- Workflow tasks, agent configs, and structured data should prefer TOON format
+- Backward compatibility maintained: JSON files still work via auto-detection
+
+**When to Use TOON:**
+- ✅ Workflow task definitions with uniform structures
+- ✅ Configuration files with repeated object patterns
+- ✅ Large datasets with consistent field sets
+- ❌ Deeply nested or non-uniform data (JSON may be more efficient)
+- ❌ External API contracts (stick with JSON for interoperability)
+
+**References:**
+- Utilities: `src/utils/toon.ts`
+- Tests: `tests/integration/toon-format.test.ts`
+- Official docs: [TOON Specification](https://github.com/toon-format/spec)
+
 ### CLI Tool Context Protocols
 For all CLI tool usage, command syntax, and integration guidelines:
 - **MCP Tool Strategy**: @~/.claude/workflows/mcp-tool-strategy.md

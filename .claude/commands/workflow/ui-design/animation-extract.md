@@ -4,12 +4,17 @@ description: Extract animation and transition patterns from prompt inference and
 argument-hint: "[--design-id <id>] [--session <id>] [--images "<glob>"] [--focus "<types>"] [--interactive] [--refine]"
 allowed-tools: TodoWrite(*), Read(*), Write(*), Glob(*), Bash(*), AskUserQuestion(*), Task(ui-design-agent)
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 # Animation Extraction Command
 
 ## Overview
 
-Extract animation and transition patterns from prompt inference and image references using AI analysis. Directly generates production-ready animation systems with complete `animation-tokens.json`.
+Extract animation and transition patterns from prompt inference and image references using AI analysis. Directly generates production-ready animation systems with complete `animation-tokens.toon`.
 
 **Strategy**: AI-Driven Animation Specification with Visual Previews
 
@@ -108,7 +113,7 @@ IF has_images:
         "files": image_list,
         "timestamp": current_timestamp()
     }
-    Write({base_path}/.intermediates/animation-analysis/image-references.json, JSON.stringify(image_metadata, indent=2))
+    Write({base_path}/.intermediates/animation-analysis/image-references.toon, encodeTOON(image_metadata, { indent: 2 }))
 
     REPORT: "   ✅ Image references prepared for AI analysis"
 ELSE:
@@ -130,8 +135,8 @@ ELSE:
 
 ```bash
 # Load existing design tokens for duration/easing alignment
-IF exists({base_path}/style-extraction/style-1/design-tokens.json):
-    design_tokens = Read({base_path}/style-extraction/style-1/design-tokens.json)
+IF exists({base_path}/style-extraction/style-1/design-tokens.toon):
+    design_tokens = Read({base_path}/style-extraction/style-1/design-tokens.toon)
     has_design_context = true
 ELSE:
     has_design_context = false
@@ -145,7 +150,7 @@ bash(mkdir -p {base_path}/animation-extraction)
 
 ```bash
 # Check if output already exists
-bash(test -f {base_path}/animation-extraction/animation-tokens.json && echo "exists")
+bash(test -f {base_path}/animation-extraction/animation-tokens.toon && echo "exists")
 IF exists: SKIP to completion
 ```
 
@@ -163,7 +168,7 @@ bash(test -f {base_path}/.brainstorming/role-analysis.md && cat it)
 
 # Load image references if available
 IF has_images:
-    image_references = Read({base_path}/.intermediates/animation-analysis/image-references.json)
+    image_references = Read({base_path}/.intermediates/animation-analysis/image-references.toon)
     REPORT: "📸 Image references loaded: {image_references.count} file(s)"
 ```
 
@@ -186,7 +191,7 @@ IF NOT refine_mode:
   - Focus types: {focus_types.join(", ")}
   - Design context: {has_design_context ? "Available" : "None"}
   - Image references: {has_images ? "Available (" + image_count + " files)" : "None"}
-  ${has_images ? "- Image Data: Read from .intermediates/animation-analysis/image-references.json" : ""}
+  ${has_images ? "- Image Data: Read from .intermediates/animation-analysis/image-references.toon" : ""}
 
   ## Analysis Rules
   - Analyze image references (if available) to infer animation patterns from visual cues
@@ -210,7 +215,7 @@ IF NOT refine_mode:
      - Visual preview (timeline representation or easing curve ASCII art)
 
   ## Output
-  Write single JSON file: {base_path}/.intermediates/animation-analysis/analysis-options.json
+  Write single JSON file: {base_path}/.intermediates/animation-analysis/analysis-options.toon
 
   Use schema:
   {
@@ -277,10 +282,10 @@ ELSE:
       SESSION: {session_id} | MODE: refine | BASE_PATH: {base_path}
 
       ## Load Existing Animation System
-      - Existing tokens: Read from {base_path}/animation-extraction/animation-tokens.json
+      - Existing tokens: Read from {base_path}/animation-extraction/animation-tokens.toon
       - Focus types: {focus_types.join(", ")}
       - Design context: {has_design_context ? "Available" : "None"}
-      ${has_images ? "- Image Data: Read from .intermediates/animation-analysis/image-references.json" : ""}
+      ${has_images ? "- Image Data: Read from .intermediates/animation-analysis/image-references.toon" : ""}
 
       ## Refinement Categories
       Generate 8-12 refinement options across these categories:
@@ -316,7 +321,7 @@ ELSE:
       7. **Before/After Preview** (show current vs proposed values)
 
       ## Output
-      Write single JSON file: {base_path}/.intermediates/animation-analysis/refinement-options.json
+      Write single JSON file: {base_path}/.intermediates/animation-analysis/refinement-options.toon
 
       Use schema:
       {
@@ -327,7 +332,7 @@ ELSE:
           "total_refinements": <count>
         },
         "current_animation_system": {
-          // Copy from animation-tokens.json for reference
+          // Copy from animation-tokens.toon for reference
         },
         "refinement_options": [
           {
@@ -358,24 +363,24 @@ ELSE:
 
 ```bash
 IF NOT refine_mode:
-    # Exploration mode: Check for analysis-options.json
-    bash(test -f {base_path}/.intermediates/animation-analysis/analysis-options.json && echo "created")
-    bash(cat {base_path}/.intermediates/animation-analysis/analysis-options.json | grep -q "specification_options" && echo "valid")
+    # Exploration mode: Check for analysis-options.toon
+    bash(test -f {base_path}/.intermediates/animation-analysis/analysis-options.toon && echo "created")
+    bash(cat {base_path}/.intermediates/animation-analysis/analysis-options.toon | grep -q "specification_options" && echo "valid")
 ELSE:
-    # Refinement mode: Check for refinement-options.json
-    bash(test -f {base_path}/.intermediates/animation-analysis/refinement-options.json && echo "created")
-    bash(cat {base_path}/.intermediates/animation-analysis/refinement-options.json | grep -q "refinement_options" && echo "valid")
+    # Refinement mode: Check for refinement-options.toon
+    bash(test -f {base_path}/.intermediates/animation-analysis/refinement-options.toon && echo "created")
+    bash(cat {base_path}/.intermediates/animation-analysis/refinement-options.toon | grep -q "refinement_options" && echo "valid")
 ```
 
 **Output**:
-- Exploration mode: `analysis-options.json` with animation specification questions
-- Refinement mode: `refinement-options.json` with refinement options
+- Exploration mode: `analysis-options.toon` with animation specification questions
+- Refinement mode: `refinement-options.toon` with refinement options
 
 ---
 
 **Phase 1 Output**:
-- Exploration mode: `analysis-options.json` with generated specification questions
-- Refinement mode: `refinement-options.json` with refinement options
+- Exploration mode: `analysis-options.toon` with generated specification questions
+- Refinement mode: `refinement-options.toon` with refinement options
 
 ## Phase 1.5: User Confirmation (Optional - Triggered by --interactive)
 
@@ -400,11 +405,11 @@ REPORT: "🎯 Interactive mode enabled: User answers required"
 # Read options file based on mode
 IF NOT refine_mode:
     # Exploration mode
-    options = Read({base_path}/.intermediates/animation-analysis/analysis-options.json)
+    options = Read({base_path}/.intermediates/animation-analysis/analysis-options.toon)
     specification_options = options.specification_options
 ELSE:
     # Refinement mode
-    options = Read({base_path}/.intermediates/animation-analysis/refinement-options.json)
+    options = Read({base_path}/.intermediates/animation-analysis/refinement-options.toon)
     refinement_options = options.refinement_options
 ```
 
@@ -433,8 +438,8 @@ IF NOT refine_mode:
            ${option.visual_preview ? "Preview:\n       " + option.visual_preview.timeline || option.visual_preview.curve_art || option.visual_preview.animation_sequence : ""}
            ${option.visual_preview ? "       " + option.visual_preview.description : ""}
 
-           ${option.duration_values ? "Durations: " + JSON.stringify(option.duration_values) : ""}
-           ${option.easing_curves ? "Easing: " + JSON.stringify(option.easing_curves) : ""}
+           ${option.duration_values ? "Durations: " + encodeTOON(option.duration_values) : ""}
+           ${option.easing_curves ? "Easing: " + encodeTOON(option.easing_curves) : ""}
            ${option.transform_value ? "Transform: " + option.transform_value : ""}
       }
 
@@ -553,7 +558,7 @@ ELSE:
 
 ```bash
 IF NOT refine_mode:
-    # EXPLORATION MODE - Update analysis-options.json
+    # EXPLORATION MODE - Update analysis-options.toon
     options.user_selection = {
       "selected_at": "{current_timestamp}",
       "session_id": "{session_id}",
@@ -561,13 +566,13 @@ IF NOT refine_mode:
     }
 
     # Write updated file back
-    Write({base_path}/.intermediates/animation-analysis/analysis-options.json, JSON.stringify(options, indent=2))
+    Write({base_path}/.intermediates/animation-analysis/analysis-options.toon, encodeTOON(options, { indent: 2 }))
 
     # Verify
-    bash(test -f {base_path}/.intermediates/animation-analysis/analysis-options.json && echo "saved")
+    bash(test -f {base_path}/.intermediates/animation-analysis/analysis-options.toon && echo "saved")
 
 ELSE:
-    # REFINEMENT MODE - Update refinement-options.json
+    # REFINEMENT MODE - Update refinement-options.toon
     options.user_selection = {
       "selected_at": "{current_timestamp}",
       "session_id": "{session_id}",
@@ -575,10 +580,10 @@ ELSE:
     }
 
     # Write updated file back
-    Write({base_path}/.intermediates/animation-analysis/refinement-options.json, JSON.stringify(options, indent=2))
+    Write({base_path}/.intermediates/animation-analysis/refinement-options.toon, encodeTOON(options, { indent: 2 }))
 
     # Verify
-    bash(test -f {base_path}/.intermediates/animation-analysis/refinement-options.json && echo "saved")
+    bash(test -f {base_path}/.intermediates/animation-analysis/refinement-options.toon && echo "saved")
 ```
 
 ### Step 6: Confirmation Message
@@ -613,8 +618,8 @@ ELSE:
 ```
 
 **Output**:
-- Exploration mode: Updated `analysis-options.json` with embedded `user_selection` field
-- Refinement mode: Updated `refinement-options.json` with `user_selection.selected_refinements` array
+- Exploration mode: Updated `analysis-options.toon` with embedded `user_selection` field
+- Refinement mode: Updated `refinement-options.toon` with `user_selection.selected_refinements` array
 
 ## Phase 2: Animation System Generation (Agent Task 2)
 
@@ -624,8 +629,8 @@ ELSE:
 
 ```bash
 IF NOT refine_mode:
-    # EXPLORATION MODE - Read analysis-options.json
-    options = Read({base_path}/.intermediates/animation-analysis/analysis-options.json)
+    # EXPLORATION MODE - Read analysis-options.toon
+    options = Read({base_path}/.intermediates/animation-analysis/analysis-options.toon)
     specification_options = options.specification_options
 
     # Check if user_selection field exists (interactive mode)
@@ -639,8 +644,8 @@ IF NOT refine_mode:
         REPORT: "ℹ️ Non-interactive mode: Using default animation preferences"
 
 ELSE:
-    # REFINEMENT MODE - Read refinement-options.json
-    options = Read({base_path}/.intermediates/animation-analysis/refinement-options.json)
+    # REFINEMENT MODE - Read refinement-options.toon
+    options = Read({base_path}/.intermediates/animation-analysis/refinement-options.toon)
     refinement_options = options.refinement_options
 
     # Check if user_selection field exists (interactive mode)
@@ -656,8 +661,8 @@ ELSE:
 # Load image references if available for agent context
 image_context = null
 IF has_images:
-    IF exists({base_path}/.intermediates/animation-analysis/image-references.json):
-        image_context = Read({base_path}/.intermediates/animation-analysis/image-references.json)
+    IF exists({base_path}/.intermediates/animation-analysis/image-references.toon):
+        image_context = Read({base_path}/.intermediates/animation-analysis/image-references.toon)
         REPORT: "📸 Using {image_context.count} image reference(s) for animation inference"
 ```
 
@@ -682,19 +687,19 @@ IF NOT refine_mode:
       SESSION: {session_id} | MODE: explore | BASE_PATH: {base_path}
 
   USER PREFERENCES:
-  ${user_answers ? "- User Selection: " + JSON.stringify(user_answers) : "- Using Defaults: First option for each category"}
-  ${user_answers ? "- Specification Options: Read from .intermediates/animation-analysis/analysis-options.json for detailed specs" : ""}
+  ${user_answers ? "- User Selection: " + encodeTOON(user_answers) : "- Using Defaults: First option for each category"}
+  ${user_answers ? "- Specification Options: Read from .intermediates/animation-analysis/analysis-options.toon for detailed specs" : ""}
 
   ## Input Analysis
   - Interactive mode: {user_answers ? "Yes (user preferences available)" : "No (using defaults)"}
   - Image references: {image_context ? "Available (" + image_context.count + " files)" : "None"}
-  ${image_context ? "- Image Data: " + JSON.stringify(image_context) : ""}
+  ${image_context ? "- Image Data: " + encodeTOON(image_context) : ""}
   - Design context: {has_design_context ? "Available" : "None"}
-  ${has_design_context ? "- Design Tokens: Read from style-extraction/style-1/design-tokens.json" : ""}
+  ${has_design_context ? "- Design Tokens: Read from style-extraction/style-1/design-tokens.toon" : ""}
 
   ## Generation Rules
   ${user_answers ? `
-  - Read analysis-options.json to get user_selection.answers
+  - Read analysis-options.toon to get user_selection.answers
   - For each category in user_selection.answers, find the selected option
   - Use the selected option's technical specs (duration_values, easing_curves, transform_value, etc.)
   - Apply these specs to generate animation tokens
@@ -709,7 +714,7 @@ IF NOT refine_mode:
   - Semantic naming for all animation values
 
   ## Synthesis Priority
-  1. User answers from analysis-options.json user_selection field (highest priority)
+  1. User answers from analysis-options.toon user_selection field (highest priority)
   2. Inferred patterns from image references (medium priority)
   3. Industry best practices (fallback)
 
@@ -743,7 +748,7 @@ IF NOT refine_mode:
 
   ## Generate Files
 
-  ### 1. animation-tokens.json
+  ### 1. animation-tokens.toon
   Complete animation token structure using var() references:
 
   {
@@ -819,14 +824,14 @@ IF NOT refine_mode:
   }
 
   ## Output File Paths
-  - animation-tokens.json: {base_path}/animation-extraction/animation-tokens.json
+  - animation-tokens.toon: {base_path}/animation-extraction/animation-tokens.toon
 
   ## Critical Requirements
   - ✅ Use Write() tool immediately to generate JSON file
   - ✅ All tokens use CSS Custom Property format: var(--duration-fast)
   - ✅ Include prefers-reduced-motion media query guidance
   - ✅ Validate all cubic-bezier values are valid (4 numbers between 0-1)
-  - ${user_answers ? "✅ READ analysis-options.json for user_selection field" : "✅ Use first option from each question as default"}
+  - ${user_answers ? "✅ READ analysis-options.toon for user_selection field" : "✅ Use first option from each question as default"}
   - ❌ NO user questions or interaction in this phase
   - ✅ Can use Exa MCP to research modern animation patterns and obtain code examples (Explore/Text mode)
     `
@@ -840,13 +845,13 @@ ELSE:
       SESSION: {session_id} | MODE: refine | BASE_PATH: {base_path}
 
       ## Load Existing Animation System
-      - Current tokens: Read from {base_path}/animation-extraction/animation-tokens.json
-      - Refinement options: Read from .intermediates/animation-analysis/refinement-options.json
+      - Current tokens: Read from {base_path}/animation-extraction/animation-tokens.toon
+      - Refinement options: Read from .intermediates/animation-analysis/refinement-options.toon
 
       REFINEMENT SELECTION:
       ${selected_refinements ? `
       - Interactive mode: Apply selected refinements
-      - Selected IDs: ${JSON.stringify(selected_refinements)}
+      - Selected IDs: ${encodeTOON(selected_refinements)}
       - For each ID in selected_refinements:
           * Find refinement in refinement_options by id
           * Apply technical_changes to corresponding tokens
@@ -858,9 +863,9 @@ ELSE:
 
       ## Input Analysis
       - Image references: {image_context ? "Available (" + image_context.count + " files)" : "None"}
-      ${image_context ? "- Image Data: " + JSON.stringify(image_context) : ""}
+      ${image_context ? "- Image Data: " + encodeTOON(image_context) : ""}
       - Design context: {has_design_context ? "Available" : "None"}
-      ${has_design_context ? "- Design Tokens: Read from style-extraction/style-1/design-tokens.json" : ""}
+      ${has_design_context ? "- Design Tokens: Read from style-extraction/style-1/design-tokens.toon" : ""}
 
       ## Refinement Application Rules
       ${selected_refinements ? `
@@ -870,7 +875,7 @@ ELSE:
       - Apply ALL refinements from refinement_options
       - Combine multiple refinements that affect same token
       `}
-      - Load current animation-tokens.json
+      - Load current animation-tokens.toon
       - For each applicable refinement:
           * Parse technical_changes field
           * Apply "to" values to replace "from" values in tokens
@@ -886,7 +891,7 @@ ELSE:
 
       ## Generate Updated Files
 
-      ### 1. animation-tokens.json
+      ### 1. animation-tokens.toon
       Updated animation token structure with refinements applied:
       - Load existing structure
       - Apply technical_changes from selected/all refinements
@@ -894,21 +899,21 @@ ELSE:
       - Validate all cubic-bezier values
 
       ## Output File Paths
-      - animation-tokens.json: {base_path}/animation-extraction/animation-tokens.json (OVERWRITE)
+      - animation-tokens.toon: {base_path}/animation-extraction/animation-tokens.toon (OVERWRITE)
 
       ## Critical Requirements
       - ✅ Use Write() tool immediately to generate JSON file
-      - ✅ OVERWRITE existing animation-tokens.json with refined version
+      - ✅ OVERWRITE existing animation-tokens.toon with refined version
       - ✅ All tokens use CSS Custom Property format: var(--duration-fast)
       - ✅ Include prefers-reduced-motion media query guidance
       - ✅ Validate all cubic-bezier values are valid (4 numbers between 0-1)
-      - ${selected_refinements ? "✅ READ refinement-options.json for user_selection.selected_refinements" : "✅ Apply ALL refinements from refinement_options"}
+      - ${selected_refinements ? "✅ READ refinement-options.toon for user_selection.selected_refinements" : "✅ Apply ALL refinements from refinement_options"}
       - ❌ NO user questions or interaction in this phase
       - ✅ Can use Exa MCP to research modern animation patterns and obtain code examples (Explore/Text mode)
     `
 ```
 
-**Output**: Agent generates/updates animation-tokens.json
+**Output**: Agent generates/updates animation-tokens.toon
 
 ## Phase 3: Verify Output
 
@@ -916,11 +921,11 @@ ELSE:
 
 ```bash
 # Verify animation system created
-bash(test -f {base_path}/animation-extraction/animation-tokens.json && echo "exists")
+bash(test -f {base_path}/animation-extraction/animation-tokens.toon && echo "exists")
 
 # Validate structure
-bash(cat {base_path}/animation-extraction/animation-tokens.json | grep -q "duration" && echo "valid")
-bash(cat {base_path}/animation-extraction/animation-tokens.json | grep -q "easing" && echo "valid")
+bash(cat {base_path}/animation-extraction/animation-tokens.toon | grep -q "duration" && echo "valid")
+bash(cat {base_path}/animation-extraction/animation-tokens.toon | grep -q "easing" && echo "valid")
 ```
 
 ### Step 2: Verify File Sizes
@@ -929,7 +934,7 @@ bash(cat {base_path}/animation-extraction/animation-tokens.json | grep -q "easin
 bash(ls -lh {base_path}/animation-extraction/)
 ```
 
-**Output**: animation-tokens.json verified
+**Output**: animation-tokens.toon verified
 
 ## Completion
 
@@ -970,15 +975,15 @@ Configuration:
 
 Generated Files:
 {base_path}/animation-extraction/
-└── animation-tokens.json      # Production-ready animation tokens
+└── animation-tokens.toon      # Production-ready animation tokens
 
 {IF has_images OR options.user_selection:
 Intermediate Analysis:
 {base_path}/.intermediates/animation-analysis/
 {IF has_images:
-├── image-references.json       # Image reference metadata ({image_count} files)
+├── image-references.toon       # Image reference metadata ({image_count} files)
 }
-├── analysis-options.json       # Generated questions{options.user_selection ? " + user answers" : ""}
+├── analysis-options.toon       # Generated questions{options.user_selection ? " + user answers" : ""}
 }
 
 Extracted Data Summary:
@@ -1010,20 +1015,20 @@ bash(mkdir -p {base_path}/.intermediates/animation-analysis)
 
 ```bash
 # Check if already extracted
-bash(test -f {base_path}/animation-extraction/animation-tokens.json && echo "exists")
+bash(test -f {base_path}/animation-extraction/animation-tokens.toon && echo "exists")
 
 # Validate JSON structure
-bash(cat {base_path}/animation-extraction/animation-tokens.json | grep -q "duration" && echo "valid")
+bash(cat {base_path}/animation-extraction/animation-tokens.toon | grep -q "duration" && echo "valid")
 
 # Count animation types
-bash(cat animation-tokens.json | grep -c "\"keyframes\":")
+bash(cat animation-tokens.toon | grep -c "\"keyframes\":")
 ```
 
 ### File Operations
 
 ```bash
 # Load design tokens context
-bash(test -f {base_path}/style-extraction/style-1/design-tokens.json && cat it)
+bash(test -f {base_path}/style-extraction/style-1/design-tokens.toon && cat it)
 
 # Verify output
 bash(ls {base_path}/animation-extraction/)
@@ -1035,13 +1040,13 @@ bash(ls {base_path}/animation-extraction/)
 {base_path}/
 ├── .intermediates/                  # Intermediate analysis files
 │   └── animation-analysis/
-│       ├── animations-{target}.json      # Extracted CSS (URL mode only)
-│       └── analysis-options.json         # Generated questions + user answers (embedded)
+│       ├── animations-{target}.toon      # Extracted CSS (URL mode only)
+│       └── analysis-options.toon         # Generated questions + user answers (embedded)
 └── animation-extraction/            # Final animation system
-    └── animation-tokens.json        # Production-ready animation tokens
+    └── animation-tokens.toon        # Production-ready animation tokens
 ```
 
-## animation-tokens.json Format
+## animation-tokens.toon Format
 
 ```json
 {
@@ -1112,5 +1117,4 @@ ERROR: Invalid cubic-bezier values
 - **Production-Ready** - CSS var() format, accessibility support
 - **Comprehensive Coverage** - Transitions, keyframes, interactions, scroll animations
 - **Clear Phase Separation** - Question generation (Agent) → User confirmation (Optional) → Token synthesis (Agent)
-
 

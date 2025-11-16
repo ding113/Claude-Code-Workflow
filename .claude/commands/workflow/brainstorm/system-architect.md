@@ -4,6 +4,11 @@ description: Generate or update system-architect/analysis.md addressing guidance
 argument-hint: "optional topic - uses existing framework if available"
 allowed-tools: Task(conceptual-planning-agent), TodoWrite(*), Read(*), Write(*)
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 ## 🏗️ **System Architect Analysis Generator**
 
@@ -332,7 +337,7 @@ TodoWrite tracking for two-step process:
 ## 🔄 **Session Integration**
 
 ### Status Synchronization
-Upon completion, update `workflow-session.json`:
+Upon completion, update `workflow-session.toon`:
 ```json
 {
   "phases": {

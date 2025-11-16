@@ -1,11 +1,16 @@
 ---
 name: conflict-resolution
 description: Detect and resolve conflicts between plan and existing codebase using CLI-powered analysis with Gemini/Qwen
-argument-hint: "--session WFS-session-id --context path/to/context-package.json"
+argument-hint: "--session WFS-session-id --context path/to/context-package.toon"
 examples:
-  - /workflow:tools:conflict-resolution --session WFS-auth --context .workflow/WFS-auth/.process/context-package.json
-  - /workflow:tools:conflict-resolution --session WFS-payment --context .workflow/WFS-payment/.process/context-package.json
+  - /workflow:tools:conflict-resolution --session WFS-auth --context .workflow/WFS-auth/.process/context-package.toon
+  - /workflow:tools:conflict-resolution --session WFS-payment --context .workflow/WFS-payment/.process/context-package.toon
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 # Conflict Resolution Command
 
@@ -54,7 +59,7 @@ Analyzes conflicts between implementation plans and existing codebase, generatin
 ### Phase 1: Validation
 ```
 1. Verify session directory exists
-2. Load context-package.json
+2. Load context-package.toon
 3. Check conflict_risk (skip if none/low)
 4. Prepare agent task prompt
 ```
@@ -73,7 +78,7 @@ Task(subagent_type="cli-execution-agent", prompt=`
 
   ### 1. Load Context
   - Read existing files from conflict_detection.existing_files
-  - Load plan from .workflow/{session_id}/.process/context-package.json
+  - Load plan from .workflow/{session_id}/.process/context-package.toon
   - Extract role analyses and requirements
 
   ### 2. Execute CLI Analysis
@@ -212,17 +217,17 @@ Task(subagent_type="cli-execution-agent", prompt=`
 4. Run CLI analysis (Gemini→Qwen→Claude)
 5. Parse conflict findings
 6. Generate 2-4 strategies per conflict with modifications
-7. Return JSON to stdout (NOT file write)
+7. Return TOON (auto-detectable as legacy JSON) to stdout (NOT file write)
 8. Return execution log path
 ```
 
 ### Phase 3: User Confirmation via Text Interaction
 
-**Command parses agent JSON output and presents conflicts to user via text**:
+**Command parses agent TOON output (legacy JSON auto-detected) and presents conflicts to user via text**:
 
 ```javascript
-// 1. Parse agent JSON output
-const conflictData = JSON.parse(agentOutput);
+// 1. Parse agent output using auto-detect decoding
+const conflictData = autoDecode(agentOutput);
 const conflicts = conflictData.conflicts; // No 4-conflict limit
 
 // 2. Format conflicts as text output (max 10 per round)
@@ -340,12 +345,12 @@ modifications.forEach(mod => {
   // Handle "add" and "remove" similarly
 });
 
-// 3. Update context-package.json
-const contextPackage = JSON.parse(Read(contextPath));
+// 3. Update context-package.toon
+const contextPackage = autoDecode(Read(contextPath));
 contextPackage.conflict_detection.conflict_risk = "resolved";
 contextPackage.conflict_detection.resolved_conflicts = conflicts.map(c => c.id);
 contextPackage.conflict_detection.resolved_at = new Date().toISOString();
-Write(contextPath, JSON.stringify(contextPackage, null, 2));
+Write(contextPath, encodeTOON(contextPackage, { indent: 2 }));
 
 // 4. Output custom conflict summary (if any)
 if (customConflicts.length > 0) {
@@ -377,7 +382,7 @@ return {
 ✓ Edit tool successfully applies modifications
 ✓ guidance-specification.md updated
 ✓ Role analyses (*.md) updated
-✓ context-package.json marked as resolved
+✓ context-package.toon marked as resolved
 ✓ Agent log saved to .workflow/{session_id}/.chat/
 ```
 
@@ -422,7 +427,7 @@ If Edit tool fails mid-application:
 1. Log all successfully applied modifications
 2. Output rollback option via text interaction
 3. If rollback selected: restore files from git or backups
-4. If continue: mark partial resolution in context-package.json
+4. If continue: mark partial resolution in context-package.toon
 ```
 
 ## Integration
@@ -430,14 +435,14 @@ If Edit tool fails mid-application:
 ### Interface
 **Input**:
 - `--session` (required): WFS-{session-id}
-- `--context` (required): context-package.json path
+- `--context` (required): context-package.toon path
 - Requires: `conflict_risk ≥ medium`
 
 **Output**:
 - Modified files:
   - `.workflow/{session_id}/.brainstorm/guidance-specification.md`
   - `.workflow/{session_id}/.brainstorm/{role}/analysis.md`
-  - `.workflow/{session_id}/.process/context-package.json` (conflict_risk → resolved)
+  - `.workflow/{session_id}/.process/context-package.toon` (conflict_risk → resolved)
 - NO report file generation
 
 **User Interaction**:
@@ -456,10 +461,9 @@ If Edit tool fails mid-application:
 ✓ Custom conflicts displayed with suggestions for manual handling
 ✓ guidance-specification.md updated with resolved conflicts
 ✓ Role analyses (*.md) updated with resolved conflicts
-✓ context-package.json marked as "resolved"
+✓ context-package.toon marked as "resolved"
 ✓ No CONFLICT_RESOLUTION.md file generated
 ✓ Modification summary includes custom conflict count
 ✓ Agent log saved to .workflow/{session_id}/.chat/
 ✓ Error handling robust (validate/retry/degrade)
 ```
-

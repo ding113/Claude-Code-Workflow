@@ -91,7 +91,7 @@ High-level orchestrators for complex, multi-phase development processes.
 - **Syntax**: `/workflow:status [task-id]`
 - **Parameters**:
   - `task-id` (Optional, String): If provided, shows details for a specific task.
-- **Responsibilities**: Generates and displays an on-demand view of the current workflow's status by reading task JSON data. Does not modify any state.
+- **Responsibilities**: Generates and displays an on-demand view of the current workflow's status by reading task TOON data. Does not modify any state.
 - **Agent Calls**: None.
 - **Integration**: A read-only command used to check progress at any point.
 - **Example**:
@@ -246,7 +246,7 @@ Commands for managing individual tasks within a workflow session.
 - **Syntax**: `/task:create "task title"`
 - **Parameters**:
   - `title` (Required, String): The title of the task.
-- **Responsibilities**: Creates a new task JSON file within the active session, auto-generating an ID and inheriting context.
+- **Responsibilities**: Creates a new task TOON file within the active session, auto-generating an ID and inheriting context.
 - **Agent Calls**: Suggests an agent (e.g., `@code-developer`) based on task type but does not call it.
 - **Example**:
   ```bash
@@ -312,7 +312,7 @@ Commands for managing individual tasks within a workflow session.
   2. Extracts keywords from task description
   3. Discovers relevant files using ripgrep/find search tools
   4. Executes Gemini/Qwen CLI for deep analysis
-  5. Generates structured JSON content package
+  5. Generates structured TOON content package
 - **Core Philosophy**: Read-only analysis, token-efficient (CLI analysis in agent), structured output
 - **Agent Calls**: `@general-purpose` agent.
 - **Integration**: Provides quick, task-relevant context for subsequent agent operations while minimizing token consumption.

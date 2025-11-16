@@ -15,6 +15,11 @@ description: |
     commentary: Gather context about existing documentation, then execute
 color: green
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 You are a versatile execution specialist focused on completing high-quality tasks efficiently across any domain. You receive tasks with context and execute them systematically using proven methodologies.
 

@@ -1,10 +1,15 @@
 ---
 name: test-concept-enhanced
 description: Analyze test requirements and generate test generation strategy using Gemini with test-context package
-argument-hint: "--session WFS-test-session-id --context path/to/test-context-package.json"
+argument-hint: "--session WFS-test-session-id --context path/to/test-context-package.toon"
 examples:
-  - /workflow:tools:test-concept-enhanced --session WFS-test-auth --context .workflow/WFS-test-auth/.process/test-context-package.json
+  - /workflow:tools:test-concept-enhanced --session WFS-test-auth --context .workflow/WFS-test-auth/.process/test-context-package.toon
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 # Test Concept Enhanced Command
 
@@ -19,7 +24,7 @@ Specialized analysis tool for test generation workflows that uses Gemini to anal
 - **No Code Generation**: Strategy and planning only, actual test generation happens in task execution
 
 ## Core Responsibilities
-- Parse test-context-package.json from test-context-gather
+- Parse test-context-package.toon from test-context-gather
 - Analyze implementation summaries and coverage gaps
 - Study existing test patterns and conventions
 - Generate test generation strategy using Gemini
@@ -30,12 +35,12 @@ Specialized analysis tool for test generation workflows that uses Gemini to anal
 ### Phase 1: Validation & Preparation
 
 1. **Session Validation**
-   - Load `.workflow/{test_session_id}/workflow-session.json`
+   - Load `.workflow/{test_session_id}/workflow-session.toon`
    - Verify test session type is "test-gen"
    - Extract source session reference
 
 2. **Context Package Validation**
-   - Read `test-context-package.json`
+   - Read `test-context-package.toon`
    - Validate required sections: metadata, source_context, test_coverage, test_framework
    - Extract coverage gaps and framework details
 
@@ -52,9 +57,9 @@ cd .workflow/{test_session_id}/.process && gemini -p "
 PURPOSE: Analyze test coverage gaps and design comprehensive test generation strategy
 TASK: Study implementation context, existing tests, and generate test requirements for missing coverage
 MODE: analysis
-CONTEXT: @{.workflow/{test_session_id}/.process/test-context-package.json}
+CONTEXT: @{.workflow/{test_session_id}/.process/test-context-package.toon}
 
-**MANDATORY FIRST STEP**: Read and analyze test-context-package.json to understand:
+**MANDATORY FIRST STEP**: Read and analyze test-context-package.toon to understand:
 - Test coverage gaps from test_coverage.missing_tests[]
 - Implementation context from source_context.implementation_summaries[]
 - Existing test patterns from test_framework.conventions
@@ -445,10 +450,10 @@ Synthesize Gemini analysis into standardized format:
 - `/workflow:test-gen` (Phase 4: Analysis)
 
 ### Requires
-- `/workflow:tools:test-context-gather` output (test-context-package.json)
+- `/workflow:tools:test-context-gather` output (test-context-package.toon)
 
 ### Followed By
-- `/workflow:tools:test-task-generate` - Generates test task JSON with code-developer invocation
+- `/workflow:tools:test-task-generate` - Generates test task TOON with code-developer invocation
 
 ## Success Criteria
 

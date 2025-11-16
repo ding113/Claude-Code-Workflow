@@ -380,12 +380,12 @@ function Confirm-Action {
         [string]$Message,
         [switch]$DefaultYes
     )
-    
+
     if ($Force) {
         Write-ColorOutput "Force mode: Proceeding with '$Message'" $ColorInfo
         return $true
     }
-    
+
     if ($NonInteractive) {
         if ($DefaultYes) {
             $result = $true
@@ -400,7 +400,7 @@ function Confirm-Action {
         Write-ColorOutput "Non-interactive mode: $Message - $resultText" $ColorInfo
         return $result
     }
-    
+
     if ($DefaultYes) {
         $defaultChar = "Y"
         $prompt = "(Y/n)"
@@ -408,13 +408,13 @@ function Confirm-Action {
         $defaultChar = "N"
         $prompt = "(y/N)"
     }
-    
+
     do {
         $response = Read-Host "$Message $prompt"
         if ([string]::IsNullOrWhiteSpace($response)) {
             return $DefaultYes
         }
-        
+
         switch ($response.ToLower()) {
             { $_ -in @('y', 'yes') } { return $true }
             { $_ -in @('n', 'no') } { return $false }
@@ -429,16 +429,16 @@ function Get-BackupDirectory {
     param(
         [string]$TargetDirectory
     )
-    
+
     $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
     $backupDirName = "claude-backup-$timestamp"
     $backupPath = Join-Path $TargetDirectory $backupDirName
-    
+
     # Ensure backup directory exists
     if (-not (Test-Path $backupPath)) {
         New-Item -ItemType Directory -Path $backupPath -Force | Out-Null
     }
-    
+
     return $backupPath
 }
 
@@ -447,15 +447,15 @@ function Backup-FileToFolder {
         [string]$FilePath,
         [string]$BackupFolder
     )
-    
+
     if (-not (Test-Path $FilePath)) {
         return $false
     }
-    
+
     try {
         $fileName = Split-Path $FilePath -Leaf
         $relativePath = ""
-        
+
         # Try to determine relative path structure for better organization
         $fileDir = Split-Path $FilePath -Parent
         if ($fileDir -match '\.claude') {
@@ -468,7 +468,7 @@ function Backup-FileToFolder {
                 }
             }
         }
-        
+
         # Create subdirectory structure in backup if needed
         $backupSubDir = $BackupFolder
         if (-not [string]::IsNullOrEmpty($relativePath)) {
@@ -477,10 +477,10 @@ function Backup-FileToFolder {
                 New-Item -ItemType Directory -Path $backupSubDir -Force | Out-Null
             }
         }
-        
+
         $backupFilePath = Join-Path $backupSubDir $fileName
         Copy-Item -Path $FilePath -Destination $backupFilePath -Force
-        
+
         Write-ColorOutput "Backed up: $fileName" $ColorInfo
         return $true
     } catch {
@@ -494,15 +494,15 @@ function Backup-DirectoryToFolder {
         [string]$DirectoryPath,
         [string]$BackupFolder
     )
-    
+
     if (-not (Test-Path $DirectoryPath)) {
         return $false
     }
-    
+
     try {
         $dirName = Split-Path $DirectoryPath -Leaf
         $backupDirPath = Join-Path $BackupFolder $dirName
-        
+
         Copy-Item -Path $DirectoryPath -Destination $backupDirPath -Recurse -Force
         Write-ColorOutput "Backed up directory: $dirName" $ColorInfo
         return $true
@@ -517,16 +517,16 @@ function Copy-DirectoryRecursive {
         [string]$Source,
         [string]$Destination
     )
-    
+
     if (-not (Test-Path $Source)) {
         throw "Source directory does not exist: $Source"
     }
-    
+
     # Create destination directory if it doesn't exist
     if (-not (Test-Path $Destination)) {
         New-Item -ItemType Directory -Path $Destination -Force | Out-Null
     }
-    
+
     try {
         # Copy all items recursively
         Copy-Item -Path "$Source\*" -Destination $Destination -Recurse -Force
@@ -543,7 +543,7 @@ function Copy-FileToDestination {
         [string]$Description = "file",
         [string]$BackupFolder = $null
     )
-    
+
     if (Test-Path $Destination) {
         # Use BackupAll mode for automatic backup without confirmation (default behavior)
         if ($BackupAll -and -not $NoBackup) {
@@ -1693,10 +1693,17 @@ function Show-Summary {
     Write-Host "3. Review .gemini/CLAUDE.md - Gemini agent execution protocol"
     Write-Host "4. Review .qwen/QWEN.md - Qwen agent execution protocol"
     Write-Host "5. Configure settings - Edit .claude/settings.local.json as needed"
-    Write-Host "6. Start using Claude Code with Agent workflow coordination!"
-    Write-Host "7. Use /workflow commands for task execution"
-    Write-Host "8. Use /update-memory commands for memory system management"
+    Write-Host "6. Install TOON dependencies - Run 'npm install' for workflow utilities"
+    Write-Host "7. Test TOON wrapper - Try './scripts/toon-wrapper.sh --help'"
+    Write-Host "8. Start using Claude Code with Agent workflow coordination!"
+    Write-Host "9. Use /workflow commands for task execution"
+    Write-Host "10. Use /update-memory commands for memory system management"
 
+    Write-Host ""
+    Write-ColorOutput "TOON Format Info:" $ColorInfo
+    Write-Host "  The system uses TOON (Token-Oriented Object Notation) for 30-60% token savings"
+    Write-Host "  Legacy JSON files are automatically supported via autoDecode()"
+    Write-Host "  See CLAUDE.md for TOON format details and usage examples"
     Write-Host ""
     Write-ColorOutput "Documentation: https://github.com/catlog22/Claude-CCW" $ColorInfo
     Write-ColorOutput "Features: Unified workflow system with comprehensive file output generation" $ColorInfo

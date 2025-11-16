@@ -4,6 +4,11 @@ description: UI design workflow with direct code/image input for design token ex
 argument-hint: "[--input "<value>"] [--session <id>]"
 allowed-tools: SlashCommand(*), TodoWrite(*), Read(*), Write(*), Bash(*)
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 # UI Design Imitate-Auto Workflow Command
 
@@ -91,7 +96,7 @@ allowed-tools: SlashCommand(*), TodoWrite(*), Read(*), Write(*), Bash(*)
 
 **Token Processing**:
 - **Direct Generation**: Complete design systems generated in style-extract phase
-  - Production-ready design-tokens.json with WCAG compliance
+  - Production-ready design-tokens.toon with WCAG compliance
   - Complete style-guide.md documentation
   - No separate consolidation step required (~30-60s faster)
 
@@ -211,7 +216,7 @@ metadata = {
     "status": "in_progress"
 }
 
-Write("{base_path}/.run-metadata.json", JSON.stringify(metadata, null, 2))
+Write("{base_path}/.run-metadata.toon", encodeTOON(metadata, { indent: 2 }))
 
 # Initialize default flags
 animation_complete = false
@@ -257,9 +262,9 @@ IF design_source == "hybrid":
 
     IF design_source == "hybrid":
         # Check file existence and assess completeness
-        style_exists = exists("{base_path}/style-extraction/style-1/design-tokens.json")
-        animation_exists = exists("{base_path}/animation-extraction/animation-tokens.json")
-        layout_count = bash(ls {base_path}/layout-extraction/layout-*.json 2>/dev/null | wc -l)
+        style_exists = exists("{base_path}/style-extraction/style-1/design-tokens.toon")
+        animation_exists = exists("{base_path}/animation-extraction/animation-tokens.toon")
+        layout_count = bash(ls {base_path}/layout-extraction/layout-*.toon 2>/dev/null | wc -l)
         layout_exists = (layout_count > 0)
 
         style_complete = false
@@ -269,7 +274,7 @@ IF design_source == "hybrid":
 
         # Style completeness check
         IF style_exists:
-            tokens = Read("{base_path}/style-extraction/style-1/design-tokens.json")
+            tokens = Read("{base_path}/style-extraction/style-1/design-tokens.toon")
             style_complete = (
                 tokens.colors?.brand && tokens.colors?.surface &&
                 tokens.typography?.font_family && tokens.spacing &&
@@ -283,7 +288,7 @@ IF design_source == "hybrid":
 
         # Animation completeness check
         IF animation_exists:
-            anim = Read("{base_path}/animation-extraction/animation-tokens.json")
+            anim = Read("{base_path}/animation-extraction/animation-tokens.toon")
             animation_complete = (
                 anim.duration && anim.easing &&
                 Object.keys(anim.duration || {}).length >= 3 &&
@@ -297,7 +302,7 @@ IF design_source == "hybrid":
         # Layout completeness check
         IF layout_exists:
             # Read first layout file to verify structure
-            first_layout = bash(ls {base_path}/layout-extraction/layout-*.json 2>/dev/null | head -1)
+            first_layout = bash(ls {base_path}/layout-extraction/layout-*.toon 2>/dev/null | head -1)
             layout_data = Read(first_layout)
             layout_complete = (
                 layout_count >= 1 &&
@@ -459,7 +464,7 @@ IF session_id:
     SlashCommand(update_command)
 
 # Update metadata
-metadata = Read("{base_path}/.run-metadata.json")
+metadata = Read("{base_path}/.run-metadata.toon")
 metadata.status = "completed"
 metadata.completion_time = current_timestamp()
 metadata.outputs = {
@@ -469,7 +474,7 @@ metadata.outputs = {
     "captured_count": captured_count,
     "generated_count": generated_count
 }
-Write("{base_path}/.run-metadata.json", JSON.stringify(metadata, null, 2))
+Write("{base_path}/.run-metadata.toon", encodeTOON(metadata, { indent: 2 }))
 
 TodoWrite(mark_completed: session_id ? "Integrate design system" : "Standalone completion")
 
@@ -503,11 +508,11 @@ Phase 0 - Input Detection: ✅ {design_source} mode
   {IF design_source == "code_only": "Code files imported" ELSE IF design_source == "hybrid": "Code + visual inputs" ELSE: "Visual inputs"}
 
 Phase 2 - Style Extraction: ✅ Production-ready design systems
-  Output: style-extraction/style-1/ (design-tokens.json + style-guide.md)
+  Output: style-extraction/style-1/ (design-tokens.toon + style-guide.md)
   Quality: WCAG AA compliant, OKLCH colors
 
 Phase 2.3 - Animation Extraction: ✅ Animation tokens
-  Output: animation-extraction/ (animation-tokens.json + animation-guide.md)
+  Output: animation-extraction/ (animation-tokens.toon + animation-guide.md)
 
 Phase 2.5 - Layout Extraction: ✅ Structure templates
   Templates: {template_count} layout structures
@@ -522,13 +527,13 @@ Phase 4 - Integration: {IF session_id: "✅ Integrated into session" ELSE: "⏭�
 {base_path}/
 ├── style-extraction/               # Production-ready design systems
 │   └── style-1/
-│       ├── design-tokens.json
+│       ├── design-tokens.toon
 │       └── style-guide.md
 ├── animation-extraction/           # CSS animations and transitions
-│   ├── animation-tokens.json
+│   ├── animation-tokens.toon
 │   └── animation-guide.md
 ├── layout-extraction/              # Structure templates
-│   └── layout-home-1.json          # Layout templates
+│   └── layout-home-1.toon          # Layout templates
 └── prototypes/                     # {generated_count} HTML/CSS files
     ├── home-style-1-layout-1.html + .css
     ├── compare.html                # Interactive preview
@@ -557,7 +562,7 @@ Total workflow time: ~{estimate_total_time()} minutes
 ELSE:
 2. To integrate into a workflow session:
    • Create session: /workflow:session:start
-   • Copy design-tokens.json to session artifacts
+   • Copy design-tokens.toon to session artifacts
 
 3. Explore prototypes in {base_path}/prototypes/ directory
 }
@@ -612,7 +617,7 @@ TodoWrite({todos: [
 
 - **Style extraction failure (Phase 2)**:
   - If extract fails: Terminate with clear error
-  - If design-tokens.json missing: Terminate with debugging info
+  - If design-tokens.toon missing: Terminate with debugging info
 
 - **Animation extraction failure (Phase 2.3)**:
   - Non-critical: Warn but continue

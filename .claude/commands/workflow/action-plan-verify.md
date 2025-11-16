@@ -1,9 +1,14 @@
 ---
 name: action-plan-verify
-description: Perform non-destructive cross-artifact consistency analysis between IMPL_PLAN.md and task JSONs with quality gate validation
+description: Perform non-destructive cross-artifact consistency analysis between IMPL_PLAN.md and task TOON files with quality gate validation
 argument-hint: "[optional: --session session-id]"
 allowed-tools: Read(*), TodoWrite(*), Glob(*), Bash(*)
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 ## User Input
 
@@ -15,7 +20,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Goal
 
-Identify inconsistencies, duplications, ambiguities, and underspecified items between action planning artifacts (`IMPL_PLAN.md`, `task.json`) and brainstorming artifacts (`role analysis documents`) before implementation. This command MUST run only after `/workflow:plan` has successfully produced complete `IMPL_PLAN.md` and task JSON files.
+Identify inconsistencies, duplications, ambiguities, and underspecified items between action planning artifacts (`IMPL_PLAN.md`, `task.toon`) and brainstorming artifacts (`role analysis documents`) before implementation. This command MUST run only after `/workflow:plan` has successfully produced complete `IMPL_PLAN.md` and task TOON files.
 
 ## Operating Constraints
 
@@ -47,7 +52,7 @@ task_dir = session_dir/.task
 # Validate required artifacts
 SYNTHESIS = brainstorm_dir/role analysis documents
 IMPL_PLAN = session_dir/IMPL_PLAN.md
-TASK_FILES = Glob(task_dir/*.json)
+TASK_FILES = Glob(task_dir/*.toon)
 
 # Abort if missing
 IF NOT EXISTS(SYNTHESIS):
@@ -59,7 +64,7 @@ IF NOT EXISTS(IMPL_PLAN):
     EXIT
 
 IF TASK_FILES.count == 0:
-    ERROR: "No task JSON files found. Run /workflow:plan first"
+    ERROR: "No task TOON files found. Run /workflow:plan first"
     EXIT
 ```
 
@@ -67,7 +72,7 @@ IF TASK_FILES.count == 0:
 
 Load only minimal necessary context from each artifact:
 
-**From workflow-session.json** (NEW - PRIMARY REFERENCE):
+**From workflow-session.toon** (NEW - PRIMARY REFERENCE):
 - Original user prompt/intent (project or description field)
 - User's stated goals and objectives
 - User's scope definition
@@ -88,7 +93,7 @@ Load only minimal necessary context from each artifact:
 - Success Criteria
 - Brainstorming Artifacts References (if present)
 
-**From task.json files**:
+**From task.toon files**:
 - Task IDs
 - Titles and descriptions
 - Status
@@ -370,7 +375,7 @@ Write(report_path, full_report_content)
 1. **Extract Findings**: Parse all issues by severity
 2. **Create TodoWrite Task List**: Convert findings to actionable todos
 3. **Execute Fixes**: Process each todo systematically
-4. **Update Task Files**: Apply modifications directly to task JSON files
+4. **Update Task Files**: Apply modifications directly to task TOON files
 5. **Update IMPL_PLAN**: Apply strategic changes if needed
 
 At end of report, provide remediation guidance:
@@ -381,7 +386,7 @@ At end of report, provide remediation guidance:
 **Recommended Approach**:
 1. **Initialize TodoWrite**: Create comprehensive task list from all findings
 2. **Process by Severity**: Start with CRITICAL, then HIGH, MEDIUM, LOW
-3. **Apply Fixes Directly**: Modify task.json files and IMPL_PLAN.md as needed
+3. **Apply Fixes Directly**: Modify task.toon files and IMPL_PLAN.md as needed
 4. **Track Progress**: Mark todos as completed after each fix
 
 **TodoWrite Execution Pattern**:
@@ -403,8 +408,8 @@ TodoWrite([
 
 **File Modification Workflow**:
 ```bash
-# For task JSON modifications:
-1. Read(.workflow/WFS-{session}/.task/IMPL-X.Y.json)
+# For task TOON modifications:
+1. Read(.workflow/WFS-{session}/.task/IMPL-X.Y.toon)
 2. Edit() to apply fixes
 3. Mark todo as completed
 

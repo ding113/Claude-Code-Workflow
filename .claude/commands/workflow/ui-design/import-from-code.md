@@ -5,6 +5,11 @@ argument-hint: "[--design-id <id>] [--session <id>] [--source <path>]"
 allowed-tools: Read,Write,Bash,Glob,Grep,Task,TodoWrite
 auto-continue: true
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 # UI Design: Import from Code
 
@@ -86,7 +91,7 @@ echo "  Source: $source"
 echo "  Output: $base_path"
 
 # 3. Discover files using script
-discovery_file="${intermediates_dir}/discovered-files.json"
+discovery_file="${intermediates_dir}/discovered-files.toon"
 ~/.claude/scripts/discover-design-files.sh "$source" "$discovery_file"
 
 echo "  Output: $discovery_file"
@@ -98,9 +103,9 @@ echo "  Output: $discovery_file"
 ```json
 [
   {"content": "Phase 0: 发现和分类代码文件", "status": "in_progress", "activeForm": "发现代码文件"},
-  {"content": "Phase 1.1: Style Agent - 提取视觉token及代码片段 (design-tokens.json + code_snippets)", "status": "pending", "activeForm": "提取视觉token"},
-  {"content": "Phase 1.2: Animation Agent - 提取动画token及代码片段 (animation-tokens.json + code_snippets)", "status": "pending", "activeForm": "提取动画token"},
-  {"content": "Phase 1.3: Layout Agent - 提取布局模式及代码片段 (layout-templates.json + code_snippets)", "status": "pending", "activeForm": "提取布局模式"}
+  {"content": "Phase 1.1: Style Agent - 提取视觉token及代码片段 (design-tokens.toon + code_snippets)", "status": "pending", "activeForm": "提取视觉token"},
+  {"content": "Phase 1.2: Animation Agent - 提取动画token及代码片段 (animation-tokens.toon + code_snippets)", "status": "pending", "activeForm": "提取动画token"},
+  {"content": "Phase 1.3: Layout Agent - 提取布局模式及代码片段 (layout-templates.toon + code_snippets)", "status": "pending", "activeForm": "提取布局模式"}
 ]
 ```
 
@@ -110,7 +115,7 @@ echo "  Output: $discovery_file"
 - **Supported file types**: CSS, SCSS, JavaScript, TypeScript, HTML
 - **Smart filtering**: Finds theme-related JS/TS files (e.g., tailwind.config.js, theme.js, styled-components)
 - **Exclusions**: Automatically excludes `node_modules/`, `dist/`, `.git/`, and build directories
-- **Output**: Single JSON file `discovered-files.json` in `.intermediates/import-analysis/`
+- **Output**: Single JSON file `discovered-files.toon` in `.intermediates/import-analysis/`
   - Structure: `{ "css": [...], "js": [...], "html": [...], "counts": {...}, "discovery_time": "..." }`
   - Generated via bash commands using `find` + JSON formatting
 
@@ -120,7 +125,7 @@ echo "  Output: $discovery_file"
 
 ### Step 2: Parallel Agent Analysis
 
-**Purpose**: Three agents analyze all file types in parallel, each producing completeness-report.json
+**Purpose**: Three agents analyze all file types in parallel, each producing completeness-report.toon
 
 **Operations**:
 - **Style Agent**: Extracts visual tokens (colors, typography, spacing) from ALL files (CSS/SCSS/JS/HTML)
@@ -129,14 +134,14 @@ echo "  Output: $discovery_file"
 
 **Validation**:
 - Each agent can reference any file type (not restricted to single type)
-- Direct output: Each agent generates completeness-report.json with findings + missing content
+- Direct output: Each agent generates completeness-report.toon with findings + missing content
 - No synthesis needed: Agents produce final output directly
 
 ```bash
 echo "[Phase 1] Starting parallel agent analysis (3 agents)"
 ```
 
-#### Style Agent Task (design-tokens.json, style-guide.md)
+#### Style Agent Task (design-tokens.toon, style-guide.md)
 
 **Agent Task**:
 
@@ -149,8 +154,8 @@ Task(subagent_type="ui-design-agent",
 
   ## Input Files
 
-  **Discovered Files**: ${intermediates_dir}/discovered-files.json
-  $(cat \"${intermediates_dir}/discovered-files.json\" 2>/dev/null | grep -E '(count|files)' | head -30)
+  **Discovered Files**: ${intermediates_dir}/discovered-files.toon
+  $(cat \"${intermediates_dir}/discovered-files.toon\" 2>/dev/null | grep -E '(count|files)' | head -30)
 
   ## Code Import Extraction Strategy
 
@@ -172,7 +177,7 @@ Task(subagent_type="ui-design-agent",
     \`\`\`
 
   **Step 1: Load file list**
-  - Read(${intermediates_dir}/discovered-files.json)
+  - Read(${intermediates_dir}/discovered-files.toon)
   - Extract: file_types.css.files, file_types.js.files, file_types.html.files
 
   **Step 2: Cross-source token extraction**
@@ -191,7 +196,7 @@ Task(subagent_type="ui-design-agent",
   **Target Directory**: ${base_path}/style-extraction/style-1/
 
   **Files to Generate**:
-  1. **design-tokens.json**
+  1. **design-tokens.toon**
      - Follow [DESIGN_SYSTEM_GENERATION_TASK] standard token structure
      - Add \"_metadata.extraction_source\": \"code_import\"
      - Add \"_metadata.files_analyzed\": {css, js, html file lists}
@@ -239,7 +244,7 @@ Task(subagent_type="ui-design-agent",
   - Optional: If insufficient usage data, mark fields as empty arrays/objects with note in completeness.recommendations
 
   ## Code Import Specific Requirements
-  - ✅ Read discovered-files.json FIRST to get file paths
+  - ✅ Read discovered-files.toon FIRST to get file paths
   - ✅ Track extraction source for each token (file:line)
   - ✅ Record complete code snippets in _metadata.code_snippets (complete blocks with dependencies/comments)
   - ✅ Include completeness assessment in _metadata
@@ -251,7 +256,7 @@ Task(subagent_type="ui-design-agent",
 ")
 ```
 
-#### Animation Agent Task (animation-tokens.json, animation-guide.md)
+#### Animation Agent Task (animation-tokens.toon, animation-guide.md)
 
 **Agent Task**:
 
@@ -264,8 +269,8 @@ Task(subagent_type="ui-design-agent",
 
   ## Input Files
 
-  **Discovered Files**: ${intermediates_dir}/discovered-files.json
-  $(cat \"${intermediates_dir}/discovered-files.json\" 2>/dev/null | grep -E '(count|files)' | head -30)
+  **Discovered Files**: ${intermediates_dir}/discovered-files.toon
+  $(cat \"${intermediates_dir}/discovered-files.toon\" 2>/dev/null | grep -E '(count|files)' | head -30)
 
   ## Code Import Extraction Strategy
 
@@ -287,7 +292,7 @@ Task(subagent_type="ui-design-agent",
     \`\`\`
 
   **Step 1: Load file list**
-  - Read(${intermediates_dir}/discovered-files.json)
+  - Read(${intermediates_dir}/discovered-files.toon)
   - Extract: file_types.css.files, file_types.js.files, file_types.html.files
 
   **Step 2: Cross-source animation extraction**
@@ -305,7 +310,7 @@ Task(subagent_type="ui-design-agent",
   **Target Directory**: ${base_path}/animation-extraction/
 
   **Files to Generate**:
-  1. **animation-tokens.json**
+  1. **animation-tokens.toon**
      - Follow [ANIMATION_TOKEN_GENERATION_TASK] standard structure
      - Add \"_metadata.framework_detected\"
      - Add \"_metadata.files_analyzed\"
@@ -321,7 +326,7 @@ Task(subagent_type="ui-design-agent",
   - Preserve original formatting and framework-specific syntax
 
   ## Code Import Specific Requirements
-  - ✅ Read discovered-files.json FIRST to get file paths
+  - ✅ Read discovered-files.toon FIRST to get file paths
   - ✅ Detect animation framework if present
   - ✅ Track extraction source for each token (file:line)
   - ✅ Record complete code snippets in _metadata.code_snippets (complete animation blocks with all steps/timing)
@@ -330,7 +335,7 @@ Task(subagent_type="ui-design-agent",
 ")
 ```
 
-#### Layout Agent Task (layout-templates.json, layout-guide.md)
+#### Layout Agent Task (layout-templates.toon, layout-guide.md)
 
 **Agent Task**:
 
@@ -343,8 +348,8 @@ Task(subagent_type="ui-design-agent",
 
   ## Input Files
 
-  **Discovered Files**: ${intermediates_dir}/discovered-files.json
-  $(cat \"${intermediates_dir}/discovered-files.json\" 2>/dev/null | grep -E '(count|files)' | head -30)
+  **Discovered Files**: ${intermediates_dir}/discovered-files.toon
+  $(cat \"${intermediates_dir}/discovered-files.toon\" 2>/dev/null | grep -E '(count|files)' | head -30)
 
   ## Code Import Extraction Strategy
 
@@ -366,7 +371,7 @@ Task(subagent_type="ui-design-agent",
     \`\`\`
 
   **Step 1: Load file list**
-  - Read(${intermediates_dir}/discovered-files.json)
+  - Read(${intermediates_dir}/discovered-files.toon)
   - Extract: file_types.css.files, file_types.js.files, file_types.html.files
 
   **Step 2: Cross-source layout extraction**
@@ -389,7 +394,7 @@ Task(subagent_type="ui-design-agent",
 
   **Files to Generate**:
 
-  1. **layout-templates.json**
+  1. **layout-templates.toon**
      - Follow [LAYOUT_TEMPLATE_GENERATION_TASK] standard structure
      - Add \"extraction_metadata\" section:
        * extraction_source: \"code_import\"
@@ -418,7 +423,7 @@ Task(subagent_type="ui-design-agent",
   - Preserve original formatting and framework-specific syntax
 
   ## Code Import Specific Requirements
-  - ✅ Read discovered-files.json FIRST to get file paths
+  - ✅ Read discovered-files.toon FIRST to get file paths
   - ✅ Detect and document naming conventions
   - ✅ Identify layout system with confidence level
   - ✅ Extract component variants and states from usage patterns
@@ -441,7 +446,7 @@ Task(subagent_type="ui-design-agent",
 
 ```bash
 # Note: Agents run in parallel and write separate completeness reports
-# Each agent generates its own completeness-report.json directly
+# Each agent generates its own completeness-report.toon directly
 # No synthesis phase needed
 echo "[Phase 1] Parallel agent analysis complete"
 ```
@@ -461,37 +466,37 @@ echo "[Phase 1] Parallel agent analysis complete"
 ${base_path}/
 ├── style-extraction/
 │   └── style-1/
-│       └── design-tokens.json       # Production-ready design tokens with code snippets
+│       └── design-tokens.toon       # Production-ready design tokens with code snippets
 ├── animation-extraction/
-│   └── animation-tokens.json        # Animation/transition tokens with code snippets
+│   └── animation-tokens.toon        # Animation/transition tokens with code snippets
 ├── layout-extraction/
-│   └── layout-templates.json        # Layout patterns with code snippets
+│   └── layout-templates.toon        # Layout patterns with code snippets
 └── .intermediates/
     └── import-analysis/
-        └── discovered-files.json    # All discovered files (JSON format)
+        └── discovered-files.toon    # All discovered files (JSON format)
 ```
 
 **Files**:
-1. **style-extraction/style-1/design-tokens.json**
+1. **style-extraction/style-1/design-tokens.toon**
    - Production-ready design tokens
    - Categories: colors, typography, spacing, opacity, border_radius, shadows, breakpoints
    - Metadata: extraction_source, files_analyzed, completeness assessment, **code_snippets**
    - **Code snippets**: Complete code blocks from source files (CSS variables, theme configs, inline styles)
 
-2. **animation-extraction/animation-tokens.json**
+2. **animation-extraction/animation-tokens.toon**
    - Animation tokens: duration, easing, transitions, keyframes, interactions
    - Framework detection: css-animations, framer-motion, gsap, etc.
    - Metadata: extraction_source, completeness assessment, **code_snippets**
    - **Code snippets**: Complete animation blocks (@keyframes, transition configs, JS animations)
 
-3. **layout-extraction/layout-templates.json**
+3. **layout-extraction/layout-templates.toon**
    - Layout templates for each discovered component
    - Extraction metadata: naming_convention, layout_system, responsive strategy, **code_snippets**
    - Component patterns with DOM structure and CSS rules
    - **Code snippets**: Complete component/structure code (HTML, CSS utilities, React components)
 
 **Intermediate Files**: `.intermediates/import-analysis/`
-- `discovered-files.json` - All discovered files in JSON format with counts and metadata
+- `discovered-files.toon` - All discovered files in JSON format with counts and metadata
 
 ---
 
@@ -515,4 +520,4 @@ ${base_path}/
 3. **Specify target design run**: Use `--design-id` for existing design run or `--session` to use session's latest design run (one of these is required)
 4. **Cross-reference agent reports**: Compare all three completeness reports (style, animation, layout) to identify gaps
 5. **Review missing content**: Check `_metadata.completeness` field in reports for actionable improvements
-6. **Verify file discovery**: Check `${base_path}/.intermediates/import-analysis/discovered-files.json` if agents report no data
+6. **Verify file discovery**: Check `${base_path}/.intermediates/import-analysis/discovered-files.toon` if agents report no data

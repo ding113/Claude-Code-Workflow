@@ -4,6 +4,11 @@ description: Execute test-fix workflow with dynamic task generation and iterativ
 argument-hint: "[--resume-session=\"session-id\"] [--max-iterations=N]"
 allowed-tools: SlashCommand(*), TodoWrite(*), Read(*), Bash(*), Task(*)
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 # Workflow Test-Cycle-Execute Command
 
@@ -39,7 +44,7 @@ Orchestrates dynamic test-fix workflow execution through iterative cycles of tes
 ### Agent Coordination
 - **@code-developer**: Understands requirements, generates implementations
 - **@test-fix-agent**: Executes tests, applies fixes, validates results, assigns criticality
-- **@cli-planning-agent**: Executes CLI analysis (Gemini/Qwen), parses results, generates fix task JSONs
+- **@cli-planning-agent**: Executes CLI analysis (Gemini/Qwen), parses results, generates fix task TOON files
 
 ## Core Rules
 1. **Dynamic Task Generation**: Create intermediate fix tasks via @cli-planning-agent based on test failures
@@ -54,8 +59,8 @@ Orchestrates dynamic test-fix workflow execution through iterative cycles of tes
 - **Session Discovery**: Identify test-fix workflow sessions
 - **Task Queue Management**: Maintain dynamic task queue with runtime additions
 - **Test Execution**: Run tests through @test-fix-agent
-- **Pass Rate Calculation**: Calculate test pass rate from test-results.json (passed/total * 100)
-- **Criticality Assessment**: Evaluate failure severity using test-results.json criticality field
+- **Pass Rate Calculation**: Calculate test pass rate from test-results.toon (passed/total * 100)
+- **Criticality Assessment**: Evaluate failure severity using test-results.toon criticality field
 - **Threshold Decision**: Determine if pass rate >= 95% with criticality consideration
 - **Failure Analysis Delegation**: Invoke @cli-planning-agent for CLI analysis and task generation
 - **Iteration Control**: Manage fix cycles with max iteration limits (5 default)
@@ -70,11 +75,11 @@ Orchestrates dynamic test-fix workflow execution through iterative cycles of tes
 | Responsibility | test-cycle-execute (Orchestrator) | @cli-planning-agent | @test-fix-agent (Executor) |
 |----------------|----------------------------|---------------------|---------------------------|
 | Manage iteration loop | Yes - Controls loop flow | No - Not involved | No - Executes single task |
-| Calculate pass rate | Yes - From test-results.json | No - Not involved | No - Reports test results |
-| Assess criticality | Yes - From test-results.json | No - Not involved | Yes - Assigns criticality in test results |
+| Calculate pass rate | Yes - From test-results.toon | No - Not involved | No - Reports test results |
+| Assess criticality | Yes - From test-results.toon | No - Not involved | Yes - Assigns criticality in test results |
 | Run CLI analysis (Gemini/Qwen) | No - Delegates to cli-planning-agent | Yes - Executes CLI internally | No - Not involved |
 | Parse CLI output | No - Delegated | Yes - Extracts fix strategy | No - Not involved |
-| Generate IMPL-fix-N.json | No - Delegated | Yes - Creates task files | No - Not involved |
+| Generate IMPL-fix-N.toon | No - Delegated | Yes - Creates task files | No - Not involved |
 | Run tests | No - Delegates to agent | No - Not involved | Yes - Executes test command |
 | Apply fixes | No - Delegates to agent | No - Not involved | Yes - Modifies code |
 | Detect test failures | Yes - Analyzes pass rate and decides next action | No - Not involved | Yes - Executes tests and reports outcomes |
@@ -92,12 +97,12 @@ Orchestrates dynamic test-fix workflow execution through iterative cycles of tes
 
 ### Phase 1: Discovery & Initialization
 1. **Detect Session Type**: Identify test-fix session from `workflow_type: "test_session"`
-2. **Load Session State**: Read `workflow-session.json`, `IMPL_PLAN.md`, `TODO_LIST.md`
-3. **Scan Initial Tasks**: Analyze `.task/*.json` files
+2. **Load Session State**: Read `workflow-session.toon`, `IMPL_PLAN.md`, `TODO_LIST.md`
+3. **Scan Initial Tasks**: Analyze `.task/*.toon` files
 4. **Initialize TodoWrite**: Create task list including initial tasks
 5. **Prepare Iteration Context**: Setup iteration counter and max limits
 
-**Resume Mode**: Load existing iteration context from `.process/iteration-state.json`
+**Resume Mode**: Load existing iteration context from `.process/iteration-state.toon`
 
 ### Phase 2: Task Execution Loop
 **Main execution loop with dynamic task generation (executed by test-cycle-execute orchestrator):**
@@ -106,13 +111,13 @@ Orchestrates dynamic test-fix workflow execution through iterative cycles of tes
 
 ```
 For each task in queue:
-  1. [Orchestrator] Load task JSON and context
+  1. [Orchestrator] Load task TOON and context
   2. [Orchestrator] Determine task type (test-gen, test-fix, fix-iteration)
   3. [Orchestrator] Execute task through appropriate agent
-  4. [Orchestrator] Collect agent results from .process/test-results.json
+  4. [Orchestrator] Collect agent results from .process/test-results.toon
   5. [Orchestrator] Calculate test pass rate:
-     a. Parse test-results.json: passRate = (passed / total) * 100
-     b. Assess failure criticality (from test-results.json)
+     a. Parse test-results.toon: passRate = (passed / total) * 100
+     b. Assess failure criticality (from test-results.toon)
      c. Evaluate fix effectiveness (NEW):
         - Compare passRate with previous iteration
         - If passRate decreased by >10%: REGRESSION detected
@@ -128,7 +133,7 @@ For each task in queue:
        → FAILED: Enter fix loop (step 7)
   7. If entering fix loop (pass rate < 95% OR critical failures exist):
      a. [Orchestrator] Invoke @cli-planning-agent with failure context
-     b. [Agent] Executes CLI analysis + generates IMPL-fix-N.json
+     b. [Agent] Executes CLI analysis + generates IMPL-fix-N.toon
      c. [Orchestrator] Insert fix task at front of queue
      d. [Orchestrator] Continue loop
   8. [Orchestrator] Check max iterations limit (abort if exceeded)
@@ -145,16 +150,16 @@ For each task in queue:
 Iteration N (managed by test-cycle-execute orchestrator):
 ├── 1. Test Execution & Pass Rate Validation
 │   ├── [Orchestrator] Launch @test-fix-agent with test task
-│   ├── [Agent] Run test suite and save results to test-results.json
+│   ├── [Agent] Run test suite and save results to test-results.toon
 │   ├── [Agent] Report completion back to orchestrator
 │   ├── [Orchestrator] Calculate pass rate: (passed / total) * 100
-│   └── [Orchestrator] Assess failure criticality from test-results.json
+│   └── [Orchestrator] Assess failure criticality from test-results.toon
 ├── 2. Failure Analysis & Task Generation (via @cli-planning-agent)
 │   ├── [Orchestrator] Assemble failure context package (tests, errors, pass_rate)
 │   ├── [Orchestrator] Invoke @cli-planning-agent with context
 │   ├── [@cli-planning-agent] Execute CLI tool (Gemini/Qwen) internally
 │   ├── [@cli-planning-agent] Parse CLI output for root causes and fix strategy
-│   ├── [@cli-planning-agent] Generate IMPL-fix-N.json with structured task
+│   ├── [@cli-planning-agent] Generate IMPL-fix-N.toon with structured task
 │   ├── [@cli-planning-agent] Save analysis to iteration-N-analysis.md
 │   └── [Orchestrator] Receive task ID and insert into queue (front position)
 ├── 3. Fix Execution
@@ -171,7 +176,7 @@ Iteration N (managed by test-cycle-execute orchestrator):
 - Pass rate calculation added to test execution step
 - Orchestrator only assembles context and invokes agent
 
-#### Iteration Task JSON Template
+#### Iteration Task TOON Template
 ```json
 {
   "id": "IMPL-fix-{iteration}",
@@ -209,7 +214,7 @@ Iteration N (managed by test-cycle-execute orchestrator):
     "pre_analysis": [
       {
         "step": "load_failure_context",
-        "command": "Read(.workflow/{session}/.process/iteration-{N-1}-failures.json)",
+        "command": "Read(.workflow/{session}/.process/iteration-{N-1}-failures.toon)",
         "output_to": "previous_failures",
         "on_error": "skip_optional"
       },
@@ -249,7 +254,7 @@ Iteration N (managed by test-cycle-execute orchestrator):
 **Orchestrator delegates CLI analysis and task generation to @cli-planning-agent:**
 
 #### When Test Failures Occur (Pass Rate < 95% OR Critical Failures)
-1. **[Orchestrator]** Detects failures from test-results.json
+1. **[Orchestrator]** Detects failures from test-results.toon
 2. **[Orchestrator]** Check for repeated failures (NEW):
    - Compare failed_tests with previous 2 iterations
    - If same test failed 3 times consecutively: Mark as "stuck"
@@ -265,7 +270,7 @@ Iteration N (managed by test-cycle-execute orchestrator):
 6. **[@cli-planning-agent]** Executes internally:
    - Runs Gemini/Qwen CLI analysis with bug diagnosis template
    - Parses CLI output to extract root causes and fix strategy
-   - Generates `IMPL-fix-N.json` with structured task definition
+   - Generates `IMPL-fix-N.toon` with structured task definition
    - Saves analysis report to `.process/iteration-N-analysis.md`
    - Saves raw CLI output to `.process/iteration-N-cli-output.txt`
 7. **[Orchestrator]** Receives task ID from agent and inserts into queue
@@ -284,11 +289,11 @@ Task(
       "iteration": ${currentIteration},
       "analysis_type": "test-failure",
       "failure_context": {
-        "failed_tests": ${JSON.stringify(failedTests)},
-        "error_messages": ${JSON.stringify(errorMessages)},
+        "failed_tests": ${encodeTOON(failedTests)},
+        "error_messages": ${encodeTOON(errorMessages)},
         "test_output": "${testOutputPath}",
         "pass_rate": ${passRate},
-        "previous_attempts": ${JSON.stringify(previousAttempts)}
+        "previous_attempts": ${encodeTOON(previousAttempts)}
       },
       "cli_config": {
         "tool": "gemini",
@@ -308,7 +313,7 @@ Task(
     ## Your Task
     1. Execute CLI analysis using Gemini (fallback to Qwen if needed)
     2. Parse CLI output and extract fix strategy with specific modification points
-    3. Generate IMPL-fix-${currentIteration}.json using your internal task template
+    3. Generate IMPL-fix-${currentIteration}.toon using your internal task template
     4. Save analysis report to .process/iteration-${currentIteration}-analysis.md
     5. Report success and task ID back to orchestrator
   `
@@ -320,7 +325,7 @@ Task(
 {
   "status": "success",
   "task_id": "IMPL-fix-${iteration}",
-  "task_path": ".workflow/${session}/.task/IMPL-fix-${iteration}.json",
+  "task_path": ".workflow/${session}/.task/IMPL-fix-${iteration}.toon",
   "analysis_report": ".process/iteration-${iteration}-analysis.md",
   "cli_output": ".process/iteration-${iteration}-cli-output.txt",
   "summary": "Fix authentication token validation and null check issues",
@@ -388,11 +393,11 @@ See: `.process/iteration-N-cli-output.txt`
 Initial Queue: [IMPL-001, IMPL-002]
 
 After IMPL-002 execution (test failures detected by orchestrator):
-  [Orchestrator] Generates IMPL-fix-1.json
+  [Orchestrator] Generates IMPL-fix-1.toon
   [Orchestrator] Inserts at front: [IMPL-fix-1, IMPL-002-retest, ...]
 
 After IMPL-fix-1 execution (still failures):
-  [Orchestrator] Generates IMPL-fix-2.json
+  [Orchestrator] Generates IMPL-fix-2.toon
   [Orchestrator] Inserts at front: [IMPL-fix-2, IMPL-002-retest, ...]
 
 After IMPL-fix-2 execution (success):
@@ -422,7 +427,7 @@ After IMPL-fix-2 execution (success):
 
 #### Completion Steps
 1. **Final Validation**: Run full test suite one more time
-2. **Calculate Final Pass Rate**: Parse test-results.json
+2. **Calculate Final Pass Rate**: Parse test-results.toon
 3. **Assess Completion Status**:
    - If pass_rate === 100% → Full Success
    - If pass_rate >= 95% + all "low" criticality → Partial Success (add review note)
@@ -454,12 +459,12 @@ After IMPL-fix-2 execution (success):
 
 #### Degraded Analysis Handling (NEW)
 When @cli-planning-agent returns `status: "degraded"` (both Gemini and Qwen failed):
-1. **Log Warning**: Record CLI analysis failure in iteration-state.json
+1. **Log Warning**: Record CLI analysis failure in iteration-state.toon
 2. **Assess Risk**: Check if degraded analysis is acceptable:
    - If iteration < 3 AND pass_rate improved: Accept degraded analysis, continue
    - If iteration >= 3 OR pass_rate stagnant: Skip iteration, mark as blocked
 3. **User Notification**: Include CLI failure in completion summary
-4. **Fallback Strategy**: Use basic pattern matching from fix-history.json
+4. **Fallback Strategy**: Use basic pattern matching from fix-history.toon
 
 ## TodoWrite Coordination
 
@@ -508,7 +513,7 @@ TodoWrite({
 **Generated by test-cycle-execute orchestrator before launching agents.**
 
 The orchestrator assembles this context package from:
-- Task JSON file (IMPL-*.json)
+- Task TOON file (IMPL-*.toon)
 - Iteration state files
 - Test results and failure context
 - Session metadata
@@ -518,7 +523,7 @@ This package is passed to agents via the Task tool's prompt context.
 ### Enhanced Context for Test-Fix Agent
 ```json
 {
-  "task": { /* IMPL-fix-N.json */ },
+  "task": { /* IMPL-fix-N.toon */ },
   "iteration_context": {
     "current_iteration": N,
     "max_iterations": 5,
@@ -544,9 +549,9 @@ This package is passed to agents via the Task tool's prompt context.
   },
   "session": {
     "workflow_dir": ".workflow/WFS-test-{session}/",
-    "iteration_state_file": ".process/iteration-state.json",
-    "test_results_file": ".process/test-results.json",
-    "fix_history_file": ".process/fix-history.json"
+    "iteration_state_file": ".process/iteration-state.toon",
+    "test_results_file": ".process/test-results.toon",
+    "fix_history_file": ".process/fix-history.toon"
   }
 }
 ```
@@ -556,14 +561,14 @@ This package is passed to agents via the Task tool's prompt context.
 ### Test-Fix Session Files
 ```
 .workflow/WFS-test-{session}/
-├── workflow-session.json          # Session metadata with workflow_type
+├── workflow-session.toon          # Session metadata with workflow_type
 ├── IMPL_PLAN.md                   # Test plan
 ├── TODO_LIST.md                   # Progress tracking
 ├── .task/
-│   ├── IMPL-001.json              # Test generation task
-│   ├── IMPL-002.json              # Initial test-fix task
-│   ├── IMPL-fix-1.json            # Generated: Iteration 1 fix
-│   ├── IMPL-fix-2.json            # Generated: Iteration 2 fix
+│   ├── IMPL-001.toon              # Test generation task
+│   ├── IMPL-002.toon              # Initial test-fix task
+│   ├── IMPL-fix-1.toon            # Generated: Iteration 1 fix
+│   ├── IMPL-fix-2.toon            # Generated: Iteration 2 fix
 │   └── ...
 ├── .summaries/
 │   ├── IMPL-001-summary.md
@@ -574,12 +579,12 @@ This package is passed to agents via the Task tool's prompt context.
 │       └── ...
 └── .process/
     ├── TEST_ANALYSIS_RESULTS.md   # From planning phase
-    ├── iteration-state.json       # Current iteration state
-    ├── test-results.json          # Latest test results
+    ├── iteration-state.toon       # Current iteration state
+    ├── test-results.toon          # Latest test results
     ├── test-output.log            # Full test output
-    ├── fix-history.json           # All fix attempts
+    ├── fix-history.toon           # All fix attempts
     ├── iteration-1-analysis.md    # CLI analysis for iteration 1
-    ├── iteration-1-failures.json  # Failures from iteration 1
+    ├── iteration-1-failures.toon  # Failures from iteration 1
     ├── iteration-1-strategy.md    # Fix strategy for iteration 1
     ├── iteration-2-analysis.md
     └── ...
@@ -622,8 +627,8 @@ This package is passed to agents via the Task tool's prompt context.
 Task(subagent_type="{meta.agent}",
      prompt="**TASK EXECUTION: {task.title}**
 
-     ## STEP 1: Load Complete Task JSON
-     **MANDATORY**: First load the complete task JSON from: {session.task_json_path}
+     ## STEP 1: Load Complete Task TOON
+     **MANDATORY**: First load the complete task TOON from: {session.task_json_path}
 
      cat {session.task_json_path}
 
@@ -643,7 +648,7 @@ Task(subagent_type="{meta.agent}",
 
      ### For test-fix (IMPL-002):
      - Run test suite: {test_command}
-     - Collect results to .process/test-results.json
+     - Collect results to .process/test-results.toon
      - Report results to orchestrator (do NOT analyze failures)
      - Orchestrator will handle failure detection and iteration decisions
      - If success: Mark complete
@@ -657,7 +662,7 @@ Task(subagent_type="{meta.agent}",
 
      ## STEP 4: Implementation Context (From JSON)
      **Requirements**: {context.requirements}
-     **Fix Strategy**: {context.fix_strategy} (full content provided in task JSON)
+     **Fix Strategy**: {context.fix_strategy} (full content provided in task TOON)
      **Failure Context**: {context.failure_context}
      **Iteration History**: {context.inherited.iteration_history}
 
@@ -672,9 +677,9 @@ Task(subagent_type="{meta.agent}",
      5. **CRITICAL**: Save results for orchestrator to analyze
 
      **Output Requirements**:
-     - test-results.json: Structured test results
+     - test-results.toon: Structured test results
      - test-output.log: Full test output
-     - iteration-state.json: Current iteration state (if applicable)
+     - iteration-state.toon: Current iteration state (if applicable)
      - task-summary.md: Completion summary
 
      **Return to Orchestrator**: Agent completes and returns. Orchestrator decides next action.
@@ -685,7 +690,7 @@ Task(subagent_type="{meta.agent}",
 **Key Points**:
 - Agent executes single task and returns
 - Orchestrator analyzes results and decides next step
-- Fix strategy content (not path) embedded in task JSON by orchestrator
+- Fix strategy content (not path) embedded in task TOON by orchestrator
 - Agent does not manage iteration loop
 
 ## Error Handling & Recovery
@@ -704,7 +709,7 @@ Task(subagent_type="{meta.agent}",
 #### Resume from Interruption
 ```bash
 # Load iteration state
-iteration_state=$(cat .workflow/{session}/.process/iteration-state.json)
+iteration_state=$(cat .workflow/{session}/.process/iteration-state.toon)
 current_iteration=$(jq -r '.current_iteration' <<< "$iteration_state")
 
 # Determine resume point
@@ -723,11 +728,11 @@ fi
 git revert HEAD
 
 # Remove failed fix task
-rm .workflow/{session}/.task/IMPL-fix-{N}.json
+rm .workflow/{session}/.task/IMPL-fix-{N}.toon
 
 # Restore iteration state
-jq '.current_iteration -= 1' iteration-state.json > temp.json
-mv temp.json iteration-state.json
+jq '.current_iteration -= 1' iteration-state.toon > temp.toon
+mv temp.toon iteration-state.toon
 
 # Re-run analysis with additional context
 # Include failure reason in next analysis
@@ -770,4 +775,3 @@ mv temp.json iteration-state.json
 4. **Incremental Fixes**: Prefer multiple small iterations over large changes
 5. **Verify No Regressions**: Check all tests pass, not just previously failing ones
 6. **Preserve Context**: All iteration artifacts saved for debugging
-

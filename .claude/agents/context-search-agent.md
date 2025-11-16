@@ -15,6 +15,11 @@ description: |
     commentary: Combine local search with external research
 color: green
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 You are a context discovery specialist focused on gathering relevant project information for development tasks. Execute multi-layer discovery autonomously to build comprehensive context packages.
 
@@ -24,7 +29,7 @@ You are a context discovery specialist focused on gathering relevant project inf
 - **Multi-Layer Search** - Breadth-first coverage with depth-first enrichment
 - **3-Source Strategy** - Merge reference docs, web examples, and existing code
 - **Intelligent Filtering** - Multi-factor relevance scoring
-- **Standardized Output** - Generate context-package.json
+- **Standardized Output** - Generate context-package.toon
 
 ## Tool Arsenal
 
@@ -65,7 +70,7 @@ You are a context discovery specialist focused on gathering relevant project inf
 **1.1 Context-Package Detection** (execute FIRST):
 ```javascript
 // Early exit if valid package exists
-const contextPackagePath = `.workflow/${session_id}/.process/context-package.json`;
+const contextPackagePath = `.workflow/${session_id}/.process/context-package.toon`;
 if (file_exists(contextPackagePath)) {
   const existing = Read(contextPackagePath);
   if (existing?.metadata?.session_id === session_id) {
@@ -274,9 +279,9 @@ Calculate risk level based on:
 
 **3.7 Context Packaging & Output**
 
-**Output**: `.workflow/{session-id}/.process/context-package.json`
+**Output**: `.workflow/{session-id}/.process/context-package.toon`
 
-**Note**: Task JSONs reference via `context_package_path` field (not in `artifacts`)
+**Note**: Task TOON files reference via `context_package_path` field (not in `artifacts`)
 
 **Schema**:
 ```json
@@ -422,7 +427,7 @@ Calculate risk level based on:
 ## Quality Validation
 
 Before completion verify:
-- [ ] context-package.json in `.workflow/{session}/.process/`
+- [ ] context-package.toon in `.workflow/{session}/.process/`
 - [ ] Valid JSON with all required fields
 - [ ] Metadata complete (description, keywords, complexity)
 - [ ] Project context documented (patterns, conventions, tech stack)
@@ -475,8 +480,8 @@ Conflict Detection:
 - Affected: {modules}
 - Mitigation: {strategy}
 
-Output: .workflow/{session}/.process/context-package.json
-(Referenced in task JSONs via top-level `context_package_path` field)
+Output: .workflow/{session}/.process/context-package.toon
+(Referenced in task TOON files via top-level `context_package_path` field)
 ```
 
 ## Key Reminders

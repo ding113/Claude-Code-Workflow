@@ -4,6 +4,11 @@ description: Parallel brainstorming automation with dynamic role selection and c
 argument-hint: "topic or challenge description" [--count N]
 allowed-tools: SlashCommand(*), Task(*), TodoWrite(*), Read(*), Write(*), Bash(*), Glob(*)
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 # Workflow Brainstorm Parallel Auto Command
 
@@ -40,7 +45,7 @@ This workflow runs **fully autonomously** once triggered. Phase 1 (artifacts) ha
 
 1. **Start Immediately**: First action is TodoWrite initialization, second action is Phase 1 command execution
 2. **No Preliminary Analysis**: Do not analyze topic before Phase 1 - artifacts handles all analysis
-3. **Parse Every Output**: Extract selected_roles from workflow-session.json after Phase 1
+3. **Parse Every Output**: Extract selected_roles from workflow-session.toon after Phase 1
 4. **Auto-Continue via TodoList**: Check TodoList status to execute next pending phase automatically
 5. **Track Progress**: Update TodoWrite dynamically with task attachment/collapse pattern
 6. **Task Attachment Model**: SlashCommand and Task invocations **attach** sub-tasks to current workflow. Orchestrator **executes** these attached tasks itself, then **collapses** them after completion
@@ -78,13 +83,13 @@ This workflow runs **fully autonomously** once triggered. Phase 1 (artifacts) ha
 
 **Parse Output**:
 - **⚠️ Memory Check**: If `selected_roles[]` already in conversation memory from previous load, skip file read
-- Extract: `selected_roles[]` from workflow-session.json (if not in memory)
-- Extract: `session_id` from workflow-session.json (if not in memory)
+- Extract: `selected_roles[]` from workflow-session.toon (if not in memory)
+- Extract: `session_id` from workflow-session.toon (if not in memory)
 - Verify: guidance-specification.md exists
 
 **Validation**:
 - guidance-specification.md created with confirmed decisions
-- workflow-session.json contains selected_roles[] (metadata only, no content duplication)
+- workflow-session.toon contains selected_roles[] (metadata only, no content duplication)
 - Session directory `.workflow/WFS-{topic}/.brainstorming/` exists
 
 **TodoWrite Update (Phase 1 SlashCommand invoked - tasks attached)**:
@@ -148,17 +153,17 @@ TOPIC: {user-provided-topic}
 
 3. **load_session_metadata**
    - Action: Load session metadata and original user intent
-   - Command: Read(.workflow/WFS-{session}/workflow-session.json)
+   - Command: Read(.workflow/WFS-{session}/workflow-session.toon)
    - Output: session_context (contains original user prompt as PRIMARY reference)
 
 4. **load_style_skill** (ONLY for ui-designer role when style_skill_package exists)
    - Action: Load style SKILL package for design system reference
-   - Command: Read(.claude/skills/style-{style_skill_package}/SKILL.md) AND Read(.workflow/reference_style/{style_skill_package}/design-tokens.json)
+   - Command: Read(.claude/skills/style-{style_skill_package}/SKILL.md) AND Read(.workflow/reference_style/{style_skill_package}/design-tokens.toon)
    - Output: style_skill_content, design_tokens
    - Usage: Apply design tokens in ui-designer analysis and artifacts
 
 ## Analysis Requirements
-**Primary Reference**: Original user prompt from workflow-session.json is authoritative
+**Primary Reference**: Original user prompt from workflow-session.toon is authoritative
 **Framework Source**: Address all discussion points in guidance-specification.md from {role-name} perspective
 **Role Focus**: {role-name} domain expertise aligned with user intent
 **Structured Approach**: Create analysis.md addressing framework discussion points
@@ -178,7 +183,7 @@ TOPIC: {user-provided-topic}
 - Provide actionable recommendations from {role-name} perspective within analysis files
 - All output files MUST start with `analysis` prefix (no recommendations.md or other naming)
 - Reference framework document using @ notation for integration
-- Update workflow-session.json with completion status
+- Update workflow-session.toon with completion status
 "
 ```
 
@@ -237,7 +242,7 @@ TOPIC: {user-provided-topic}
 **Command**: `SlashCommand(command="/workflow:brainstorm:synthesis --session {sessionId}")`
 
 **What It Does**:
-- Load original user intent from workflow-session.json
+- Load original user intent from workflow-session.toon
 - Read all role analysis.md files
 - Integrate role insights into synthesis-specification.md
 - Validate alignment with user's original objectives
@@ -409,7 +414,7 @@ CONTEXT_VARS:
 
 **Phase 1 Output**:
 - `.workflow/WFS-{topic}/.brainstorming/guidance-specification.md` (framework content)
-- `.workflow/WFS-{topic}/workflow-session.json` (metadata: selected_roles[], topic, timestamps, style_skill_package)
+- `.workflow/WFS-{topic}/workflow-session.toon` (metadata: selected_roles[], topic, timestamps, style_skill_package)
 
 **Phase 2 Output**:
 - `.workflow/WFS-{topic}/.brainstorming/{role}/analysis.md` (one per role)
@@ -418,8 +423,8 @@ CONTEXT_VARS:
 **Phase 3 Output**:
 - `.workflow/WFS-{topic}/.brainstorming/synthesis-specification.md` (integrated analysis)
 
-**⚠️ Storage Separation**: Guidance content in .md files, metadata in .json (no duplication)
-**⚠️ Style References**: When --style-skill provided, workflow-session.json stores style_skill_package name, ui-designer loads from `.claude/skills/style-{package-name}/`
+**⚠️ Storage Separation**: Guidance content in .md files, metadata in .toon (legacy `.json` read-only, no duplication)
+**⚠️ Style References**: When --style-skill provided, workflow-session.toon stores style_skill_package name, ui-designer loads from `.claude/skills/style-{package-name}/`
 
 ## Available Roles
 
@@ -448,7 +453,7 @@ CONTEXT_VARS:
 ```
 .workflow/WFS-[topic]/
 ├── .active-brainstorming
-├── workflow-session.json              # Session metadata ONLY
+├── workflow-session.toon              # Session metadata ONLY
 └── .brainstorming/
     ├── guidance-specification.md      # Framework (Phase 1)
     ├── {role-1}/
@@ -461,4 +466,3 @@ CONTEXT_VARS:
 ```
 
 **Template Source**: `~/.claude/workflows/cli-templates/planning-roles/`
-

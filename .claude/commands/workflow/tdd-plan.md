@@ -4,6 +4,11 @@ description: TDD workflow planning with Red-Green-Refactor task chain generation
 argument-hint: "[--cli-execute] \"feature description\"|file.md"
 allowed-tools: SlashCommand(*), TodoWrite(*), Read(*), Bash(*)
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 # TDD Workflow Plan Command (/workflow:tdd-plan)
 
@@ -69,8 +74,8 @@ TEST_FOCUS: [Test scenarios]
 **Input**: `sessionId` from Phase 1
 
 **Parse Output**:
-- Extract: context-package.json path (store as `contextPath`)
-- Typical pattern: `.workflow/[sessionId]/.process/context-package.json`
+- Extract: context-package.toon path (store as `contextPath`)
+- Typical pattern: `.workflow/[sessionId]/.process/context-package.toon`
 
 **Validation**:
 - Context package path extracted
@@ -91,7 +96,7 @@ TEST_FOCUS: [Test scenarios]
 - Related components and integration points
 - Test framework detection
 
-**Parse**: Extract testContextPath (`.workflow/[sessionId]/.process/test-context-package.json`)
+**Parse**: Extract testContextPath (`.workflow/[sessionId]/.process/test-context-package.toon`)
 
 **Benefits**:
 - Makes TDD aware of existing environment
@@ -139,14 +144,14 @@ TEST_FOCUS: [Test scenarios]
 
 ### Phase 4: Conflict Resolution (Optional - auto-triggered by conflict risk)
 
-**Trigger**: Only execute when context-package.json indicates conflict_risk is "medium" or "high"
+**Trigger**: Only execute when context-package.toon indicates conflict_risk is "medium" or "high"
 
 **Command**: `SlashCommand(command="/workflow:tools:conflict-resolution --session [sessionId] --context [contextPath]")`
 
 **Input**:
 - sessionId from Phase 1
 - contextPath from Phase 2
-- conflict_risk from context-package.json
+- conflict_risk from context-package.toon
 
 **Parse Output**:
 - Extract: Execution status (success/skipped/failed)
@@ -216,7 +221,7 @@ TEST_FOCUS: [Test scenarios]
 
 **Validate**:
 - IMPL_PLAN.md exists (unified plan with TDD Implementation Tasks section)
-- IMPL-*.json files exist (one per feature, or container + subtasks for complex features)
+- IMPL-*.toon files exist (one per feature, or container + subtasks for complex features)
 - TODO_LIST.md exists with internal TDD phase indicators
 - Each IMPL task includes:
   - `meta.tdd_workflow: true`
@@ -365,14 +370,14 @@ TDD Workflow Orchestrator
 │
 ├─ Phase 2: Context Gathering
 │  └─ /workflow:tools:context-gather
-│     └─ Returns: context-package.json path
+│     └─ Returns: context-package.toon path
 │
 ├─ Phase 3: Test Coverage Analysis                    ← ATTACHED (3 tasks)
 │  └─ /workflow:tools:test-context-gather
 │     ├─ Phase 3.1: Detect test framework
 │     ├─ Phase 3.2: Analyze existing test coverage
 │     └─ Phase 3.3: Identify coverage gaps
-│     └─ Returns: test-context-package.json           ← COLLAPSED
+│     └─ Returns: test-context-package.toon           ← COLLAPSED
 │
 ├─ Phase 4: Conflict Resolution (conditional)
 │  IF conflict_risk ≥ medium:
@@ -389,7 +394,7 @@ TDD Workflow Orchestrator
 │     ├─ Phase 5.1: Discovery - analyze TDD requirements
 │     ├─ Phase 5.2: Planning - design Red-Green-Refactor cycles
 │     └─ Phase 5.3: Output - generate IMPL tasks with internal TDD phases
-│     └─ Returns: IMPL-*.json, IMPL_PLAN.md           ← COLLAPSED
+│     └─ Returns: IMPL-*.toon, IMPL_PLAN.md           ← COLLAPSED
 │        (Each IMPL task contains internal Red-Green-Refactor cycle)
 │
 └─ Phase 6: TDD Structure Validation
@@ -500,16 +505,16 @@ Supports action-planning-agent for more autonomous TDD planning with:
 ├── IMPL_PLAN.md (unified plan with TDD Implementation Tasks section)
 ├── TODO_LIST.md (with internal TDD phase indicators)
 ├── .process/
-│   ├── context-package.json
-│   ├── test-context-package.json
+│   ├── context-package.toon
+│   ├── test-context-package.toon
 │   ├── ANALYSIS_RESULTS.md (enhanced with TDD breakdown)
 │   └── green-fix-iteration-*.md (fix logs from Green phase cycles)
 └── .task/
-    ├── IMPL-1.json (Complete TDD task: Red-Green-Refactor internally)
-    ├── IMPL-2.json (Complete TDD task)
-    ├── IMPL-3.json (Complex feature container, if needed)
-    ├── IMPL-3.1.json (Complex feature subtask, if needed)
-    └── IMPL-3.2.json (Complex feature subtask, if needed)
+    ├── IMPL-1.toon (Complete TDD task: Red-Green-Refactor internally)
+    ├── IMPL-2.toon (Complete TDD task)
+    ├── IMPL-3.toon (Complex feature container, if needed)
+    ├── IMPL-3.1.toon (Complex feature subtask, if needed)
+    └── IMPL-3.2.toon (Complex feature subtask, if needed)
 ```
 
 **File Count Comparison**:

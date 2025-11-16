@@ -3,6 +3,11 @@ name: review
 description: Post-implementation review with specialized types (security/architecture/action-items/quality) using analysis agents and Gemini
 argument-hint: "[--type=security|architecture|action-items|quality] [optional: session-id]"
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 ## Command Overview: /workflow:review
 
@@ -86,7 +91,7 @@ After bash validation, the model takes control to:
    cat .workflow/${sessionId}/.summaries/TEST-FIX-*.md 2>/dev/null
 
    # Get changed files
-   git log --since="$(cat .workflow/${sessionId}/workflow-session.json | jq -r .created_at)" --name-only --pretty=format: | sort -u
+   git log --since="$(cat .workflow/${sessionId}/workflow-session.toon | jq -r .created_at)" --name-only --pretty=format: | sort -u
    ```
 
 2. **Perform Specialized Review**: Based on `review_type`
@@ -136,7 +141,7 @@ After bash validation, the model takes control to:
    - Verify all requirements and acceptance criteria met:
      ```bash
      # Load task requirements and acceptance criteria
-     find .workflow/${sessionId}/.task -name "IMPL-*.json" -exec jq -r '
+     find .workflow/${sessionId}/.task -name "IMPL-*.toon" -exec jq -r '
        "Task: " + .id + "\n" +
        "Requirements: " + (.context.requirements | join(", ")) + "\n" +
        "Acceptance: " + (.context.acceptance | join(", "))
@@ -146,7 +151,7 @@ After bash validation, the model takes control to:
      cd .workflow/${sessionId} && gemini -p "
      PURPOSE: Verify all requirements and acceptance criteria are met
      TASK: Cross-check implementation summaries against original requirements
-     CONTEXT: @.task/IMPL-*.json,.summaries/IMPL-*.md,../.. @../../CLAUDE.md
+     CONTEXT: @.task/IMPL-*.toon,.summaries/IMPL-*.md,../.. @../../CLAUDE.md
      EXPECTED:
      - Requirements coverage matrix
      - Acceptance criteria verification
@@ -198,7 +203,7 @@ After bash validation, the model takes control to:
    Write(.workflow/${sessionId}/REVIEW-${review_type}.md)
 
    # Update session metadata
-   # (optional) Update workflow-session.json with review status
+   # (optional) Update workflow-session.toon with review status
    ```
 
 5. **Optional: Update Memory** (if docs review or significant findings):

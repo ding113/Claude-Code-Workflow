@@ -1,0 +1,81 @@
+"workflow:plan":
+  calls_internally[5]: "workflow:session:start","workflow:tools:context-gather","workflow:tools:conflict-resolution","workflow:tools:task-generate","workflow:tools:task-generate-agent"
+  next_steps[3]: "workflow:action-plan-verify","workflow:status","workflow:execute"
+  alternatives[1]: "workflow:tdd-plan"
+  prerequisites[0]:
+"workflow:tdd-plan":
+  calls_internally[3]: "workflow:session:start","workflow:tools:context-gather","workflow:tools:task-generate-tdd"
+  next_steps[3]: "workflow:tdd-verify","workflow:status","workflow:execute"
+  alternatives[1]: "workflow:plan"
+  prerequisites[0]:
+"workflow:execute":
+  prerequisites[2]: "workflow:plan","workflow:tdd-plan"
+  related[2]: "workflow:status","workflow:resume"
+  next_steps[2]: "workflow:review","workflow:tdd-verify"
+"workflow:action-plan-verify":
+  prerequisites[1]: "workflow:plan"
+  next_steps[1]: "workflow:execute"
+  related[1]: "workflow:status"
+"workflow:tdd-verify":
+  prerequisites[1]: "workflow:execute"
+  related[1]: "workflow:tools:tdd-coverage-analysis"
+"workflow:session:start":
+  next_steps[2]: "workflow:plan","workflow:execute"
+  related[2]: "workflow:session:list","workflow:session:resume"
+"workflow:session:resume":
+  alternatives[1]: "workflow:resume"
+  related[2]: "workflow:session:list","workflow:status"
+"workflow:resume":
+  alternatives[1]: "workflow:session:resume"
+  related[1]: "workflow:status"
+"task:create":
+  next_steps[1]: "task:execute"
+  related[1]: "task:breakdown"
+"task:breakdown":
+  next_steps[1]: "task:execute"
+  related[1]: "task:create"
+"task:replan":
+  prerequisites[1]: "workflow:plan"
+  related[1]: "workflow:action-plan-verify"
+"task:execute":
+  prerequisites[3]: "task:create","task:breakdown","workflow:plan"
+  related[1]: "workflow:status"
+"memory:docs":
+  calls_internally[2]: "workflow:session:start","workflow:tools:context-gather"
+  next_steps[1]: "workflow:execute"
+"memory:skill-memory":
+  next_steps[2]: "workflow:plan","cli:analyze"
+  related[1]: "memory:load-skill-memory"
+"memory:workflow-skill-memory":
+  related[1]: "memory:skill-memory"
+  next_steps[1]: "workflow:plan"
+"cli:execute":
+  alternatives[1]: "cli:codex-execute"
+  related[2]: "cli:analyze","cli:chat"
+"cli:analyze":
+  related[2]: "cli:chat","cli:mode:code-analysis"
+  next_steps[1]: "cli:execute"
+"workflow:brainstorm:artifacts":
+  next_steps[2]: "workflow:brainstorm:synthesis","workflow:plan"
+  related[1]: "workflow:brainstorm:auto-parallel"
+"workflow:brainstorm:synthesis":
+  prerequisites[1]: "workflow:brainstorm:artifacts"
+  next_steps[1]: "workflow:plan"
+"workflow:brainstorm:auto-parallel":
+  next_steps[2]: "workflow:brainstorm:synthesis","workflow:plan"
+  related[1]: "workflow:brainstorm:artifacts"
+"workflow:test-gen":
+  prerequisites[1]: "workflow:execute"
+  next_steps[1]: "workflow:test-cycle-execute"
+"workflow:test-fix-gen":
+  alternatives[1]: "workflow:test-gen"
+  next_steps[1]: "workflow:test-cycle-execute"
+"workflow:test-cycle-execute":
+  prerequisites[2]: "workflow:test-gen","workflow:test-fix-gen"
+  related[1]: "workflow:tdd-verify"
+"workflow:ui-design:explore-auto":
+  calls_internally[3]: "workflow:ui-design:capture","workflow:ui-design:style-extract","workflow:ui-design:layout-extract"
+  next_steps[1]: "workflow:ui-design:generate"
+"workflow:ui-design:imitate-auto":
+  calls_internally[1]: "workflow:ui-design:capture"
+  next_steps[1]: "workflow:ui-design:generate"

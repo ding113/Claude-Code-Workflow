@@ -1,9 +1,14 @@
 ---
 name: plan
-description: 5-phase planning workflow with action-planning-agent task generation, outputs IMPL_PLAN.md and task JSONs with optional CLI auto-execution
+description: 5-phase planning workflow with action-planning-agent task generation, outputs IMPL_PLAN.md and task TOON files with optional CLI auto-execution
 argument-hint: "[--cli-execute] \"text description\"|file.md"
 allowed-tools: SlashCommand(*), TodoWrite(*), Read(*), Bash(*)
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 # Workflow Plan Command (/workflow:plan)
 
@@ -86,8 +91,8 @@ CONTEXT: Existing user database schema, REST API endpoints
 **Input**: `sessionId` from Phase 1
 
 **Parse Output**:
-- Extract: context-package.json path (store as `contextPath`)
-- Typical pattern: `.workflow/[sessionId]/.process/context-package.json`
+- Extract: context-package.toon path (store as `contextPath`)
+- Typical pattern: `.workflow/[sessionId]/.process/context-package.toon`
 
 **Validation**:
 - Context package path extracted
@@ -127,14 +132,14 @@ CONTEXT: Existing user database schema, REST API endpoints
 
 ### Phase 3: Conflict Resolution (Optional - auto-triggered by conflict risk)
 
-**Trigger**: Only execute when context-package.json indicates conflict_risk is "medium" or "high"
+**Trigger**: Only execute when context-package.toon indicates conflict_risk is "medium" or "high"
 
 **Command**: `SlashCommand(command="/workflow:tools:conflict-resolution --session [sessionId] --context [contextPath]")`
 
 **Input**:
 - sessionId from Phase 1
 - contextPath from Phase 2
-- conflict_risk from context-package.json
+- conflict_risk from context-package.toon
 
 **Parse Output**:
 - Extract: Execution status (success/skipped/failed)
@@ -233,7 +238,7 @@ SlashCommand(command="/workflow:tools:task-generate-agent --session [sessionId] 
 
 **Validation**:
 - `.workflow/[sessionId]/IMPL_PLAN.md` exists
-- `.workflow/[sessionId]/.task/IMPL-*.json` exists (at least one)
+- `.workflow/[sessionId]/.task/IMPL-*.toon` exists (at least one)
 - `.workflow/[sessionId]/TODO_LIST.md` exists
 
 <!-- TodoWrite: When task-generate-agent invoked, ATTACH 1 agent task -->
@@ -360,7 +365,7 @@ Phase 1: session:start --auto "structured-description"
     ↓
 Phase 2: context-gather --session sessionId "structured-description"
     ↓ Input: sessionId + session memory + structured description
-    ↓ Output: contextPath (context-package.json) + conflict_risk
+    ↓ Output: contextPath (context-package.toon) + conflict_risk
     ↓
 Phase 3: conflict-resolution [AUTO-TRIGGERED if conflict_risk ≥ medium]
     ↓ Input: sessionId + contextPath + conflict_risk
@@ -370,13 +375,13 @@ Phase 3: conflict-resolution [AUTO-TRIGGERED if conflict_risk ≥ medium]
     ↓ Apply modifications via Edit tool:
     ↓   - Update guidance-specification.md
     ↓   - Update role analyses (*.md)
-    ↓   - Mark context-package.json as "resolved"
+    ↓   - Mark context-package.toon as "resolved"
     ↓ Output: Modified brainstorm artifacts (NO report file)
     ↓ Skip if conflict_risk is none/low → proceed directly to Phase 4
     ↓
 Phase 4: task-generate-agent --session sessionId [--cli-execute]
     ↓ Input: sessionId + resolved brainstorm artifacts + session memory
-    ↓ Output: IMPL_PLAN.md, task JSONs, TODO_LIST.md
+    ↓ Output: IMPL_PLAN.md, task TOON files, TODO_LIST.md
     ↓
 Return summary to user
 ```
@@ -429,7 +434,7 @@ Phase 4: Task Generation (SlashCommand invoked)
     - Execute task-generate-agent
   → Agent autonomously completes internally:
     (discovery → planning → output)
-  → Outputs: IMPL_PLAN.md, IMPL-*.json, TODO_LIST.md
+  → Outputs: IMPL_PLAN.md, IMPL-*.toon, TODO_LIST.md
   ↓
 Return summary to user
 ```
@@ -457,7 +462,7 @@ Return summary to user
 - Parse session ID from Phase 1 output, store in memory
 - Pass session ID and structured description to Phase 2 command
 - Parse context path from Phase 2 output, store in memory
-- **Extract conflict_risk from context-package.json**: Determine Phase 3 execution
+- **Extract conflict_risk from context-package.toon**: Determine Phase 3 execution
 - **If conflict_risk ≥ medium**: Launch Phase 3 conflict-resolution with sessionId and contextPath
 - Wait for Phase 3 to finish executing (if executed), verify CONFLICT_RESOLUTION.md created
 - **If conflict_risk is none/low**: Skip Phase 3, proceed directly to Phase 4
@@ -507,7 +512,7 @@ CONSTRAINTS: [Limitations or boundaries]
 - `/workflow:tools:context-gather` - Phase 2: Gather project context and analyze codebase
 - `/workflow:tools:conflict-resolution` - Phase 3: Detect and resolve conflicts (auto-triggered if conflict_risk ≥ medium)
 - `/compact` - Phase 3: Memory optimization (if context approaching limits)
-- `/workflow:tools:task-generate-agent` - Phase 4: Generate task JSON files with agent-driven approach
+- `/workflow:tools:task-generate-agent` - Phase 4: Generate task TOON files with agent-driven approach
 
 **Follow-up Commands**:
 - `/workflow:action-plan-verify` - Recommended: Verify plan quality and catch issues before execution

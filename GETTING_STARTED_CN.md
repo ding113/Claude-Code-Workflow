@@ -3,7 +3,7 @@
 
 欢迎来到 Claude Code Workflow (CCW) v5.0！本指南将帮助您在 5 分钟内快速入门，体验由 AI 驱动的自动化软件开发流程，以及我们全新的精简化、零外部依赖的工作流系统。
 
-**项目地址**：[catlog22/Claude-Code-Workflow](https://github.com/catlog22/Claude-Code-Workflow)
+**项目地址**：[ding113/Claude-Code-Workflow](https://github.com/ding113/Claude-Code-Workflow)
 
 > **🎉 v5.0 新特性：少即是多**！我们移除了外部 MCP 依赖，简化了工作流程。CCW 现在使用标准工具（ripgrep/find）以获得更好的稳定性和性能。头脑风暴工作流专注于角色分析，使规划更加清晰。
 
@@ -30,7 +30,7 @@
 这个命令会启动一个完全自动化的规划流程，包括：
 1.  **上下文收集**：分析您的项目环境。
 2.  **智能体分析**：AI 智能体思考最佳实现路径。
-3.  **任务生成**：创建具体的任务文件（`.json` 格式）。
+3.  **任务生成**：以 TOON 格式（如 `.toon` 文件）创建具体的任务文件。
 
 ### 第 3 步：执行计划
 
@@ -62,7 +62,22 @@
     > 就像一个独立的沙盒或项目空间，用于隔离不同任务的上下文、文件和历史记录。所有相关文件都存放在 `.workflow/WFS-<会话名>/` 目录下。
 
 -   **任务 (Task)**
-    > 一个原子化的工作单元，例如“创建 API 路由”、“编写测试用例”。每个任务都是一个 `.json` 文件，详细定义了目标、上下文和执行步骤。
+    > 一个原子化的工作单元，例如“创建 API 路由”、“编写测试用例”。每个任务以 TOON 格式（如 `.toon`）存储，用紧凑、可读的结构描述目标、上下文和执行步骤。
+
+    TOON 任务示例：
+    ```toon
+    id: IMPL-001
+    title: 创建 Hello World 接口
+    agent: @code-developer
+    priority: medium
+    status: pending
+    steps[3]{name,status}:
+      分析项目上下文,pending
+      实现 GET / 处理器,pending
+      添加请求测试,pending
+    ```
+
+    > **💡 TOON 格式优势**: TOON (Token-Oriented Object Notation) 相比 JSON 可节省 30-60% 的令牌使用，同时保持更好的人类可读性。所有任务文件现在都使用 `.toon` 扩展名。系统通过 `autoDecode()` 自动兼容旧的 JSON 格式文件。
 
 -   **智能体 (Agent)**
     > 专门负责特定领域工作的 AI 助手。例如：

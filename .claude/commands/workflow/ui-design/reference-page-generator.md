@@ -5,6 +5,11 @@ argument-hint: "[--design-run <path>] [--package-name <name>] [--output-dir <pat
 allowed-tools: Read,Write,Bash,Task,TodoWrite
 auto-continue: true
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 # UI Design: Reference Page Generator
 
@@ -12,7 +17,7 @@ auto-continue: true
 
 Converts design run extraction results into shareable reference package with:
 - Interactive multi-component preview (preview.html + preview.css)
-- Component layout templates (layout-templates.json)
+- Component layout templates (layout-templates.toon)
 
 **Role**: Takes existing design run (from `import-from-code` or other extraction commands) and generates preview pages for easy reference.
 
@@ -63,8 +68,8 @@ fi
 
 # 4. Check required extraction files exist
 required_files=(
-  "$design_run/style-extraction/style-1/design-tokens.json"
-  "$design_run/layout-extraction/layout-templates.json"
+  "$design_run/style-extraction/style-1/design-tokens.toon"
+  "$design_run/layout-extraction/layout-templates.toon"
 )
 
 for file in "${required_files[@]}"; do
@@ -82,9 +87,9 @@ package_dir="${output_dir}/${package_name}"
 # Check if package directory exists and is not empty
 if [ -d "$package_dir" ] && [ "$(ls -A $package_dir 2>/dev/null)" ]; then
   # Directory exists - check if it's a valid package or just a directory
-  if [ -f "$package_dir/metadata.json" ]; then
+  if [ -f "$package_dir/metadata.toon" ]; then
     # Valid package - safe to overwrite
-    existing_version=$(jq -r '.version // "unknown"' "$package_dir/metadata.json" 2>/dev/null || echo "unknown")
+    existing_version=$(jq -r '.version // "unknown"' "$package_dir/metadata.toon" 2>/dev/null || echo "unknown")
     echo "INFO: Overwriting existing package '$package_name' (version: $existing_version)"
   else
     # Directory exists but not a valid package
@@ -125,29 +130,29 @@ echo "  Output: $package_dir"
 echo "[Phase 1] Preparing component data from design run"
 
 # 1. Copy layout templates as component patterns
-cp "${design_run}/layout-extraction/layout-templates.json" "${package_dir}/layout-templates.json"
+cp "${design_run}/layout-extraction/layout-templates.toon" "${package_dir}/layout-templates.toon"
 
-if [ ! -f "${package_dir}/layout-templates.json" ]; then
+if [ ! -f "${package_dir}/layout-templates.toon" ]; then
   echo "ERROR: Failed to copy layout templates"
   exit 1
 fi
 
 # Count components from layout templates
-component_count=$(jq -r '.layout_templates | length // 0' "${package_dir}/layout-templates.json" 2>/dev/null || echo 0)
+component_count=$(jq -r '.layout_templates | length // 0' "${package_dir}/layout-templates.toon" 2>/dev/null || echo 0)
 echo "  ✓ Layout templates copied (${component_count} components)"
 
 # 2. Copy design tokens (required for preview generation)
-cp "${design_run}/style-extraction/style-1/design-tokens.json" "${package_dir}/design-tokens.json"
+cp "${design_run}/style-extraction/style-1/design-tokens.toon" "${package_dir}/design-tokens.toon"
 
-if [ ! -f "${package_dir}/design-tokens.json" ]; then
+if [ ! -f "${package_dir}/design-tokens.toon" ]; then
   echo "ERROR: Failed to copy design tokens"
   exit 1
 fi
 echo "  ✓ Design tokens copied"
 
 # 3. Copy animation tokens if exists (optional)
-if [ -f "${design_run}/animation-extraction/animation-tokens.json" ]; then
-  cp "${design_run}/animation-extraction/animation-tokens.json" "${package_dir}/animation-tokens.json"
+if [ -f "${design_run}/animation-extraction/animation-tokens.toon" ]; then
+  cp "${design_run}/animation-extraction/animation-tokens.toon" "${package_dir}/animation-tokens.toon"
   echo "  ✓ Animation tokens copied"
 else
   echo "  ○ Animation tokens not found (optional)"
@@ -183,9 +188,9 @@ Task(ui-design-agent): `
 
   ## Input Files (MUST READ ALL)
 
-  1. ${package_dir}/layout-templates.json (component layout patterns - REQUIRED)
-  2. ${package_dir}/design-tokens.json (design tokens - REQUIRED)
-  3. ${package_dir}/animation-tokens.json (optional, if exists)
+  1. ${package_dir}/layout-templates.toon (component layout patterns - REQUIRED)
+  2. ${package_dir}/design-tokens.toon (design tokens - REQUIRED)
+  3. ${package_dir}/animation-tokens.toon (optional, if exists)
 
   ## Generation Task
 
@@ -200,14 +205,14 @@ Task(ui-design-agent): `
   - Display typography scale (font sizes, weights)
   - Show typography combinations if available
   - Include font family examples
-  - **Display usage recommendations** (from design-tokens.json _metadata.usage_recommendations.typography):
+  - **Display usage recommendations** (from design-tokens.toon _metadata.usage_recommendations.typography):
     * Common sizes table (small_text, body_text, heading)
     * Common combinations with use cases
 
   ### Section 3: Components
-  - Render all components from layout-templates.json (use layout_templates field)
+  - Render all components from layout-templates.toon (use layout_templates field)
   - **Universal Components**: Display reusable multi-component showcases (buttons, inputs, cards, etc.)
-    * **Display usage_guide** (from layout-templates.json):
+    * **Display usage_guide** (from layout-templates.toon):
       - Common sizes table with dimensions and use cases
       - Variant recommendations (when to use primary/secondary/etc)
       - Usage context list (typical scenarios)
@@ -222,7 +227,7 @@ Task(ui-design-agent): `
   - Visual spacing scale
   - Border radius examples
   - Shadow depth examples
-  - **Display spacing recommendations** (from design-tokens.json _metadata.usage_recommendations.spacing):
+  - **Display spacing recommendations** (from design-tokens.toon _metadata.usage_recommendations.spacing):
     * Size guide table (tight/normal/loose categories)
     * Common patterns with use cases and pixel values
 
@@ -245,17 +250,17 @@ Task(ui-design-agent): `
   - Footer with package metadata
 
   ### preview.css Structure:
-  - CSS Custom Properties from design-tokens.json
+  - CSS Custom Properties from design-tokens.toon
   - Typography combination classes
-  - Component classes from layout-templates.json
+  - Component classes from layout-templates.toon
   - Preview page layout styles
   - Interactive demo styles
 
   ## Critical Requirements
-  - ✅ Read ALL input files (layout-templates.json, design-tokens.json, animation-tokens.json if exists)
+  - ✅ Read ALL input files (layout-templates.toon, design-tokens.toon, animation-tokens.toon if exists)
   - ✅ Generate complete, interactive showcase HTML
   - ✅ All CSS uses var() references to design tokens
-  - ✅ Display ALL components from layout-templates.json
+  - ✅ Display ALL components from layout-templates.toon
   - ✅ **Separate universal components from specialized components** in the showcase
   - ✅ Display component DOM structures with proper styling
   - ✅ Include usage code snippets
@@ -290,9 +295,9 @@ Task(ui-design-agent): `
 ```
 ${output_dir}/
 └── ${package_name}/
-    ├── layout-templates.json    # Layout templates (copied from design run)
-    ├── design-tokens.json       # Design tokens (copied from design run)
-    ├── animation-tokens.json    # Animation tokens (copied from design run, optional)
+    ├── layout-templates.toon    # Layout templates (copied from design run)
+    ├── design-tokens.toon       # Design tokens (copied from design run)
+    ├── animation-tokens.toon    # Animation tokens (copied from design run, optional)
     ├── preview.html             # Interactive showcase (NEW)
     └── preview.css              # Showcase styling (NEW)
 ```
@@ -306,9 +311,9 @@ Package: {package_name}
 Location: {package_dir}
 
 Files:
-✓ layout-templates.json    {component_count} components
-✓ design-tokens.json       Design tokens
-✓ animation-tokens.json    Animation tokens {if exists: "✓" else: "○ (not found)"}
+✓ layout-templates.toon    {component_count} components
+✓ design-tokens.toon       Design tokens
+✓ animation-tokens.toon    Animation tokens {if exists: "✓" else: "○ (not found)"}
 ✓ preview.html             Interactive showcase
 ✓ preview.css              Showcase styling
 
@@ -326,8 +331,8 @@ Open preview:
 | Invalid package name | Contains uppercase, special chars | Use lowercase, alphanumeric, hyphens only |
 | Design run not found | Incorrect path or design run doesn't exist | Verify design run path, run import-from-code first |
 | Missing extraction files | Design run incomplete | Ensure design run has style-extraction and layout-extraction results |
-| Layout templates copy failed | layout-templates.json not found | Run import-from-code with Layout Agent first |
-| Preview generation failed | Invalid design tokens | Check design-tokens.json format |
+| Layout templates copy failed | layout-templates.toon not found | Run import-from-code with Layout Agent first |
+| Preview generation failed | Invalid design tokens | Check design-tokens.toon format |
 
 ---
 

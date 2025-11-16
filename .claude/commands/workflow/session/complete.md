@@ -5,6 +5,11 @@ examples:
   - /workflow:session:complete
   - /workflow:session:complete --detailed
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 # Complete Workflow Session (/workflow:session:complete)
 
@@ -65,10 +70,10 @@ Complete workflow session archival. Session already moved to archive location.
 
 ## Tasks
 
-1. **Extract session data** from workflow-session.json (session_id, description/topic, started_at/timestamp, completed_at, status)
+1. **Extract session data** from workflow-session.toon (session_id, description/topic, started_at/timestamp, completed_at, status)
    - If status != "completed", update it with timestamp
 
-2. **Count files**: tasks (.task/*.json) and summaries (.summaries/*.md)
+2. **Count files**: tasks (.task/*.toon) and summaries (.summaries/*.md)
 
 3. **Generate lessons**: Use gemini with ~/.claude/workflows/cli-templates/prompts/archive/analysis-simple.txt (fallback: analyze files directly)
    - Return: {successes, challenges, watch_patterns}
@@ -77,7 +82,7 @@ Complete workflow session archival. Session already moved to archive location.
    - Calculate: duration_hours, success_rate, tags (3-5 keywords)
    - Construct complete JSON with session_id, description, archived_at, archive_path, metrics, tags, lessons
 
-5. **Update manifest**: Initialize .workflow/.archives/manifest.json if needed, append entry
+5. **Update manifest**: Initialize .workflow/.archives/manifest.toon if needed, append entry
 
 6. **Remove active marker**
 
@@ -133,15 +138,15 @@ After archival, you can query the manifest:
 
 ```bash
 # List all archived sessions
-jq '.archives[].session_id' .workflow/.archives/manifest.json
+jq '.archives[].session_id' .workflow/.archives/manifest.toon
 
 # Find sessions by keyword
-jq '.archives[] | select(.description | test("auth"; "i"))' .workflow/.archives/manifest.json
+jq '.archives[] | select(.description | test("auth"; "i"))' .workflow/.archives/manifest.toon
 
 # Get specific session details
-jq '.archives[] | select(.session_id == "WFS-user-auth")' .workflow/.archives/manifest.json
+jq '.archives[] | select(.session_id == "WFS-user-auth")' .workflow/.archives/manifest.toon
 
 # List all watch patterns across sessions
-jq '.archives[].lessons.watch_patterns[]' .workflow/.archives/manifest.json
+jq '.archives[].lessons.watch_patterns[]' .workflow/.archives/manifest.toon
 ```
 

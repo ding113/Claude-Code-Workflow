@@ -3,6 +3,11 @@ name: workflow:status
 description: Generate on-demand task status views from JSON task data with optional task-id filtering for detailed view
 argument-hint: "[optional: task-id]"
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 # Workflow Status Command (/workflow:status)
 
@@ -25,22 +30,22 @@ find .workflow/ -name ".active-*" -type f 2>/dev/null | head -1
 
 ### Step 2: Load Session Data
 ```bash
-cat .workflow/WFS-session/workflow-session.json
+cat .workflow/WFS-session/workflow-session.toon
 ```
 
 ### Step 3: Scan Task Files
 ```bash
-find .workflow/WFS-session/.task/ -name "*.json" -type f 2>/dev/null
+find .workflow/WFS-session/.task/ -name "*.toon" -type f 2>/dev/null
 ```
 
 ### Step 4: Generate Task Status
 ```bash
-cat .workflow/WFS-session/.task/impl-1.json | jq -r '.status'
+cat .workflow/WFS-session/.task/impl-1.toon | jq -r '.status'
 ```
 
 ### Step 5: Count Task Progress
 ```bash
-find .workflow/WFS-session/.task/ -name "*.json" -type f | wc -l
+find .workflow/WFS-session/.task/ -name "*.toon" -type f | wc -l
 find .workflow/WFS-session/.summaries/ -name "*.md" -type f 2>/dev/null | wc -l
 ```
 
@@ -62,9 +67,9 @@ find .workflow/WFS-session/.summaries/ -name "*.md" -type f 2>/dev/null | wc -l
 
 ### Basic Operations
 - **Find active session**: `find .workflow/ -name ".active-*" -type f`
-- **Read session info**: `cat .workflow/session/workflow-session.json`
-- **List tasks**: `find .workflow/session/.task/ -name "*.json" -type f`
-- **Check task status**: `cat task.json | jq -r '.status'`
+- **Read session info**: `cat .workflow/session/workflow-session.toon`
+- **List tasks**: `find .workflow/session/.task/ -name "*.toon" -type f`
+- **Check task status**: `cat task.toon | jq -r '.status'`
 - **Count completed**: `find .summaries/ -name "*.md" -type f | wc -l`
 
 ### Task Status Check
@@ -79,10 +84,10 @@ find .workflow/WFS-session/.summaries/ -name "*.md" -type f 2>/dev/null | wc -l
 test -f .workflow/.active-* && echo "Session active"
 
 # Validate task files
-for f in .workflow/session/.task/*.json; do jq empty "$f" && echo "Valid: $f"; done
+for f in .workflow/session/.task/*.toon; do jq empty "$f" && echo "Valid: $f"; done
 
 # Check summaries match
-find .task/ -name "*.json" -type f | wc -l
+find .task/ -name "*.toon" -type f | wc -l
 find .summaries/ -name "*.md" -type f 2>/dev/null | wc -l
 ```
 

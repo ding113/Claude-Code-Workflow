@@ -6,11 +6,16 @@ examples:
   - /workflow:tools:task-generate-agent --session WFS-auth
   - /workflow:tools:task-generate-agent --session WFS-auth --cli-execute
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 # Autonomous Task Generation Command
 
 ## Overview
-Autonomous task JSON and IMPL_PLAN.md generation using action-planning-agent with two-phase execution: discovery and document generation. Supports both agent-driven execution (default) and CLI tool execution modes.
+Autonomous task TOON and IMPL_PLAN.md generation using action-planning-agent with two-phase execution: discovery and document generation. Supports both agent-driven execution (default) and CLI tool execution modes.
 
 ## Core Philosophy
 - **Agent-Driven**: Delegate execution to action-planning-agent for autonomous operation
@@ -36,10 +41,10 @@ Autonomous task JSON and IMPL_PLAN.md generation using action-planning-agent wit
   // Path selected by command based on --cli-execute flag, agent reads it
   "session_metadata": {
     // If in memory: use cached content
-    // Else: Load from .workflow/{session-id}/workflow-session.json
+    // Else: Load from .workflow/{session-id}/workflow-session.toon
   },
   "brainstorm_artifacts": {
-    // Loaded from context-package.json → brainstorm_artifacts section
+    // Loaded from context-package.toon → brainstorm_artifacts section
     "role_analyses": [
       {
         "role": "system-architect",
@@ -50,10 +55,10 @@ Autonomous task JSON and IMPL_PLAN.md generation using action-planning-agent wit
     "synthesis_output": {"path": "...", "exists": true},
     "conflict_resolution": {"path": "...", "exists": true}  // if conflict_risk >= medium
   },
-  "context_package_path": ".workflow/{session-id}/.process/context-package.json",
+  "context_package_path": ".workflow/{session-id}/.process/context-package.toon",
   "context_package": {
     // If in memory: use cached content
-    // Else: Load from .workflow/{session-id}/.process/context-package.json
+    // Else: Load from .workflow/{session-id}/.process/context-package.toon
   },
   "mcp_capabilities": {
     "code_index": true,
@@ -66,19 +71,19 @@ Autonomous task JSON and IMPL_PLAN.md generation using action-planning-agent wit
 **Discovery Actions**:
 1. **Load Session Context** (if not in memory)
    ```javascript
-   if (!memory.has("workflow-session.json")) {
-     Read(.workflow/{session-id}/workflow-session.json)
+   if (!memory.has("workflow-session.toon")) {
+     Read(.workflow/{session-id}/workflow-session.toon)
    }
    ```
 
 2. **Load Context Package** (if not in memory)
    ```javascript
-   if (!memory.has("context-package.json")) {
-     Read(.workflow/{session-id}/.process/context-package.json)
+   if (!memory.has("context-package.toon")) {
+     Read(.workflow/{session-id}/.process/context-package.toon)
    }
    ```
 
-3. **Extract & Load Role Analyses** (from context-package.json)
+3. **Extract & Load Role Analyses** (from context-package.toon)
    ```javascript
    // Extract role analysis paths from context package
    const roleAnalysisPaths = contextPackage.brainstorm_artifacts.role_analyses
@@ -88,7 +93,7 @@ Autonomous task JSON and IMPL_PLAN.md generation using action-planning-agent wit
    roleAnalysisPaths.forEach(path => Read(path));
    ```
 
-4. **Load Conflict Resolution** (from context-package.json, if exists)
+4. **Load Conflict Resolution** (from context-package.toon, if exists)
    ```javascript
    if (contextPackage.brainstorm_artifacts.conflict_resolution?.exists) {
      Read(contextPackage.brainstorm_artifacts.conflict_resolution.path)
@@ -125,13 +130,13 @@ const templatePath = hasCliExecuteFlag
 ```javascript
 Task(
   subagent_type="action-planning-agent",
-  description="Generate task JSON and implementation plan",
+  description="Generate task TOON and implementation plan",
   prompt=`
 ## Execution Context
 
 **Session ID**: WFS-{session-id}
 **Execution Mode**: {agent-mode | cli-execute-mode}
-**Task JSON Template Path**: {template_path}
+**Task TOON Template Path**: {template_path}
 
 ## Phase 1: Discovery Results (Provided Context)
 
@@ -154,7 +159,7 @@ Task(
 If conflict_risk was medium/high, modifications have been applied to:
 - **guidance-specification.md**: Design decisions updated to resolve conflicts
 - **Role analyses (*.md)**: Recommendations adjusted for compatibility
-- **context-package.json**: Marked as "resolved" with conflict IDs
+- **context-package.toon**: Marked as "resolved" with conflict IDs
 - NO separate CONFLICT_RESOLUTION.md file (conflicts resolved in-place)
 
 ### MCP Analysis Results (Optional)
@@ -168,18 +173,18 @@ If conflict_risk was medium/high, modifications have been applied to:
 Refer to: @.claude/agents/action-planning-agent.md for:
 - Task Decomposition Standards
 - Quantification Requirements (MANDATORY)
-- 5-Field Task JSON Schema
+- 5-Field Task TOON Schema
 - IMPL_PLAN.md Structure
 - TODO_LIST.md Format
 - Execution Flow & Quality Validation
 
 ### Required Outputs Summary
 
-#### 1. Task JSON Files (.task/IMPL-*.json)
+#### 1. Task TOON Files (.task/IMPL-*.toon)
 - **Location**: `.workflow/{session-id}/.task/`
 - **Template**: Read from `{template_path}` (pre-selected by command based on `--cli-execute` flag)
 - **Schema**: 5-field structure (id, title, status, meta, context, flow_control) with artifacts integration
-- **Details**: See action-planning-agent.md § Task JSON Generation
+- **Details**: See action-planning-agent.md § Task TOON Generation
 
 #### 2. IMPL_PLAN.md
 - **Location**: `.workflow/{session-id}/IMPL_PLAN.md`
@@ -194,11 +199,11 @@ Refer to: @.claude/agents/action-planning-agent.md for:
 ### Agent Execution Summary
 
 **Key Steps** (Detailed instructions in action-planning-agent.md):
-1. Load task JSON template from provided path
+1. Load task TOON template from provided path
 2. Extract and decompose tasks with quantification
-3. Generate task JSON files enforcing quantification requirements
+3. Generate task TOON files enforcing quantification requirements
 4. Create IMPL_PLAN.md using template
-5. Generate TODO_LIST.md matching task JSONs
+5. Generate TODO_LIST.md matching task TOON files
 6. Update session state
 
 **Quality Gates** (Full checklist in action-planning-agent.md):
@@ -211,7 +216,7 @@ Refer to: @.claude/agents/action-planning-agent.md for:
 ## Output
 
 Generate all three documents and report completion status:
-- Task JSON files created: N files
+- Task TOON files created: N files
 - Artifacts integrated: synthesis-spec, guidance-specification, N role analyses
 - MCP enhancements: code-index, exa-research
 - Session ready for execution: /workflow:execute
@@ -229,15 +234,15 @@ const agentContext = {
   session_id: "WFS-[id]",
 
   // Use memory if available, else load
-  session_metadata: memory.has("workflow-session.json")
-    ? memory.get("workflow-session.json")
-    : Read(.workflow/WFS-[id]/workflow-session.json),
+  session_metadata: memory.has("workflow-session.toon")
+    ? memory.get("workflow-session.toon")
+    : Read(.workflow/WFS-[id]/workflow-session.toon),
 
-  context_package_path: ".workflow/WFS-[id]/.process/context-package.json",
+  context_package_path: ".workflow/WFS-[id]/.process/context-package.toon",
 
-  context_package: memory.has("context-package.json")
-    ? memory.get("context-package.json")
-    : Read(".workflow/WFS-[id]/.process/context-package.json"),
+  context_package: memory.has("context-package.toon")
+    ? memory.get("context-package.toon")
+    : Read(".workflow/WFS-[id]/.process/context-package.toon"),
 
   // Extract brainstorm artifacts from context package
   brainstorm_artifacts: extractBrainstormArtifacts(context_package),

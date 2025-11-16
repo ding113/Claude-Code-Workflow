@@ -11,16 +11,16 @@ Claude Code Agent 工作流协调和分布式内存系统的交互式安装指�
 ### 所有平台 - 远程 PowerShell 安装
 ```powershell
 # 从功能分支进行交互式远程安装（最新版本）
-iex (iwr -useb https://raw.githubusercontent.com/catlog22/Claude-Code-Workflow/main/install-remote.ps1)
+iex (iwr -useb https://raw.githubusercontent.com/ding113/Claude-Code-Workflow/main/install-remote.ps1)
 
 # 包含统一文件输出系统的全局安装
-iex (iwr -useb https://raw.githubusercontent.com/catlog22/Claude-Code-Workflow/main/install-remote.ps1) -Global
+iex (iwr -useb https://raw.githubusercontent.com/ding113/Claude-Code-Workflow/main/install-remote.ps1) -Global
 
 # 强制覆盖（非交互式）- 包含所有新的工作流文件生成功能
-iex (iwr -useb https://raw.githubusercontent.com/catlog22/Claude-Code-Workflow/main/install-remote.ps1) -Force -NonInteractive
+iex (iwr -useb https://raw.githubusercontent.com/ding113/Claude-Code-Workflow/main/install-remote.ps1) -Force -NonInteractive
 
 # 一键备份所有现有文件（无需确认）
-iex (iwr -useb https://raw.githubusercontent.com/catlog22/Claude-Code-Workflow/main/install-remote.ps1) -BackupAll
+iex (iwr -useb https://raw.githubusercontent.com/ding113/Claude-Code-Workflow/main/install-remote.ps1) -BackupAll
 ```
 
 **远程安装器的功能：**
@@ -58,19 +58,19 @@ pwsh ./Install-Claude.ps1
 
 ```powershell
 # 全局安装
-iex (iwr -useb https://raw.githubusercontent.com/catlog22/Claude-Code-Workflow/main/install-remote.ps1) -Global
+iex (iwr -useb https://raw.githubusercontent.com/ding113/Claude-Code-Workflow/main/install-remote.ps1) -Global
 
 # 安装到指定目录
-iex (iwr -useb https://raw.githubusercontent.com/catlog22/Claude-Code-Workflow/main/install-remote.ps1) -Directory "C:\MyProject"
+iex (iwr -useb https://raw.githubusercontent.com/ding113/Claude-Code-Workflow/main/install-remote.ps1) -Directory "C:\MyProject"
 
 # 强制覆盖而不提示
-iex (iwr -useb https://raw.githubusercontent.com/catlog22/Claude-Code-Workflow/main/install-remote.ps1) -Force -NonInteractive
+iex (iwr -useb https://raw.githubusercontent.com/ding113/Claude-Code-Workflow/main/install-remote.ps1) -Force -NonInteractive
 
 # 从特定分支安装
-iex (iwr -useb https://raw.githubusercontent.com/catlog22/Claude-Code-Workflow/main/install-remote.ps1) -Branch "dev"
+iex (iwr -useb https://raw.githubusercontent.com/ding113/Claude-Code-Workflow/main/install-remote.ps1) -Branch "dev"
 
 # 跳过备份（更快）
-iex (iwr -useb https://raw.githubusercontent.com/catlog22/Claude-Code-Workflow/main/install-remote.ps1) -NoBackup
+iex (iwr -useb https://raw.githubusercontent.com/ding113/Claude-Code-Workflow/main/install-remote.ps1) -NoBackup
 ```
 
 ### 本地安装选项
@@ -141,7 +141,7 @@ iex (iwr -useb https://raw.githubusercontent.com/catlog22/Claude-Code-Workflow/m
 ### ⚡ 超快速（一键）
 ```powershell
 # 一条命令完成安装
-iex (iwr -useb https://raw.githubusercontent.com/catlog22/Claude-Code-Workflow/main/install-remote.ps1) -Global
+iex (iwr -useb https://raw.githubusercontent.com/ding113/Claude-Code-Workflow/main/install-remote.ps1) -Global
 
 # 完成！🎉
 # 开始使用 Claude Code Agent 工作流！

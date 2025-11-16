@@ -1,8 +1,13 @@
 ---
 name: breakdown
-description: Decompose complex task into subtasks with dependency mapping, creates child task JSONs with parent references and execution order
+description: Decompose complex task into subtasks with dependency mapping, creates child task TOON files with parent references and execution order
 argument-hint: "task-id"
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 # Task Breakdown Command (/task:breakdown)
 
@@ -88,7 +93,7 @@ IMPL-1: Build authentication module (container)
   ├── IMPL-1.1: User authentication core -> @code-developer
   └── IMPL-1.2: OAuth integration -> @code-developer
 
-Files updated: .task/IMPL-1.json + 2 subtask files + TODO_LIST.md
+Files updated: .task/IMPL-1.toon + 2 subtask files + TODO_LIST.md
 ```
 
 ## Decomposition Logic
@@ -137,7 +142,7 @@ Files updated: .task/IMPL-1.json + 2 subtask files + TODO_LIST.md
 
 ## Implementation Details
 
-- Complete task JSON schema
+- Complete task TOON schema
 - Implementation field structure
 - Context inheritance rules
 - Agent assignment logic
@@ -154,7 +159,7 @@ Files updated: .task/IMPL-1.json + 2 subtask files + TODO_LIST.md
 
 ### Post-breakdown Actions
 1. Update parent to `container` status
-2. Create subtask JSON files
+2. Create subtask TOON files
 3. Update parent subtasks list
 4. Update session stats
 5. **Regenerate TODO_LIST.md** with new hierarchy

@@ -1,8 +1,13 @@
 ---
 name: execute
-description: Execute task JSON using appropriate agent (@doc-generator/@implementation-agent/@test-agent) with pre-analysis context loading and status tracking
+description: Execute task TOON using appropriate agent (@doc-generator/@implementation-agent/@test-agent) with pre-analysis context loading and status tracking
 argument-hint: "task-id"
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 ## Command Overview: /task:execute
 
@@ -245,8 +250,8 @@ Different agents receive context tailored to their function, including implement
 
 ### Simplified File Output
 
--   **Task JSON File (`.task/<task-id>.json`)**: Updated with status and last attempt time only.
--   **Session File (`workflow-session.json`)**: Updated task stats (completed count).
+-   **Task TOON File (`.task/<task-id>.toon`)**: Updated with status and last attempt time only.
+-   **Session File (`workflow-session.toon`)**: Updated task stats (completed count).
 -   **Summary File**: Generated in `.summaries/` upon completion (optional).
 
 ### Simplified Summary Template

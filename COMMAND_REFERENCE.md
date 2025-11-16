@@ -41,7 +41,7 @@ These commands orchestrate complex, multi-phase development processes, from plan
 | `/workflow:execute` | Coordinate agents for existing workflow tasks with automatic discovery. |
 | `/workflow:resume` | Intelligent workflow session resumption with automatic progress analysis. |
 | `/workflow:review` | Optional specialized review (security, architecture, docs) for completed implementation. |
-| `/workflow:status` | Generate on-demand views from JSON task data. |
+| `/workflow:status` | Generate on-demand views from TOON task data. |
 
 ### Brainstorming
 
@@ -64,7 +64,7 @@ These commands orchestrate complex, multi-phase development processes, from plan
 
 | Command | Description |
 |---|---|
-| `/workflow:action-plan-verify`| Perform non-destructive cross-artifact consistency and quality analysis of IMPL_PLAN.md and task.json before execution. |
+| `/workflow:action-plan-verify`| Perform non-destructive cross-artifact consistency and quality analysis of IMPL_PLAN.md and TOON task files before execution. |
 
 ### Test-Driven Development (TDD)
 
@@ -103,14 +103,14 @@ These commands are primarily used internally by other workflow commands but can 
 |---|---|
 | `/workflow:tools:concept-enhanced` | Enhanced intelligent analysis with parallel CLI execution and design blueprint generation. |
 | `/workflow:tools:conflict-resolution` | Detect and resolve conflicts between plan and existing codebase using CLI-powered analysis. |
-| `/workflow:tools:context-gather` | Intelligently collect project context using universal-executor agent based on task description and package into standardized JSON. |
-| `/workflow:tools:task-generate` | Generate task JSON files and IMPL_PLAN.md from analysis results with artifacts integration. |
+| `/workflow:tools:context-gather` | Intelligently collect project context using universal-executor agent based on task description and package into standardized TOON bundles. |
+| `/workflow:tools:task-generate` | Generate TOON task files and IMPL_PLAN.md from analysis results with artifacts integration. |
 | `/workflow:tools:task-generate-agent` | Autonomous task generation using action-planning-agent with discovery and output phases. |
 | `/workflow:tools:task-generate-tdd` | Generate TDD task chains with Red-Green-Refactor dependencies. |
 | `/workflow:tools:tdd-coverage-analysis` | Analyze test coverage and TDD cycle execution. |
 | `/workflow:tools:test-concept-enhanced` | Analyze test requirements and generate test generation strategy using Gemini. |
 | `/workflow:tools:test-context-gather` | Collect test coverage context and identify files requiring test generation. |
-| `/workflow:tools:test-task-generate` | Generate test-fix task JSON with iterative test-fix-retest cycle specification. |
+| `/workflow:tools:test-task-generate` | Generate test-fix TOON task files with iterative test-fix-retest cycle specification. |
 
 ## Task Commands (`/task:*`)
 
@@ -132,4 +132,3 @@ Commands for managing individual tasks within a workflow session.
 | `/memory:update-related` | Context-aware CLAUDE.md documentation updates based on recent changes. |
 | `/version` | Display version information and check for updates. |
 | `/enhance-prompt` | Context-aware prompt enhancement using session memory and codebase analysis. |
-

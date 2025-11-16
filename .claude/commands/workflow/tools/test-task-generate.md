@@ -8,11 +8,16 @@ examples:
   - /workflow:tools:test-task-generate --cli-execute --session WFS-test-auth
   - /workflow:tools:test-task-generate --cli-execute --use-codex --session WFS-test-auth
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 # Autonomous Test Task Generation Command
 
 ## Overview
-Autonomous test-fix task JSON generation using action-planning-agent with two-phase execution: discovery and document generation. Supports both agent-driven execution (default) and CLI tool execution modes. Generates specialized test-fix tasks with comprehensive test-fix-retest cycle specification.
+Autonomous test-fix task TOON generation using action-planning-agent with two-phase execution: discovery and document generation. Supports both agent-driven execution (default) and CLI tool execution modes. Generates specialized test-fix tasks with comprehensive test-fix-retest cycle specification.
 
 ## Core Philosophy
 - **Agent-Driven**: Delegate execution to action-planning-agent for autonomous operation
@@ -54,14 +59,14 @@ Autonomous test-fix task JSON generation using action-planning-agent with two-ph
   "use_codex": true | false,  // Determined by --use-codex flag
   "session_metadata": {
     // If in memory: use cached content
-    // Else: Load from .workflow/{test-session-id}/workflow-session.json
+    // Else: Load from .workflow/{test-session-id}/workflow-session.toon
   },
   "test_analysis_results_path": ".workflow/{test-session-id}/.process/TEST_ANALYSIS_RESULTS.md",
   "test_analysis_results": {
     // If in memory: use cached content
     // Else: Load from TEST_ANALYSIS_RESULTS.md
   },
-  "test_context_package_path": ".workflow/{test-session-id}/.process/test-context-package.json",
+  "test_context_package_path": ".workflow/{test-session-id}/.process/test-context-package.toon",
   "test_context_package": {
     // Existing test patterns and coverage analysis
   },
@@ -80,8 +85,8 @@ Autonomous test-fix task JSON generation using action-planning-agent with two-ph
 **Discovery Actions**:
 1. **Load Test Session Context** (if not in memory)
    ```javascript
-   if (!memory.has("workflow-session.json")) {
-     Read(.workflow/{test-session-id}/workflow-session.json)
+   if (!memory.has("workflow-session.toon")) {
+     Read(.workflow/{test-session-id}/workflow-session.toon)
    }
    ```
 
@@ -94,8 +99,8 @@ Autonomous test-fix task JSON generation using action-planning-agent with two-ph
 
 3. **Load Test Context Package** (if not in memory)
    ```javascript
-   if (!memory.has("test-context-package.json")) {
-     Read(.workflow/{test-session-id}/.process/test-context-package.json)
+   if (!memory.has("test-context-package.toon")) {
+     Read(.workflow/{test-session-id}/.process/test-context-package.toon)
    }
    ```
 
@@ -137,14 +142,14 @@ const templatePath = hasCliExecuteFlag
 ```javascript
 Task(
   subagent_type="action-planning-agent",
-  description="Generate test-fix task JSON and implementation plan",
+  description="Generate test-fix task TOON and implementation plan",
   prompt=`
 ## Execution Context
 
 **Session ID**: WFS-test-{session-id}
 **Workflow Type**: Test Session
 **Execution Mode**: {agent-mode | cli-execute-mode}
-**Task JSON Template Path**: {template_path}
+**Task TOON Template Path**: {template_path}
 **Use Codex**: {true | false}
 
 ## Phase 1: Discovery Results (Provided Context)
@@ -182,7 +187,7 @@ Task(
 Refer to: @.claude/agents/action-planning-agent.md for:
 - Test Task Decomposition Standards
 - Test-Fix-Retest Cycle Requirements
-- 5-Field Task JSON Schema
+- 5-Field Task TOON Schema
 - IMPL_PLAN.md Structure (Test variant)
 - TODO_LIST.md Format
 - Test Execution Flow & Quality Validation
@@ -204,14 +209,14 @@ Refer to: @.claude/agents/action-planning-agent.md for:
 
 #### Required Outputs Summary
 
-##### 1. Test Task JSON Files (.task/IMPL-*.json)
+##### 1. Test Task TOON Files (.task/IMPL-*.toon)
 - **Location**: `.workflow/{test-session-id}/.task/`
 - **Template**: Read from `{template_path}` (pre-selected by command based on `--cli-execute` flag)
 - **Schema**: 5-field structure with test-specific metadata
   - IMPL-001: `meta.type: "test-gen"`, `meta.agent: "@code-developer"`
   - IMPL-002: `meta.type: "test-fix"`, `meta.agent: "@test-fix-agent"`, `meta.use_codex: {use_codex}`
   - `flow_control`: Test generation approach (IMPL-001) or test-fix cycle (IMPL-002)
-- **Details**: See action-planning-agent.md § Test Task JSON Generation
+- **Details**: See action-planning-agent.md § Test Task TOON Generation
 
 ##### 2. IMPL_PLAN.md (Test Variant)
 - **Location**: `.workflow/{test-session-id}/IMPL_PLAN.md`
@@ -229,11 +234,11 @@ Refer to: @.claude/agents/action-planning-agent.md for:
 ### Agent Execution Summary
 
 **Key Steps** (Detailed instructions in action-planning-agent.md):
-1. Load task JSON template from provided path
+1. Load task TOON template from provided path
 2. Parse TEST_ANALYSIS_RESULTS.md for test requirements
-3. Generate IMPL-001 (test generation) task JSON
-4. Generate IMPL-002 (test execution & fix) task JSON with use_codex flag
-5. Generate additional IMPL-*.json if project complexity requires
+3. Generate IMPL-001 (test generation) task TOON
+4. Generate IMPL-002 (test execution & fix) task TOON with use_codex flag
+5. Generate additional IMPL-*.toon if project complexity requires
 6. Create IMPL_PLAN.md using test template variant
 7. Generate TODO_LIST.md with test task indicators
 8. Update session state with test metadata
@@ -250,7 +255,7 @@ Refer to: @.claude/agents/action-planning-agent.md for:
 ## Output
 
 Generate all three documents and report completion status:
-- Test task JSON files created: N files (minimum 2)
+- Test task TOON files created: N files (minimum 2)
 - Test requirements integrated: TEST_ANALYSIS_RESULTS.md
 - Test context integrated: existing patterns and coverage
 - Source session context: {source_session_id} summaries (if exists)
@@ -271,9 +276,9 @@ const agentContext = {
   use_codex: hasUseCodexFlag,
 
   // Use memory if available, else load
-  session_metadata: memory.has("workflow-session.json")
-    ? memory.get("workflow-session.json")
-    : Read(.workflow/WFS-test-[id]/workflow-session.json),
+  session_metadata: memory.has("workflow-session.toon")
+    ? memory.get("workflow-session.toon")
+    : Read(.workflow/WFS-test-[id]/workflow-session.toon),
 
   test_analysis_results_path: ".workflow/WFS-test-[id]/.process/TEST_ANALYSIS_RESULTS.md",
 
@@ -281,11 +286,11 @@ const agentContext = {
     ? memory.get("TEST_ANALYSIS_RESULTS.md")
     : Read(".workflow/WFS-test-[id]/.process/TEST_ANALYSIS_RESULTS.md"),
 
-  test_context_package_path: ".workflow/WFS-test-[id]/.process/test-context-package.json",
+  test_context_package_path: ".workflow/WFS-test-[id]/.process/test-context-package.toon",
 
-  test_context_package: memory.has("test-context-package.json")
-    ? memory.get("test-context-package.json")
-    : Read(".workflow/WFS-test-[id]/.process/test-context-package.json"),
+  test_context_package: memory.has("test-context-package.toon")
+    ? memory.get("test-context-package.toon")
+    : Read(".workflow/WFS-test-[id]/.process/test-context-package.toon"),
 
   // Load source session summaries if exists
   source_session_id: session_metadata.source_session_id || null,
@@ -301,7 +306,7 @@ const agentContext = {
 
 ## Test Task Structure Reference
 
-This section provides quick reference for test task JSON structure. For complete implementation details, see the agent invocation prompt in Phase 2 above.
+This section provides quick reference for test task TOON structure. For complete implementation details, see the agent invocation prompt in Phase 2 above.
 
 **Quick Reference**:
 - Minimum 2 tasks: IMPL-001 (test-gen) + IMPL-002 (test-fix)
@@ -313,14 +318,14 @@ This section provides quick reference for test task JSON structure. For complete
 ## Output Files Structure
 ```
 .workflow/WFS-test-[session]/
-├── workflow-session.json           # Test session metadata
+├── workflow-session.toon           # Test session metadata
 ├── IMPL_PLAN.md                    # Test validation plan
 ├── TODO_LIST.md                    # Progress tracking
 ├── .task/
-│   └── IMPL-001.json               # Test-fix task with cycle spec
+│   └── IMPL-001.toon               # Test-fix task with cycle spec
 ├── .process/
 │   ├── ANALYSIS_RESULTS.md         # From concept-enhanced (optional)
-│   ├── context-package.json        # From context-gather
+│   ├── context-package.toon        # From context-gather
 │   ├── initial-test.log            # Phase 1: Initial test results
 │   ├── fix-iteration-1-diagnosis.md # Gemini diagnosis iteration 1
 │   ├── fix-iteration-1-changes.log  # Codex changes iteration 1
@@ -387,7 +392,7 @@ This section provides quick reference for test task JSON structure. For complete
 - **Both flags**: CLI generation + automated Codex fixes
 
 ### Output
-- Test task JSON files in `.task/` directory (minimum 2: IMPL-001.json + IMPL-002.json)
+- Test task TOON files in `.task/` directory (minimum 2: IMPL-001.toon + IMPL-002.toon)
 - IMPL_PLAN.md with test generation and fix cycle strategy
 - TODO_LIST.md with test task indicators
 - Session state updated with test metadata
@@ -397,7 +402,7 @@ This section provides quick reference for test task JSON structure. For complete
 
 The `@test-fix-agent` will execute the task by following the `flow_control.implementation_approach` specification:
 
-1. **Load task JSON**: Read complete test-fix task from `.task/IMPL-002.json`
+1. **Load task TOON**: Read complete test-fix task from `.task/IMPL-002.toon`
 2. **Check meta.use_codex**: Determine fix mode (manual or automated)
 3. **Execute pre_analysis**: Load source context, discover framework, analyze tests
 4. **Phase 1**: Run initial test suite

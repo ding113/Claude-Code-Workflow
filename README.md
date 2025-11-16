@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![Version](https://img.shields.io/badge/version-v5.5.0-blue.svg)](https://github.com/catlog22/Claude-Code-Workflow/releases)
+[![Version](https://img.shields.io/badge/version-v5.5.0-blue.svg)](https://github.com/ding113/Claude-Code-Workflow/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)]()
 
@@ -33,11 +33,15 @@
 CCW is built on a set of core principles that differentiate it from traditional AI development approaches:
 
 - **Context-First Architecture**: Pre-defined context gathering eliminates execution uncertainty by ensuring agents have the correct information *before* implementation.
-- **JSON-First State Management**: Task states live in `.task/IMPL-*.json` files as the single source of truth, enabling programmatic orchestration without state drift.
+- **TOON-First State Management**: Task states live in `.task/IMPL-*.toon` bundles that encode the same structure with 30-60% fewer tokens (benchmarked in `tests/integration/toon-format.test.ts`), eliminating state drift while extending context capacity.
 - **Autonomous Multi-Phase Orchestration**: Commands chain specialized sub-commands and agents to automate complex workflows with zero user intervention.
 - **Multi-Model Strategy**: Leverages the unique strengths of different AI models (Gemini for analysis, Codex for implementation) for superior results.
 - **Hierarchical Memory System**: A 4-layer documentation system provides context at the appropriate level of abstraction, preventing information overload.
 - **Specialized Role-Based Agents**: A suite of agents (`@code-developer`, `@test-fix-agent`, etc.) mirrors a real software team to handle diverse tasks.
+
+### 🧾 TOON Format Benefits
+
+The IMPL-001 → IMPL-004 migration moved every workflow artifact to TOON as the canonical format. Compared with equivalent JSON dumps, TOON bundles consistently save 30-60% tokens (see `tests/integration/toon-format.test.ts`), allowing more history per request while staying human-readable. Utilities in `src/utils/toon.ts` keep JSON interoperability through `autoDecode()` so legacy task files continue to work without manual conversion.
 
 ---
 
@@ -49,12 +53,12 @@ For detailed installation instructions, please refer to the [**INSTALL.md**](INS
 
 **Windows (PowerShell):**
 ```powershell
-Invoke-Expression (Invoke-WebRequest -Uri "https://raw.githubusercontent.com/catlog22/Claude-Code-Workflow/main/install-remote.ps1" -UseBasicParsing).Content
+Invoke-Expression (Invoke-WebRequest -Uri "https://raw.githubusercontent.com/ding113/Claude-Code-Workflow/main/install-remote.ps1" -UseBasicParsing).Content
 ```
 
 **Linux/macOS (Bash/Zsh):**
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/catlog22/Claude-Code-Workflow/main/install-remote.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/ding113/Claude-Code-Workflow/main/install-remote.sh)
 ```
 
 ### **✅ Verify Installation**
@@ -125,9 +129,9 @@ Here is a quick example of a common development workflow:
 
 ## 🤝 Contributing & Support
 
-- **Repository**: [GitHub - Claude-Code-Workflow](https://github.com/catlog22/Claude-Code-Workflow)
-- **Issues**: Report bugs or request features on [GitHub Issues](https://github.com/catlog22/Claude-Code-Workflow/issues).
-- **Discussions**: Join the [Community Forum](https://github.com/catlog22/Claude-Code-Workflow/discussions).
+- **Repository**: [GitHub - Claude-Code-Workflow](https://github.com/ding113/Claude-Code-Workflow)
+- **Issues**: Report bugs or request features on [GitHub Issues](https://github.com/ding113/Claude-Code-Workflow/issues).
+- **Discussions**: Join the [Community Forum](https://github.com/ding113/Claude-Code-Workflow/discussions).
 
 ## 📄 License
 

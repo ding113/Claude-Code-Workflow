@@ -4,6 +4,11 @@ description: Assemble UI prototypes by combining layout templates with design to
 argument-hint: [--design-id <id>] [--session <id>]
 allowed-tools: TodoWrite(*), Read(*), Write(*), Task(ui-design-agent), Bash(*)
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 # Generate UI Prototypes (/workflow:ui-design:generate)
 
@@ -11,14 +16,14 @@ allowed-tools: TodoWrite(*), Read(*), Write(*), Task(ui-design-agent), Bash(*)
 Pure assembler that combines pre-extracted layout templates with design tokens to generate UI prototypes (`style × layout × targets`). No layout design logic - purely combines existing components.
 
 **Strategy**: Pure Assembly
-- **Input**: `layout-*.json` files + `design-tokens.json` (+ reference images if available)
+- **Input**: `layout-*.toon` files + `design-tokens.toon` (+ reference images if available)
 - **Process**: Combine structure (DOM) with style (tokens)
 - **Output**: Complete HTML/CSS prototypes
 - **No Design Logic**: All layout and style decisions already made
 - **Automatic Image Reference**: If source images exist in layout templates, they're automatically used for visual context
 
 **Prerequisite Commands**:
-- `/workflow:ui-design:style-extract` → Complete design systems (design-tokens.json + style-guide.md)
+- `/workflow:ui-design:style-extract` → Complete design systems (design-tokens.toon + style-guide.md)
 - `/workflow:ui-design:layout-extract` → Layout structure
 
 ## Phase 1: Setup & Validation
@@ -56,10 +61,10 @@ bash(ls "$base_path"/style-extraction/style-* -d | wc -l)
 ### Step 2: Load Layout Templates
 ```bash
 # Check layout templates exist (multi-file pattern)
-bash(find {base_path}/layout-extraction -name "layout-*.json" -print -quit | grep -q . && echo "exists")
+bash(find {base_path}/layout-extraction -name "layout-*.toon" -print -quit | grep -q . && echo "exists")
 
 # Get list of all layout files
-bash(ls {base_path}/layout-extraction/layout-*.json 2>/dev/null)
+bash(ls {base_path}/layout-extraction/layout-*.toon 2>/dev/null)
 
 # Load each layout template file
 FOR each layout_file in layout_files:
@@ -74,10 +79,10 @@ FOR each layout_file in layout_files:
 ### Step 3: Validate Design Tokens
 ```bash
 # Check design tokens exist for all styles
-bash(test -f {base_path}/style-extraction/style-1/design-tokens.json && echo "valid")
+bash(test -f {base_path}/style-extraction/style-1/design-tokens.toon && echo "valid")
 
 # For each style variant: Load design tokens
-Read({base_path}/style-extraction/style-{id}/design-tokens.json)
+Read({base_path}/style-extraction/style-{id}/design-tokens.toon)
 ```
 
 **Output**: `design_tokens[]` for all style variants
@@ -85,11 +90,11 @@ Read({base_path}/style-extraction/style-{id}/design-tokens.json)
 ### Step 4: Load Animation Tokens (Optional)
 ```bash
 # Check if animation tokens exist
-bash(test -f {base_path}/animation-extraction/animation-tokens.json && echo "exists")
+bash(test -f {base_path}/animation-extraction/animation-tokens.toon && echo "exists")
 
 # Load animation tokens if available
-IF exists({base_path}/animation-extraction/animation-tokens.json):
-    animation_tokens = Read({base_path}/animation-extraction/animation-tokens.json)
+IF exists({base_path}/animation-extraction/animation-tokens.toon):
+    animation_tokens = Read({base_path}/animation-extraction/animation-tokens.toon)
     has_animations = true
 ELSE:
     has_animations = false
@@ -177,7 +182,7 @@ For each agent group `{target, style_id, layout_ids[]}` in current batch:
 Task(ui-design-agent): `
   [LAYOUT_STYLE_ASSEMBLY]
   🎯 {target} × Style-{style_id} × Layouts-{layout_ids}
-  ⚠️ CONSTRAINT: Use ONLY style-{style_id}/design-tokens.json (never mix styles)
+  ⚠️ CONSTRAINT: Use ONLY style-{style_id}/design-tokens.toon (never mix styles)
 
   TARGET: {target} | STYLE: {style_id} | LAYOUTS: {layout_ids} (max 10)
   BASE_PATH: {base_path}
@@ -185,12 +190,12 @@ Task(ui-design-agent): `
   ## Inputs (READ ONLY - NO DESIGN DECISIONS)
   1. Layout Templates (LOOP THROUGH):
      FOR each layout_id in layout_ids:
-       Read("{base_path}/layout-extraction/layout-{target}-{layout_id}.json")
+       Read("{base_path}/layout-extraction/layout-{target}-{layout_id}.toon")
        This file contains the specific layout template for this target and variant.
        Extract: dom_structure, css_layout_rules, device_type, source_image_path (from template field)
 
   2. Design Tokens (SHARED - READ ONCE):
-     Read("{base_path}/style-extraction/style-{style_id}/design-tokens.json")
+     Read("{base_path}/style-extraction/style-{style_id}/design-tokens.toon")
      Extract: ALL token values including:
        * colors, typography (with combinations), spacing, opacity
        * border_radius, shadows, breakpoints
@@ -198,8 +203,8 @@ Task(ui-design-agent): `
      Note: typography.combinations, opacity, and component_styles fields contain preset configurations using var() references
 
   3. Animation Tokens (OPTIONAL):
-     IF exists("{base_path}/animation-extraction/animation-tokens.json"):
-       Read("{base_path}/animation-extraction/animation-tokens.json")
+     IF exists("{base_path}/animation-extraction/animation-tokens.toon"):
+       Read("{base_path}/animation-extraction/animation-tokens.toon")
        Extract: duration, easing, transitions, keyframes, interactions
        has_animations = true
      ELSE:
@@ -228,7 +233,7 @@ Task(ui-design-agent): `
 
     2. Build CSS: {base_path}/prototypes/{target}-style-{style_id}-layout-{layout_id}.css
        - Start with template.css_layout_rules
-       - Replace ALL var(--*) with actual token values from design-tokens.json
+       - Replace ALL var(--*) with actual token values from design-tokens.toon
          Example: var(--spacing-4) → 1rem (from tokens.spacing.4)
          Example: var(--breakpoint-md) → 768px (from tokens.breakpoints.md)
          Example: var(--opacity-80) → 0.8 (from tokens.opacity.80)
@@ -324,12 +329,12 @@ TodoWrite({todos: [
 
 Configuration:
 - Style Variants: {style_variants}
-- Layout Variants: {layout_variants} (from layout-*.json files)
+- Layout Variants: {layout_variants} (from layout-*.toon files)
 - Device Type: {device_type}
 - Targets: {targets}
 - Total Prototypes: {S × L × T}
 - Image Reference: Auto-detected (uses source images when available in layout templates)
-- Animation Support: {has_animations ? 'Enabled (animation-tokens.json loaded)' : 'Not available'}
+- Animation Support: {has_animations ? 'Enabled (animation-tokens.toon loaded)' : 'Not available'}
 
 Assembly Process:
 - Pure assembly: Combined pre-extracted layouts + design tokens
@@ -357,7 +362,7 @@ Generated Files:
 └── PREVIEW.md (instructions)
 
 Input Files (from layout-extraction/):
-├── layout-{target}-{variant}.json (multiple files, one per target-variant combination)
+├── layout-{target}-{variant}.toon (multiple files, one per target-variant combination)
 
 Preview:
 1. Open compare.html (recommended)
@@ -381,13 +386,13 @@ bash(ls {base_path}/style-extraction/style-* -d | wc -l)
 ### Validation Commands
 ```bash
 # Check layout templates exist (multi-file pattern)
-bash(find {base_path}/layout-extraction -name "layout-*.json" -print -quit | grep -q . && echo "exists")
+bash(find {base_path}/layout-extraction -name "layout-*.toon" -print -quit | grep -q . && echo "exists")
 
 # Count layout files
-bash(ls {base_path}/layout-extraction/layout-*.json 2>/dev/null | wc -l)
+bash(ls {base_path}/layout-extraction/layout-*.toon 2>/dev/null | wc -l)
 
 # Check design tokens exist
-bash(test -f {base_path}/style-extraction/style-1/design-tokens.json && echo "valid")
+bash(test -f {base_path}/style-extraction/style-1/design-tokens.toon && echo "valid")
 
 # Count generated files
 bash(ls {base_path}/prototypes/{target}-style-*-layout-*.html | wc -l)
@@ -410,10 +415,10 @@ bash(~/.claude/scripts/ui-generate-preview.sh "{base_path}/prototypes")
 ```
 {base_path}/
 ├── layout-extraction/
-│   └── layout-{target}-{variant}.json  # Input (multiple files from layout-extract)
+│   └── layout-{target}-{variant}.toon  # Input (multiple files from layout-extract)
 ├── style-extraction/
 │   └── style-{s}/
-│       ├── design-tokens.json          # Input (from style-extract)
+│       ├── design-tokens.toon          # Input (from style-extract)
 │       └── style-guide.md
 └── prototypes/
     ├── {target}-style-{s}-layout-{l}.html  # Assembled prototypes
@@ -442,8 +447,8 @@ ERROR: Script permission denied
 
 ### Recovery Strategies
 - **Partial success**: Keep successful assembly combinations
-- **Invalid template structure**: Validate layout-*.json files
-- **Invalid tokens**: Validate design-tokens.json structure
+- **Invalid template structure**: Validate layout-*.toon files
+- **Invalid tokens**: Validate design-tokens.toon structure
 
 ## Quality Checklist
 
@@ -466,9 +471,9 @@ ERROR: Script permission denied
 ## Integration
 
 **Prerequisites**:
-- `/workflow:ui-design:style-extract` → `design-tokens.json` + `style-guide.md`
-- `/workflow:ui-design:layout-extract` → `layout-{target}-{variant}.json` files
+- `/workflow:ui-design:style-extract` → `design-tokens.toon` + `style-guide.md`
+- `/workflow:ui-design:layout-extract` → `layout-{target}-{variant}.toon` files
 
-**Input**: `layout-*.json` files + `design-tokens.json`
+**Input**: `layout-*.toon` files + `design-tokens.toon`
 **Output**: S×L×T prototypes for `/workflow:ui-design:update`
 **Called by**: `/workflow:ui-design:explore-auto`, `/workflow:ui-design:imitate-auto`

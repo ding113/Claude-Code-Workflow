@@ -4,6 +4,11 @@ description: Clarify and refine role analyses through intelligent Q&A and target
 argument-hint: "[optional: --session session-id]"
 allowed-tools: Task(conceptual-planning-agent), TodoWrite(*), Read(*), Write(*), Edit(*), Glob(*)
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 ## Overview
 
@@ -52,7 +57,7 @@ Three-phase workflow to eliminate ambiguities and enhance conceptual depth in ro
 2. **Validate Files**:
    - `guidance-specification.md` (optional, warn if missing)
    - `*/analysis*.md` (required, error if empty)
-3. **Load User Intent**: Extract from `workflow-session.json` (project/description field)
+3. **Load User Intent**: Extract from `workflow-session.toon` (project/description field)
 
 ### Phase 2: Role Discovery & Path Preparation
 
@@ -97,7 +102,7 @@ Analyze role documents, identify conflicts/gaps, and generate enhancement recomm
 
 1. **load_session_metadata**
    - Action: Load original user intent as primary reference
-   - Command: Read({brainstorm_dir}/../workflow-session.json)
+   - Command: Read({brainstorm_dir}/../workflow-session.toon)
    - Output: original_user_intent (from project/description field)
 
 2. **load_role_analyses**
@@ -320,7 +325,7 @@ Updated {role2}/analysis.md with Clarifications section + enhanced content
 **Main flow finalizes**:
 
 1. Wait for all parallel agents to complete
-2. Update workflow-session.json:
+2. Update workflow-session.toon:
 ```json
 {
   "phases": {
@@ -383,7 +388,7 @@ Updated {role2}/analysis.md with Clarifications section + enhanced content
 
 ## Session Metadata
 
-Update `workflow-session.json`:
+Update `workflow-session.toon`:
 
 ```json
 {

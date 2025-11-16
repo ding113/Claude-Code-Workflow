@@ -1326,12 +1326,19 @@ function show_summary() {
     echo "3. Review .gemini/CLAUDE.md - Gemini agent execution protocol"
     echo "4. Review .qwen/QWEN.md - Qwen agent execution protocol"
     echo "5. Configure settings - Edit .claude/settings.local.json as needed"
-    echo "6. Start using Claude Code with Agent workflow coordination!"
-    echo "7. Use /workflow commands for task execution"
-    echo "8. Use /update-memory commands for memory system management"
+    echo "6. Install TOON dependencies - Run 'npm install' for workflow utilities"
+    echo "7. Test TOON wrapper - Try './scripts/toon-wrapper.sh --help'"
+    echo "8. Start using Claude Code with Agent workflow coordination!"
+    echo "9. Use /workflow commands for task execution"
+    echo "10. Use /update-memory commands for memory system management"
 
     echo ""
-    write_color "Documentation: https://github.com/catlog22/Claude-Code-Workflow" "$COLOR_INFO"
+    write_color "TOON Format Info:" "$COLOR_INFO"
+    echo "  The system uses TOON (Token-Oriented Object Notation) for 30-60% token savings"
+    echo "  Legacy JSON files are automatically supported via autoDecode()"
+    echo "  See CLAUDE.md for TOON format details and usage examples"
+    echo ""
+    write_color "Documentation: https://github.com/ding113/Claude-Code-Workflow" "$COLOR_INFO"
     write_color "Features: Unified workflow system with comprehensive file output generation" "$COLOR_INFO"
 }
 

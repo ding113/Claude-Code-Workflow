@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![Version](https://img.shields.io/badge/version-v5.5.0-blue.svg)](https://github.com/catlog22/Claude-Code-Workflow/releases)
+[![Version](https://img.shields.io/badge/version-v5.5.0-blue.svg)](https://github.com/ding113/Claude-Code-Workflow/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)]()
 
@@ -33,7 +33,7 @@
 CCW 构建在一系列核心原则之上，这些原则使其与传统的 AI 开发方法区别开来：
 
 - **上下文优先架构**: 通过预定义的上下文收集，消除了执行过程中的不确定性，确保智能体在实现*之前*就拥有正确的信息。
-- **JSON 优先的状态管理**: 任务状态完全存储在 `.task/IMPL-*.json` 文件中，作为唯一的事实来源，实现了无需状态漂移的程序化编排。
+- **TOON 优先的状态管理**: 任务状态存储在 `.task/IMPL-*.toon` 包中，相比等效的 JSON 转储可节省 30-60% 的令牌（通过 `tests/integration/toon-format.test.ts` 基准测试），在保持人类可读性的同时扩展上下文容量。`src/utils/toon.ts` 中的工具通过 `autoDecode()` 保持 JSON 互操作性，使旧任务文件无需手动转换即可继续工作。
 - **自主多阶段编排**: 命令链式调用专门的子命令和智能体，以零用户干预的方式自动化复杂的工作流。
 - **多模型策略**: 充分利用不同 AI 模型（如 Gemini 用于分析，Codex 用于实现）的独特优势，以获得更优越的结果。
 - **分层内存系统**: 一个 4 层文档系统，在适当的抽象级别上提供上下文，防止信息过载。
@@ -49,12 +49,12 @@ CCW 构建在一系列核心原则之上，这些原则使其与传统的 AI 开
 
 **Windows (PowerShell):**
 ```powershell
-Invoke-Expression (Invoke-WebRequest -Uri "https://raw.githubusercontent.com/catlog22/Claude-Code-Workflow/main/install-remote.ps1" -UseBasicParsing).Content
+Invoke-Expression (Invoke-WebRequest -Uri "https://raw.githubusercontent.com/ding113/Claude-Code-Workflow/main/install-remote.ps1" -UseBasicParsing).Content
 ```
 
 **Linux/macOS (Bash/Zsh):**
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/catlog22/Claude-Code-Workflow/main/install-remote.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/ding113/Claude-Code-Workflow/main/install-remote.sh)
 ```
 
 ### **✅ 验证安装**
@@ -125,9 +125,9 @@ CCW 包含内置的**命令指南技能**，帮助您有效地发现和使用命
 
 ## 🤝 贡献与支持
 
-- **仓库**: [GitHub - Claude-Code-Workflow](https://github.com/catlog22/Claude-Code-Workflow)
-- **问题**: 在 [GitHub Issues](https://github.com/catlog22/Claude-Code-Workflow/issues) 上报告错误或请求功能。
-- **讨论**: 加入 [社区论坛](https://github.com/catlog22/Claude-Code-Workflow/discussions)。
+- **仓库**: [GitHub - Claude-Code-Workflow](https://github.com/ding113/Claude-Code-Workflow)
+- **问题**: 在 [GitHub Issues](https://github.com/ding113/Claude-Code-Workflow/issues) 上报告错误或请求功能。
+- **讨论**: 加入 [社区论坛](https://github.com/ding113/Claude-Code-Workflow/discussions)。
 
 ## 📄 许可证
 

@@ -8,12 +8,17 @@ examples:
   - /workflow:tools:context-gather --session WFS-bugfix "Fix login validation error"
 allowed-tools: Task(*), Read(*), Glob(*)
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 # Context Gather Command (/workflow:tools:context-gather)
 
 ## Overview
 
-Orchestrator command that invokes `context-search-agent` to gather comprehensive project context for implementation planning. Generates standardized `context-package.json` with codebase analysis, dependencies, and conflict detection.
+Orchestrator command that invokes `context-search-agent` to gather comprehensive project context for implementation planning. Generates standardized `context-package.toon` with codebase analysis, dependencies, and conflict detection.
 
 **Agent**: `context-search-agent` (`.claude/agents/context-search-agent.md`)
 
@@ -22,7 +27,7 @@ Orchestrator command that invokes `context-search-agent` to gather comprehensive
 - **Agent Delegation**: Delegate all discovery to `context-search-agent` for autonomous execution
 - **Detection-First**: Check for existing context-package before executing
 - **Plan Mode**: Full comprehensive analysis (vs lightweight brainstorm mode)
-- **Standardized Output**: Generate `.workflow/{session}/.process/context-package.json`
+- **Standardized Output**: Generate `.workflow/{session}/.process/context-package.toon`
 
 ## Execution Flow
 
@@ -31,7 +36,7 @@ Orchestrator command that invokes `context-search-agent` to gather comprehensive
 **Execute First** - Check if valid package already exists:
 
 ```javascript
-const contextPackagePath = `.workflow/${session_id}/.process/context-package.json`;
+const contextPackagePath = `.workflow/${session_id}/.process/context-package.toon`;
 
 if (file_exists(contextPackagePath)) {
   const existing = Read(contextPackagePath);
@@ -65,7 +70,7 @@ You are executing as context-search-agent (.claude/agents/context-search-agent.m
 ## Session Information
 - **Session ID**: ${session_id}
 - **Task Description**: ${task_description}
-- **Output Path**: .workflow/${session_id}/.process/context-package.json
+- **Output Path**: .workflow/${session_id}/.process/context-package.toon
 
 ## Mission
 Execute complete context-search-agent workflow for implementation planning:
@@ -77,7 +82,7 @@ Execute complete context-search-agent workflow for implementation planning:
 
 ### Phase 2: Multi-Source Context Discovery
 Execute all 4 discovery tracks:
-- **Track 1**: Historical archive analysis (query manifest.json for lessons learned)
+- **Track 1**: Historical archive analysis (query manifest.toon for lessons learned)
 - **Track 2**: Reference documentation (CLAUDE.md, architecture docs)
 - **Track 3**: Web examples (use Exa MCP for unfamiliar tech/APIs)
 - **Track 4**: Codebase analysis (5-layer discovery: files, content, patterns, deps, config/tests)
@@ -88,10 +93,10 @@ Execute all 4 discovery tracks:
 3. Integrate brainstorm artifacts (if .brainstorming/ exists, read content)
 4. Perform conflict detection with risk assessment
 5. **Inject historical conflicts** from archive analysis into conflict_detection
-6. Generate and validate context-package.json
+6. Generate and validate context-package.toon
 
 ## Output Requirements
-Complete context-package.json with:
+Complete context-package.toon with:
 - **metadata**: task_description, keywords, complexity, tech_stack, session_id
 - **project_context**: architecture_patterns, coding_conventions, tech_stack
 - **assets**: {documentation[], source_code[], config[], tests[]} with relevance scores
@@ -120,9 +125,9 @@ After agent completes, verify output:
 
 ```javascript
 // Verify file was created
-const outputPath = `.workflow/${session_id}/.process/context-package.json`;
+const outputPath = `.workflow/${session_id}/.process/context-package.toon`;
 if (!file_exists(outputPath)) {
-  throw new Error("❌ Agent failed to generate context-package.json");
+  throw new Error("❌ Agent failed to generate context-package.toon");
 }
 ```
 
@@ -135,7 +140,7 @@ if (!file_exists(outputPath)) {
 
 ## Output Schema
 
-Refer to `context-search-agent.md` Phase 3.7 for complete `context-package.json` schema.
+Refer to `context-search-agent.md` Phase 3.7 for complete `context-package.toon` schema.
 
 **Key Sections**:
 - **metadata**: Session info, keywords, complexity, tech stack
@@ -154,7 +159,7 @@ The context-search-agent MUST perform historical archive analysis as Track 1 in 
 **Step 1: Check for Archive Manifest**
 ```bash
 # Check if archive manifest exists
-if [[ -f .workflow/.archives/manifest.json ]]; then
+if [[ -f .workflow/.archives/manifest.toon ]]; then
   # Manifest available for querying
 fi
 ```
@@ -233,9 +238,9 @@ if (historicalConflicts.length > 0 && currentRisk === "low") {
 ### Archive Query Algorithm
 
 ```markdown
-1. IF .workflow/.archives/manifest.json does NOT exist → Skip Track 1, continue to Track 2
+1. IF .workflow/.archives/manifest.toon does NOT exist → Skip Track 1, continue to Track 2
 2. IF manifest exists:
-   a. Load manifest.json
+   a. Load manifest.toon
    b. Extract keywords from task_description (nouns, verbs, technical terms)
    c. Filter archives where:
       - ANY tag matches keywords (case-insensitive) OR
@@ -258,7 +263,7 @@ if (historicalConflicts.length > 0 && currentRisk === "low") {
 ```
 ## Success Criteria
 
-- ✅ Valid context-package.json generated in `.workflow/{session}/.process/`
+- ✅ Valid context-package.toon generated in `.workflow/{session}/.process/`
 - ✅ Contains >80% relevant files based on task keywords
 - ✅ Execution completes within 2 minutes
 - ✅ All required schema fields present and valid

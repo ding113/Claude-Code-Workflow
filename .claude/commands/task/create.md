@@ -1,8 +1,13 @@
 ---
 name: create
-description: Generate task JSON from natural language description with automatic file pattern detection, scope inference, and dependency analysis
+description: Generate task TOON from natural language description with automatic file pattern detection, scope inference, and dependency analysis
 argument-hint: "\"task title\""
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 # Task Create Command (/task:create)
 
@@ -17,7 +22,7 @@ Creates new implementation tasks with automatic context awareness and ID generat
 ### Automatic Behaviors
 - **ID Generation**: Auto-generates IMPL-N format (max 2 levels)
 - **Context Inheritance**: Inherits from active workflow session
-- **JSON Creation**: Creates task JSON in active session
+- **TOON Creation**: Creates task TOON in active session
 - **Status Setting**: Initial status = "pending"
 - **Agent Assignment**: Suggests agent based on task type
 - **Session Integration**: Updates workflow session stats
@@ -80,20 +85,20 @@ Suggest running: gemini analysis for file locations and dependencies
 ## File Management
 
 ### JSON Task File
-- **Location**: `.task/IMPL-[N].json` in active session
+- **Location**: `.task/IMPL-[N].toon` in active session
 - **Content**: Complete task with implementation field
 - **Updates**: Session stats only
 
 ### Simple Process
 1. Validate session and inputs
-2. Generate task JSON
+2. Generate task TOON
 3. Update session stats
 4. Notify completion
 
 ## Context Inheritance
 
 Tasks inherit from:
-1. **Active Session** - Requirements and scope from workflow-session.json
+1. **Active Session** - Requirements and scope from workflow-session.toon
 2. **Planning Document** - Context from IMPL_PLAN.md
 3. **Parent Task** - For subtasks (IMPL-N.M format)
 

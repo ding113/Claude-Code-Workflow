@@ -102,7 +102,7 @@ function get_temp_directory() {
 }
 
 function get_latest_release() {
-    local api_url="https://api.github.com/repos/catlog22/Claude-Code-Workflow/releases/latest"
+    local api_url="https://api.github.com/repos/ding113/Claude-Code-Workflow/releases/latest"
 
     if command -v jq &> /dev/null; then
         # Use jq if available
@@ -132,7 +132,7 @@ function download_repository() {
     local version_type="${2:-stable}"
     local branch="${3:-main}"
     local tag="${4:-}"
-    local repo_url="https://github.com/catlog22/Claude-Code-Workflow"
+    local repo_url="https://github.com/ding113/Claude-Code-Workflow"
     local zip_url=""
     local download_type=""
 
@@ -509,7 +509,7 @@ Examples:
     # Custom directory installation
     $0 --directory /opt/claude-code-workflow
 
-Repository: https://github.com/catlog22/Claude-Code-Workflow
+Repository: https://github.com/ding113/Claude-Code-Workflow
 
 EOF
 }
@@ -577,7 +577,7 @@ function get_user_version_choice() {
 
     # Get latest release info
     local release_data
-    release_data=$(curl -fsSL --connect-timeout 5 "https://api.github.com/repos/catlog22/Claude-Code-Workflow/releases/latest" 2>/dev/null)
+    release_data=$(curl -fsSL --connect-timeout 5 "https://api.github.com/repos/ding113/Claude-Code-Workflow/releases/latest" 2>/dev/null)
 
     if [ -n "$release_data" ]; then
         if command -v jq &> /dev/null; then
@@ -610,7 +610,7 @@ function get_user_version_choice() {
 
     # Get latest commit info
     local commit_data
-    commit_data=$(curl -fsSL --connect-timeout 5 "https://api.github.com/repos/catlog22/Claude-Code-Workflow/commits/main" 2>/dev/null)
+    commit_data=$(curl -fsSL --connect-timeout 5 "https://api.github.com/repos/ding113/Claude-Code-Workflow/commits/main" 2>/dev/null)
 
     if [ -n "$commit_data" ]; then
         if command -v jq &> /dev/null; then
@@ -723,7 +723,7 @@ function main() {
     if [ "$NON_INTERACTIVE" != true ] && [ "$FORCE" != true ]; then
         echo ""
         write_color "INSTALLATION DETAILS:" "$COLOR_INFO"
-        echo "- Repository: https://github.com/catlog22/Claude-Code-Workflow"
+        echo "- Repository: https://github.com/ding113/Claude-Code-Workflow"
         echo "- Version: $version_info"
         echo "- Features: Intelligent workflow orchestration with multi-agent coordination"
         echo ""
@@ -783,7 +783,7 @@ function main() {
                 [ "$VERSION_TYPE" = "branch" ] && temp_branch="$BRANCH"
 
                 local commit_data
-                commit_data=$(curl -fsSL --connect-timeout 10 "https://api.github.com/repos/catlog22/Claude-Code-Workflow/commits/$temp_branch" 2>/dev/null)
+                commit_data=$(curl -fsSL --connect-timeout 10 "https://api.github.com/repos/ding113/Claude-Code-Workflow/commits/$temp_branch" 2>/dev/null)
 
                 if [ -n "$commit_data" ]; then
                     if command -v jq &> /dev/null; then

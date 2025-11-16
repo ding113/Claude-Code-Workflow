@@ -4,6 +4,11 @@ description: List all workflow sessions with status filtering, shows session met
 examples:
   - /workflow:session:list
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 # List Workflow Sessions (/workflow:session:list)
 
@@ -29,18 +34,18 @@ ls .workflow/.active-* 2>/dev/null | head -1
 
 ### Step 3: Read Session Metadata
 ```bash
-jq -r '.session_id, .status, .project' .workflow/WFS-session/workflow-session.json
+jq -r '.session_id, .status, .project' .workflow/WFS-session/workflow-session.toon
 ```
 
 ### Step 4: Count Task Progress
 ```bash
-find .workflow/WFS-session/.task/ -name "*.json" -type f 2>/dev/null | wc -l
+find .workflow/WFS-session/.task/ -name "*.toon" -type f 2>/dev/null | wc -l
 find .workflow/WFS-session/.summaries/ -name "*.md" -type f 2>/dev/null | wc -l
 ```
 
 ### Step 5: Get Creation Time
 ```bash
-jq -r '.created_at // "unknown"' .workflow/WFS-session/workflow-session.json
+jq -r '.created_at // "unknown"' .workflow/WFS-session/workflow-session.toon
 ```
 
 ## Simple Bash Commands
@@ -48,10 +53,10 @@ jq -r '.created_at // "unknown"' .workflow/WFS-session/workflow-session.json
 ### Basic Operations
 - **List sessions**: `find .workflow/ -maxdepth 1 -type d -name "WFS-*"`
 - **Find active**: `find .workflow/ -name ".active-*" -type f`
-- **Read session data**: `jq -r '.session_id, .status' session.json`
-- **Count tasks**: `find .task/ -name "*.json" -type f | wc -l`
+- **Read session data**: `jq -r '.session_id, .status' session.toon`
+- **Count tasks**: `find .task/ -name "*.toon" -type f | wc -l`
 - **Count completed**: `find .summaries/ -name "*.md" -type f 2>/dev/null | wc -l`
-- **Get timestamp**: `jq -r '.created_at' session.json`
+- **Get timestamp**: `jq -r '.created_at' session.toon`
 
 ## Simple Output Format
 
@@ -95,5 +100,5 @@ ls .workflow/WFS-* | wc -l
 ls .workflow/.active-* | basename | sed 's/^\.active-//'
 
 # Show recent sessions
-ls -t .workflow/WFS-*/workflow-session.json | head -3
+ls -t .workflow/WFS-*/workflow-session.toon | head -3
 ```

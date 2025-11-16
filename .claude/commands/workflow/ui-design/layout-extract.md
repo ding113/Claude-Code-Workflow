@@ -4,6 +4,11 @@ description: Extract structural layout information from reference images, URLs, 
 argument-hint: [--design-id <id>] [--session <id>] [--images "<glob>"] [--urls "<list>"] [--prompt "<desc>"] [--targets "<list>"] [--variants <count>] [--device-type <desktop|mobile|tablet|responsive>] [--interactive] [--refine]
 allowed-tools: TodoWrite(*), Read(*), Write(*), Glob(*), Bash(*), AskUserQuestion(*), Task(ui-design-agent), mcp__exa__web_search_exa(*)
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 # Layout Extraction Command
 
@@ -19,7 +24,7 @@ This command separates the "scaffolding" (HTML structure and CSS layout) from th
 
 - **Agent-Powered**: Uses `ui-design-agent` for deep structural analysis
 - **Dual Mode**: Exploration (multiple contrasting variants) or Refinement (single layout fine-tuning)
-- **Output**: `layout-templates.json` with DOM structure, component hierarchy, and CSS layout rules
+- **Output**: `layout-templates.toon` with DOM structure, component hierarchy, and CSS layout rules
 - **Device-Aware**: Optimized for specific device types (desktop, mobile, tablet, responsive)
 - **Token-Based**: CSS uses `var()` placeholders for spacing and breakpoints
 
@@ -147,7 +152,7 @@ IF --urls AND url_list:
             result = mcp__chrome-devtools__evaluate_script(function=script_content)
 
             # Save DOM structure for this target (intermediate file)
-            Write({base_path}/.intermediates/layout-analysis/dom-structure-{target}.json, result)
+            Write({base_path}/.intermediates/layout-analysis/dom-structure-{target}.toon, result)
 
             REPORT: "   ✅ DOM structure extracted for '{target}'"
         ELSE:
@@ -215,7 +220,7 @@ IF result.exploration?.triggered:
 IF session_has_inputs: SKIP Step 2 file reading
 
 # 2. Check if output already exists
-bash(find {base_path}/layout-extraction -name "layout-*.json" -print -quit | grep -q . && echo "exists")
+bash(find {base_path}/layout-extraction -name "layout-*.toon" -print -quit | grep -q . && echo "exists")
 IF exists: SKIP to completion
 ```
 
@@ -231,7 +236,7 @@ IF refine_mode:
     # Load existing layout for refinement
     existing_layouts = {}
     FOR target IN targets:
-        layout_files = bash(find {base_path}/layout-extraction -name "layout-{target}-*.json" -print)
+        layout_files = bash(find {base_path}/layout-extraction -name "layout-{target}-*.toon" -print)
         IF layout_files:
             # Use first/latest layout file for this target
             existing_layouts[target] = Read(first_layout_file)
@@ -258,7 +263,7 @@ IF NOT refine_mode:
       - Targets: {targets.join(", ")}
       - Device type: {device_type}
       - Visual references: {loaded_images if available}
-      ${dom_structure_available ? "- DOM Structure: Read from .intermediates/layout-analysis/dom-structure-*.json" : ""}
+      ${dom_structure_available ? "- DOM Structure: Read from .intermediates/layout-analysis/dom-structure-*.toon" : ""}
 
       ## Analysis Rules
       - For EACH target, generate {variants_count} structurally DIFFERENT layout concepts
@@ -285,9 +290,9 @@ IF NOT refine_mode:
            └──┴─────────┴────┘
 
   ## Output
-  Write single JSON file: {base_path}/.intermediates/layout-analysis/analysis-options.json
+  Write single JSON file: {base_path}/.intermediates/layout-analysis/analysis-options.toon
 
-  Use schema from INTERACTIVE-DATA-SPEC.md (Layout Extract: analysis-options.json)
+  Use schema from INTERACTIVE-DATA-SPEC.md (Layout Extract: analysis-options.toon)
 
   CRITICAL: Use Write() tool immediately after generating complete JSON
     `
@@ -341,7 +346,7 @@ ELSE:
       - impact_scope: Which layout regions affected
 
       ## Output
-      Write single JSON file: {base_path}/.intermediates/layout-analysis/analysis-options.json
+      Write single JSON file: {base_path}/.intermediates/layout-analysis/analysis-options.toon
 
       Use refinement schema:
       {
@@ -359,13 +364,13 @@ ELSE:
 
 ### Step 2: Verify Options File Created
 ```bash
-bash(test -f {base_path}/.intermediates/layout-analysis/analysis-options.json && echo "created")
+bash(test -f {base_path}/.intermediates/layout-analysis/analysis-options.toon && echo "created")
 
 # Quick validation
-bash(cat {base_path}/.intermediates/layout-analysis/analysis-options.json | grep -q "layout_concepts" && echo "valid")
+bash(cat {base_path}/.intermediates/layout-analysis/analysis-options.toon | grep -q "layout_concepts" && echo "valid")
 ```
 
-**Output**: `analysis-options.json` with layout concept options for all targets
+**Output**: `analysis-options.toon` with layout concept options for all targets
 
 ---
 
@@ -394,7 +399,7 @@ REPORT: "🎯 Interactive mode: User selection required for {targets.length} tar
 ### Step 2: Load and Present Options (Mode-Specific)
 ```bash
 # Read options file
-options = Read({base_path}/.intermediates/layout-analysis/analysis-options.json)
+options = Read({base_path}/.intermediates/layout-analysis/analysis-options.toon)
 
 # Branch based on mode
 IF NOT refine_mode:
@@ -505,8 +510,8 @@ FOR each target:
 // Calculate total selections across all targets
 total_selections = sum([len(selections[t].selected_indices) for t in targets])
 
-// Update analysis-options.json with user selection (embedded in same file)
-options_file = Read({base_path}/.intermediates/layout-analysis/analysis-options.json)
+// Update analysis-options.toon with user selection (embedded in same file)
+options_file = Read({base_path}/.intermediates/layout-analysis/analysis-options.toon)
 options_file.user_selection = {
   "selected_at": "{current_timestamp}",
   "selection_type": "per_target_multi",
@@ -516,7 +521,7 @@ options_file.user_selection = {
 }
 
 // Write updated file back
-Write({base_path}/.intermediates/layout-analysis/analysis-options.json, JSON.stringify(options_file, indent=2))
+Write({base_path}/.intermediates/layout-analysis/analysis-options.toon, encodeTOON(options_file, { indent: 2 }))
 ```
 
 ### Step 4: Confirmation Message
@@ -533,7 +538,7 @@ Write({base_path}/.intermediates/layout-analysis/analysis-options.json, JSON.str
 Proceeding to generate {total_selections} detailed layout template(s)...
 ```
 
-**Output**: `analysis-options.json` updated with embedded `user_selection` field
+**Output**: `analysis-options.toon` updated with embedded `user_selection` field
 
 ## Phase 2: Layout Template Generation (Agent Task 2)
 
@@ -541,8 +546,8 @@ Proceeding to generate {total_selections} detailed layout template(s)...
 
 ### Step 1: Load User Selections or Default to All
 ```bash
-# Read analysis-options.json which may contain user_selection
-options = Read({base_path}/.intermediates/layout-analysis/analysis-options.json)
+# Read analysis-options.toon which may contain user_selection
+options = Read({base_path}/.intermediates/layout-analysis/analysis-options.toon)
 layout_concepts = options.layout_concepts
 
 # Check if user_selection field exists (interactive mode)
@@ -577,7 +582,7 @@ FOR each target in targets:
             target: target,
             variant_id: variant_id,
             concept: concept,
-            output_file: "{base_path}/layout-extraction/layout-{target}-{variant_id}.json"
+            output_file: "{base_path}/layout-extraction/layout-{target}-{variant_id}.toon"
         })
 
 total_tasks = task_list.length
@@ -608,7 +613,7 @@ FOR each task in task_list:
       - Target: {task.target}
       - Device type: {device_type}
       - Visual references: {loaded_images if available}
-      ${dom_structure_available ? "- DOM Structure Data: Read from .intermediates/layout-analysis/dom-structure-{task.target}.json - USE THIS for accurate layout properties" : ""}
+      ${dom_structure_available ? "- DOM Structure Data: Read from .intermediates/layout-analysis/dom-structure-{task.target}.toon - USE THIS for accurate layout properties" : ""}
 
       ## Generation Rules
       - Develop the user-selected layout concept into a detailed template
@@ -648,7 +653,7 @@ FOR each task in task_list:
 
       Generate 2 files:
 
-      1. **layout-templates.json** - {task.output_file}
+      1. **layout-templates.toon** - {task.output_file}
          Write single-template JSON object with:
          - target: "{task.target}"
          - variant_id: "layout-{task.variant_id}"
@@ -675,7 +680,7 @@ FOR each task in task_list:
 ```bash
 # Count generated files
 expected_count = total_tasks
-actual_count = bash(ls {base_path}/layout-extraction/layout-*.json | wc -l)
+actual_count = bash(ls {base_path}/layout-extraction/layout-*.toon | wc -l)
 
 # Verify all files were created
 IF actual_count == expected_count:
@@ -684,7 +689,7 @@ ELSE:
     ERROR: "Expected {expected_count} files, found {actual_count}"
 
 # Verify file structure (sample check)
-bash(cat {base_path}/layout-extraction/layout-{first_target}-1.json | grep -q "variant_id" && echo "valid structure")
+bash(cat {base_path}/layout-extraction/layout-{first_target}-1.toon | grep -q "variant_id" && echo "valid structure")
 ```
 
 **Output**: All layout template files created and verified (one file per selected concept)
@@ -728,15 +733,15 @@ Generated Templates:
 {base_path}/layout-extraction/
 {FOR each target in targets:
   {FOR each variant_id in range(1, selections_per_target[target].selected_indices.length + 1):
-    └── layout-{target}-{variant_id}.json
+    └── layout-{target}-{variant_id}.toon
   }
 }
 
 Intermediate Files:
 - {base_path}/.intermediates/layout-analysis/
-  ├── analysis-options.json (concept proposals + user selections embedded)
+  ├── analysis-options.toon (concept proposals + user selections embedded)
   {IF dom_structure_available:
-  ├── dom-structure-*.json ({len(url_list)} DOM extracts)
+  ├── dom-structure-*.toon ({len(url_list)} DOM extracts)
   }
 
 Next: /workflow:ui-design:generate will combine these structural templates with design systems to produce final prototypes.
@@ -756,13 +761,13 @@ bash(mkdir -p {base_path}/layout-extraction)
 ### Validation Commands
 ```bash
 # Check if already extracted
-bash(find {base_path}/layout-extraction -name "layout-*.json" -print -quit | grep -q . && echo "exists")
+bash(find {base_path}/layout-extraction -name "layout-*.toon" -print -quit | grep -q . && echo "exists")
 
 # Count generated files
-bash(ls {base_path}/layout-extraction/layout-*.json | wc -l)
+bash(ls {base_path}/layout-extraction/layout-*.toon | wc -l)
 
 # Validate JSON structure (sample check)
-bash(cat {base_path}/layout-extraction/layout-{first_target}-1.json | grep -q "variant_id" && echo "valid")
+bash(cat {base_path}/layout-extraction/layout-{first_target}-1.toon | grep -q "variant_id" && echo "valid")
 ```
 
 ### File Operations
@@ -772,7 +777,7 @@ bash(ls {images_pattern})
 Read({image_path})
 
 # Write layout templates
-bash(echo '{json}' > {base_path}/layout-extraction/layout-templates.json)
+bash(echo '{json}' > {base_path}/layout-extraction/layout-templates.toon)
 ```
 
 ## Output Structure
@@ -781,15 +786,15 @@ bash(echo '{json}' > {base_path}/layout-extraction/layout-templates.json)
 {base_path}/
 ├── .intermediates/                    # Intermediate analysis files
 │   └── layout-analysis/
-│       ├── analysis-options.json      # Generated layout concepts + user selections (embedded)
-│       └── dom-structure-{target}.json   # Extracted DOM structure (URL mode only)
+│       ├── analysis-options.toon      # Generated layout concepts + user selections (embedded)
+│       └── dom-structure-{target}.toon   # Extracted DOM structure (URL mode only)
 └── layout-extraction/                 # Final layout templates
-    └── layout-{target}-{variant}.json # Structural layout template JSON
+    └── layout-{target}-{variant}.toon # Structural layout template JSON
 ```
 
 ## Layout Template File Format
 
-Each `layout-{target}-{variant}.json` file contains a single template:
+Each `layout-{target}-{variant}.toon` file contains a single template:
 
 ```json
 {
@@ -878,5 +883,4 @@ ERROR: MCP search failed
 - **Graceful Fallback** - Falls back to visual analysis if Chrome DevTools unavailable
 - **Foundation for Assembly** - Provides structural blueprint for prototype generation
 - **Agent-Powered** - Deep structural analysis with AI
-
 

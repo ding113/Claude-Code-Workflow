@@ -7,6 +7,11 @@ examples:
   - /workflow:session:start --auto "implement OAuth2 authentication"
   - /workflow:session:start --new "fix login bug"
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 # Start Workflow Session (/workflow:session:start)
 
@@ -32,7 +37,7 @@ bash(ls -1 .workflow/WFS-* 2>/dev/null | head -5)
 
 ### Step 3: Display Session Metadata
 ```bash
-bash(cat .workflow/WFS-promptmaster-platform/workflow-session.json)
+bash(cat .workflow/WFS-promptmaster-platform/workflow-session.toon)
 ```
 
 ### Step 4: User Decision
@@ -63,7 +68,7 @@ bash(mkdir -p .workflow/WFS-implement-oauth2-auth/.task)
 bash(mkdir -p .workflow/WFS-implement-oauth2-auth/.summaries)
 
 # Create metadata
-bash(echo '{"session_id":"WFS-implement-oauth2-auth","project":"implement OAuth2 auth","status":"planning"}' > .workflow/WFS-implement-oauth2-auth/workflow-session.json)
+bash(echo '{"session_id":"WFS-implement-oauth2-auth","project":"implement OAuth2 auth","status":"planning"}' > .workflow/WFS-implement-oauth2-auth/workflow-session.toon)
 
 # Mark as active
 bash(touch .workflow/.active-WFS-implement-oauth2-auth)
@@ -77,7 +82,7 @@ bash(touch .workflow/.active-WFS-implement-oauth2-auth)
 bash(ls .workflow/.active-* 2>/dev/null | head -1 | xargs basename | sed 's/^\.active-//')
 
 # Read project name from metadata
-bash(cat .workflow/WFS-promptmaster-platform/workflow-session.json | grep -o '"project":"[^"]*"' | cut -d'"' -f4)
+bash(cat .workflow/WFS-promptmaster-platform/workflow-session.toon | grep -o '"project":"[^"]*"' | cut -d'"' -f4)
 
 # Check keyword match (manual comparison)
 # If task contains project keywords → Reuse session
@@ -122,7 +127,7 @@ bash(mkdir -p .workflow/WFS-fix-login-bug/.summaries)
 
 ### Step 3: Create Metadata
 ```bash
-bash(echo '{"session_id":"WFS-fix-login-bug","project":"fix login bug","status":"planning"}' > .workflow/WFS-fix-login-bug/workflow-session.json)
+bash(echo '{"session_id":"WFS-fix-login-bug","project":"fix login bug","status":"planning"}' > .workflow/WFS-fix-login-bug/workflow-session.toon)
 ```
 
 ### Step 4: Mark Active and Clean Old Markers
@@ -184,7 +189,7 @@ bash(ls .workflow/.active-*)
 bash(ls .workflow/WFS-*)
 
 # Read session metadata
-bash(cat .workflow/WFS-[session-id]/workflow-session.json)
+bash(cat .workflow/WFS-[session-id]/workflow-session.toon)
 
 # Create session directories
 bash(mkdir -p .workflow/WFS-[session-id]/.process)
@@ -205,7 +210,7 @@ bash(echo "Task Description" | sed 's/[^a-zA-Z0-9]/-/g' | tr '[:upper:]' '[:lowe
 
 ### Create Metadata JSON
 ```bash
-bash(echo '{"session_id":"WFS-test","project":"test project","status":"planning"}' > .workflow/WFS-test/workflow-session.json)
+bash(echo '{"session_id":"WFS-test","project":"test project","status":"planning"}' > .workflow/WFS-test/workflow-session.toon)
 ```
 
 ## Session ID Format

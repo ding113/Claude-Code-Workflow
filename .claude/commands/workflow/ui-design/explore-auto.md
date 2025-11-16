@@ -4,6 +4,11 @@ description: Interactive exploratory UI design workflow with style-centric batch
 argument-hint: "[--input "<value>"] [--targets "<list>"] [--target-type "page|component"] [--session <id>] [--style-variants <count>] [--layout-variants <count>]"
 allowed-tools: SlashCommand(*), TodoWrite(*), Read(*), Bash(*), Glob(*), Write(*), Task(conceptual-planning-agent)
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 # UI Design Auto Workflow Command
 
@@ -272,7 +277,7 @@ Bash(mkdir -p "${relative_base_path}/style-extraction")
 Bash(mkdir -p "${relative_base_path}/prototypes")
 base_path=$(cd "${relative_base_path}" && pwd)
 
-Write({base_path}/.run-metadata.json): {
+Write({base_path}/.run-metadata.toon): {
   "design_id": "${design_id}", "session_id": "${session_id}", "timestamp": "...",
   "workflow": "ui-design:auto",
   "architecture": "style-centric-batch-generation",
@@ -398,9 +403,9 @@ IF design_source IN ["code_only", "hybrid"]:
             design_source = "visual_only"
 
     # Check file existence and assess completeness
-    style_exists = exists("{base_path}/style-extraction/style-1/design-tokens.json")
-    animation_exists = exists("{base_path}/animation-extraction/animation-tokens.json")
-    layout_count = bash(ls {base_path}/layout-extraction/layout-*.json 2>/dev/null | wc -l)
+    style_exists = exists("{base_path}/style-extraction/style-1/design-tokens.toon")
+    animation_exists = exists("{base_path}/animation-extraction/animation-tokens.toon")
+    layout_count = bash(ls {base_path}/layout-extraction/layout-*.toon 2>/dev/null | wc -l)
     layout_exists = (layout_count > 0)
 
     style_complete = false
@@ -410,7 +415,7 @@ IF design_source IN ["code_only", "hybrid"]:
 
     # Style completeness check
     IF style_exists:
-        tokens = Read("{base_path}/style-extraction/style-1/design-tokens.json")
+        tokens = Read("{base_path}/style-extraction/style-1/design-tokens.toon")
         style_complete = (
             tokens.colors?.brand && tokens.colors?.surface &&
             tokens.typography?.font_family && tokens.spacing &&
@@ -424,7 +429,7 @@ IF design_source IN ["code_only", "hybrid"]:
 
     # Animation completeness check
     IF animation_exists:
-        anim = Read("{base_path}/animation-extraction/animation-tokens.json")
+        anim = Read("{base_path}/animation-extraction/animation-tokens.toon")
         animation_complete = (
             anim.duration && anim.easing &&
             Object.keys(anim.duration || {}).length >= 3 &&
@@ -438,7 +443,7 @@ IF design_source IN ["code_only", "hybrid"]:
     # Layout completeness check
     IF layout_exists:
         # Read first layout file to verify structure
-        first_layout = bash(ls {base_path}/layout-extraction/layout-*.json 2>/dev/null | head -1)
+        first_layout = bash(ls {base_path}/layout-extraction/layout-*.toon 2>/dev/null | head -1)
         layout_data = Read(first_layout)
         layout_complete = (
             layout_count >= 1 &&
@@ -540,7 +545,7 @@ IF should_extract_animation:
 ELSE:
     REPORT: "✅ Phase 8: Animation (Using Code Import)"
 
-# Output: animation-tokens.json + animation-guide.md
+# Output: animation-tokens.toon + animation-guide.md
 # When phase finishes, IMMEDIATELY execute Phase 9 (auto-continue)
 ```
 
@@ -699,14 +704,14 @@ Design Quality:
 
 📂 {base_path}/
   ├── .intermediates/          (Intermediate analysis files)
-  │   ├── style-analysis/      (analysis-options.json with embedded user_selection, computed-styles.json if URL mode)
-  │   ├── animation-analysis/  (analysis-options.json with embedded user_selection, animations-*.json if URL mode)
-  │   └── layout-analysis/     (analysis-options.json with embedded user_selection, dom-structure-*.json if URL mode)
+  │   ├── style-analysis/      (analysis-options.toon with embedded user_selection, computed-styles.toon if URL mode)
+  │   ├── animation-analysis/  (analysis-options.toon with embedded user_selection, animations-*.toon if URL mode)
+  │   └── layout-analysis/     (analysis-options.toon with embedded user_selection, dom-structure-*.toon if URL mode)
   ├── style-extraction/        ({s} complete design systems)
-  ├── animation-extraction/    (animation-tokens.json, animation-guide.md)
-  ├── layout-extraction/       ({n×l} layout template files: layout-{target}-{variant}.json)
+  ├── animation-extraction/    (animation-tokens.toon, animation-guide.md)
+  ├── layout-extraction/       ({n×l} layout template files: layout-{target}-{variant}.toon)
   ├── prototypes/              ({total} assembled prototypes)
-  └── .run-metadata.json       (includes device type)
+  └── .run-metadata.toon       (includes device type)
 
 🌐 Preview: {base_path}/prototypes/compare.html
   - Interactive {s}×{l} matrix view

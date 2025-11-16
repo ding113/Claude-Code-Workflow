@@ -5,6 +5,11 @@ argument-hint: "<path> [--package-name <name>] [--output-dir <path>] [--overwrit
 allowed-tools: SlashCommand,Bash,Read,TodoWrite
 auto-continue: true
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 # UI Design: Codify Style (Orchestrator)
 
@@ -40,7 +45,7 @@ auto-continue: true
 ## Core Rules
 
 1. **Start Immediately**: TodoWrite initialization → Phase 0 validation → Phase 1 execution
-2. **No Task JSON**: This command does not create task JSON files - pure orchestrator pattern
+2. **No Task TOON**: This command does not create task TOON files - pure orchestrator pattern
 3. **Parse & Pass**: Extract required data from each command output (design run path, metadata)
 4. **Intelligent Validation**: Smart parameter validation with user-friendly error messages
 5. **Safety First**: Package overwrite protection, existence checks, fallback error handling
@@ -245,7 +250,7 @@ TRY:
     SlashCommand(command)
 
     # After executing all attached tasks, verify extraction outputs
-    tokens_path = "${design_run_path}/style-extraction/style-1/design-tokens.json"
+    tokens_path = "${design_run_path}/style-extraction/style-1/design-tokens.toon"
     guide_path = "${design_run_path}/style-extraction/style-1/style-guide.md"
 
     tokens_exists = Bash(test -f "${tokens_path}" && echo "exists" || echo "missing")
@@ -273,11 +278,11 @@ CATCH error:
 - ✅ `import-from-code` command executed successfully
 - ✅ Design run created at `${design_run_path}`
 - ✅ Required files exist:
-  - `design-tokens.json` - Complete design token system
+  - `design-tokens.toon` - Complete design token system
   - `style-guide.md` - Style documentation
 - ⭕ Optional files:
-  - `animation-tokens.json` - Animation specifications
-  - `component-patterns.json` - Component catalog
+  - `animation-tokens.toon` - Animation specifications
+  - `component-patterns.toon` - Component catalog
 
 <!-- TodoWrite: REMOVE Phase 1.0-1.3 tasks, INSERT reference-page-generator tasks -->
 
@@ -325,8 +330,8 @@ TRY:
 
     # After executing all attached tasks, verify package outputs
     required_files = [
-        "layout-templates.json",
-        "design-tokens.json",
+        "layout-templates.toon",
+        "design-tokens.toon",
         "preview.html",
         "preview.css"
     ]
@@ -361,12 +366,12 @@ CATCH error:
 - ✅ `reference-page-generator` executed successfully
 - ✅ Reference package created at `${package_path}/`
 - ✅ All required files present:
-  - `layout-templates.json` - Layout templates from design run
-  - `design-tokens.json` - Complete design token system
+  - `layout-templates.toon` - Layout templates from design run
+  - `design-tokens.toon` - Complete design token system
   - `preview.html` - Interactive multi-component showcase
   - `preview.css` - Showcase styling
 - ⭕ Optional files:
-  - `animation-tokens.json` - Animation specifications (if available from extraction)
+  - `animation-tokens.toon` - Animation specifications (if available from extraction)
 
 <!-- TodoWrite: REMOVE Phase 2.0-2.2 tasks, restore to orchestrator view -->
 
@@ -408,8 +413,8 @@ IF package_exists != "exists":
 
 # Get absolute path and component count for final report
 absolute_package_path = Bash(cd "${package_path}" && pwd 2>/dev/null || echo "${package_path}")
-component_count = Bash(jq -r '.layout_templates | length // "unknown"' "${package_path}/layout-templates.json" 2>/dev/null || echo "unknown")
-anim_exists = Bash(test -f "${package_path}/animation-tokens.json" && echo "✓" || echo "○")
+component_count = Bash(jq -r '.layout_templates | length // "unknown"' "${package_path}/layout-templates.toon" 2>/dev/null || echo "unknown")
+anim_exists = Bash(test -f "${package_path}/animation-tokens.toon" && echo "✓" || echo "○")
 ```
 
 <!-- TodoWrite: Update Phase 3 → completed -->
@@ -428,7 +433,7 @@ anim_exists = Bash(test -f "${package_path}/animation-tokens.json" && echo "✓"
 📄 Source: {source}
 📊 Components: {component_count}
 
-Files: layout-templates.json, design-tokens.json, animation-tokens.json (optional), preview.html, preview.css
+Files: layout-templates.toon, design-tokens.toon, animation-tokens.toon (optional), preview.html, preview.css
 
 Preview: file://{absolute_package_path}/preview.html
 
@@ -523,7 +528,7 @@ User triggers: /workflow:ui-design:codify-style ./src --package-name my-style-v1
 [Execute Phase 1.0] → Discover files (orchestrator executes this)
   ↓
 [Execute Phase 1.1-1.3] → Run 3 agents in parallel (orchestrator executes these)
-  └─ Outputs: design-tokens.json, style-guide.md, animation-tokens.json, layout-templates.json
+  └─ Outputs: design-tokens.toon, style-guide.md, animation-tokens.toon, layout-templates.toon
   ↓
 [Phase 1 Complete] → TodoWrite: COLLAPSE Phase 1.0-1.3 into Phase 1 summary
   ↓
@@ -540,7 +545,7 @@ User triggers: /workflow:ui-design:codify-style ./src --package-name my-style-v1
 [Execute Phase 2.1] → Prepare component data (orchestrator executes this)
   ↓
 [Execute Phase 2.2] → Generate preview pages (orchestrator executes this)
-  └─ Outputs: layout-templates.json, design-tokens.json, animation-tokens.json (optional), preview.html, preview.css
+  └─ Outputs: layout-templates.toon, design-tokens.toon, animation-tokens.toon (optional), preview.html, preview.css
   ↓
 [Phase 2 Complete] → TodoWrite: COLLAPSE Phase 2.0-2.2 into Phase 2 summary
   ├─ Phase 0 (completed)
@@ -609,9 +614,9 @@ File discovery is fully automatic - no glob patterns needed.
 .workflow/
 ├── reference_style/              # Default output directory
 │   └── {package-name}/
-│       ├── layout-templates.json
-│       ├── design-tokens.json
-│       ├── animation-tokens.json (optional)
+│       ├── layout-templates.toon
+│       ├── design-tokens.toon
+│       ├── animation-tokens.toon (optional)
 │       ├── preview.html
 │       └── preview.css
 │
@@ -658,7 +663,7 @@ codify-style (orchestrator - simplified interface)
       └─ Report completion
 
 Design Principles:
-✓ No task JSON created by this command
+✓ No task TOON created by this command
 ✓ All extraction delegated to import-from-code
 ✓ All packaging delegated to reference-page-generator
 ✓ Pure orchestration with intelligent defaults

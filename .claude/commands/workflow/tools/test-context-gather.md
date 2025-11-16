@@ -7,12 +7,17 @@ examples:
   - /workflow:tools:test-context-gather --session WFS-test-payment
 allowed-tools: Task(*), Read(*), Glob(*)
 ---
+> **TOON Format Default**
+> - Encode structured artifacts with `encodeTOON` or `scripts/toon-wrapper.sh encode` into `.toon` files.
+> - Load artifacts with `autoDecode`/`decodeTOON` (or `scripts/toon-wrapper.sh decode`) to auto-detect TOON vs legacy `.json`.
+> - When instructions mention JSON outputs, treat TOON as the default format while keeping legacy `.json` readable.
+
 
 # Test Context Gather Command (/workflow:tools:test-context-gather)
 
 ## Overview
 
-Orchestrator command that invokes `test-context-search-agent` to gather comprehensive test coverage context for test generation workflows. Generates standardized `test-context-package.json` with coverage analysis, framework detection, and source implementation context.
+Orchestrator command that invokes `test-context-search-agent` to gather comprehensive test coverage context for test generation workflows. Generates standardized `test-context-package.toon` with coverage analysis, framework detection, and source implementation context.
 
 **Agent**: `test-context-search-agent` (`.claude/agents/test-context-search-agent.md`)
 
@@ -22,7 +27,7 @@ Orchestrator command that invokes `test-context-search-agent` to gather comprehe
 - **Detection-First**: Check for existing test-context-package before executing
 - **Coverage-First**: Analyze existing test coverage before planning new tests
 - **Source Context Loading**: Import implementation summaries from source session
-- **Standardized Output**: Generate `.workflow/{test_session_id}/.process/test-context-package.json`
+- **Standardized Output**: Generate `.workflow/{test_session_id}/.process/test-context-package.toon`
 
 ## Execution Flow
 
@@ -31,7 +36,7 @@ Orchestrator command that invokes `test-context-search-agent` to gather comprehe
 **Execute First** - Check if valid package already exists:
 
 ```javascript
-const testContextPath = `.workflow/${test_session_id}/.process/test-context-package.json`;
+const testContextPath = `.workflow/${test_session_id}/.process/test-context-package.toon`;
 
 if (file_exists(testContextPath)) {
   const existing = Read(testContextPath);
@@ -65,7 +70,7 @@ You are executing as test-context-search-agent (.claude/agents/test-context-sear
 
 ## Session Information
 - **Test Session ID**: ${test_session_id}
-- **Output Path**: .workflow/${test_session_id}/.process/test-context-package.json
+- **Output Path**: .workflow/${test_session_id}/.process/test-context-package.toon
 
 ## Mission
 Execute complete test-context-search-agent workflow for test generation planning:
@@ -84,10 +89,10 @@ Execute coverage discovery:
 ### Phase 3: Framework Detection & Packaging
 1. Framework identification from package.json/requirements.txt
 2. Convention analysis from existing test patterns
-3. Generate and validate test-context-package.json
+3. Generate and validate test-context-package.toon
 
 ## Output Requirements
-Complete test-context-package.json with:
+Complete test-context-package.toon with:
 - **metadata**: test_session_id, source_session_id, task_type, complexity
 - **source_context**: implementation_summaries, tech_stack, project_patterns
 - **test_coverage**: existing_tests[], missing_tests[], coverage_stats
@@ -117,9 +122,9 @@ After agent completes, verify output:
 
 ```javascript
 // Verify file was created
-const outputPath = `.workflow/${test_session_id}/.process/test-context-package.json`;
+const outputPath = `.workflow/${test_session_id}/.process/test-context-package.toon`;
 if (!file_exists(outputPath)) {
-  throw new Error("❌ Agent failed to generate test-context-package.json");
+  throw new Error("❌ Agent failed to generate test-context-package.toon");
 }
 
 // Load and display summary
@@ -137,7 +142,7 @@ console.log("⚠️  Tests to generate:", testContext.test_coverage.missing_test
 
 ## Output Schema
 
-Refer to `test-context-search-agent.md` Phase 3.2 for complete `test-context-package.json` schema.
+Refer to `test-context-search-agent.md` Phase 3.2 for complete `test-context-package.toon` schema.
 
 **Key Sections**:
 - **metadata**: Test session info, source session reference, complexity
@@ -164,7 +169,7 @@ Refer to `test-context-search-agent.md` Phase 3.2 for complete `test-context-pac
 
 ## Success Criteria
 
-- ✅ Valid test-context-package.json generated in `.workflow/{test_session_id}/.process/`
+- ✅ Valid test-context-package.toon generated in `.workflow/{test_session_id}/.process/`
 - ✅ Source session context loaded successfully
 - ✅ Test coverage gaps identified (>90% accuracy)
 - ✅ Test framework detected and documented

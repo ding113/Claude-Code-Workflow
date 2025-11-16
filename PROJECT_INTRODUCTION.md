@@ -1,6 +1,6 @@
 # 🚀 Claude Code Workflow (CCW): 下一代多智能体软件开发自动化框架
 
-[![Version](https://img.shields.io/badge/version-v3.2.1-blue.svg)](https://github.com/catlog22/Claude-Code-Workflow/releases)
+[![Version](https://img.shields.io/badge/version-v3.2.1-blue.svg)](https://github.com/ding113/Claude-Code-Workflow/releases)
 [![MCP工具](https://img.shields.io/badge/🔧_MCP工具-实验性-orange.svg)](https://github.com/modelcontextprotocol)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
@@ -17,7 +17,7 @@
 CCW 的设计基于几个核心理念：
 
 1. **🧠 智能协作而非替代**: 不是完全取代开发者，而是作为智能助手协同工作
-2. **📊 JSON 优先架构**: 以 JSON 作为单一数据源，消除同步复杂性
+2. **📊 TOON 优先架构**: 以紧凑的 TOON 语义格式统一数据源，降低 30-60% 上下文开销
 3. **🔄 完整的开发生命周期**: 覆盖从构思到部署的每一个环节
 4. **🤖 多智能体协调**: 专门的智能体处理不同类型的开发任务
 5. **⚡ 原子化会话管理**: 超快速的上下文切换和并行工作
@@ -27,7 +27,7 @@ CCW 的设计基于几个核心理念：
 ```mermaid
 graph TD
     A[🖥️ CLI 接口层] --> B[📋 会话管理层]
-    B --> C[📊 JSON 任务数据层]
+    B --> C[📊 TOON 语义数据层]
     C --> D[🤖 多智能体编排层]
 
     A --> A1[Gemini CLI - 分析探索]
@@ -37,7 +37,7 @@ graph TD
     B --> B1[.active-session 标记]
     B --> B2[工作流会话状态]
 
-    C --> C1[IMPL-*.json 任务定义]
+    C --> C1[IMPL-*.toon 任务定义]
     C --> C2[动态任务分解]
     C --> C3[依赖关系映射]
 
@@ -83,30 +83,31 @@ graph TD
 
 ## 🛠️ 核心工作流介绍
 
-### 📊 JSON 优先数据模型
+### 📊 TOON 优先数据模型
 
-CCW 采用独特的 JSON 优先架构，所有工作流状态都存储在结构化的 JSON 文件中：
+IMPL-001 → IMPL-004 迁移完成后，CCW 以 **TOON-first** 为唯一真源：所有任务、会话与记忆均以 `.toon` 文件描述，再由 `src/utils/toon.ts` 自动双向转换保障兼容性。TOON 语法将嵌套 JSON 拆解为紧凑的列式结构，可验证地节省 30-60% token（详见 `tests/integration/toon-format.test.ts` 基准）。
 
-```json
-{
-  "id": "IMPL-1.2",
-  "title": "实现 JWT 认证系统",
-  "status": "pending",
-  "meta": {
-    "type": "feature",
-    "agent": "code-developer"
-  },
-  "context": {
-    "requirements": ["JWT 认证", "OAuth2 支持"],
-    "focus_paths": ["src/auth", "tests/auth"],
-    "acceptance": ["JWT 验证工作", "OAuth 流程完整"]
-  },
-  "flow_control": {
-    "pre_analysis": [...],
-    "implementation_approach": {...}
-  }
-}
+```text
+task:
+  id: IMPL-1.2
+  title: 实现 JWT 认证系统
+  status: pending
+meta:
+  type: feature
+  agent: code-developer
+context.requirements[2]:
+  - JWT 认证
+  - OAuth2 支持
+context.focus_paths[2]: src/auth, tests/auth
+flow_control[2]{phase,state}:
+  pre_analysis,complete
+  implementation_approach,planned
 ```
+
+> 📌 **为何选择 TOON?**  
+> - **上下文压缩**: 相同任务在 TOON 中的 token 占用可下降 37-55%（测量样本覆盖任务、会话、集成测试场景）。  
+> - **人机协同友好**: 自动对齐 tabular/kv 结构，人工审阅无需 JSON 括号。  
+> - **渐进迁移**: `autoDecode()` 会根据内容自动选择 JSON 或 TOON，旧任务无缝兼容。
 
 ### 🧠 智能内存管理系统
 
@@ -346,7 +347,7 @@ CCW 基于任务类型自动选择最适合的工具：
 ### 快速安装
 ```powershell
 # Windows 一键安装
-Invoke-Expression (Invoke-WebRequest -Uri "https://raw.githubusercontent.com/catlog22/Claude-Code-Workflow/main/install-remote.ps1" -UseBasicParsing).Content
+Invoke-Expression (Invoke-WebRequest -Uri "https://raw.githubusercontent.com/ding113/Claude-Code-Workflow/main/install-remote.ps1" -UseBasicParsing).Content
 
 # 验证安装
 /workflow:session:list
@@ -365,7 +366,7 @@ Invoke-Expression (Invoke-WebRequest -Uri "https://raw.githubusercontent.com/cat
 
 ### 当前状态 (v2.1.0-experimental)
 - ✅ 核心多智能体系统完成
-- ✅ JSON 优先架构稳定
+- ✅ TOON 优先架构稳定（JSON 作为兼容层）
 - ✅ 完整工作流生命周期支持
 - 🧪 MCP 工具集成 (实验性)
 - ✅ 智能内存管理系统
@@ -378,9 +379,9 @@ Invoke-Expression (Invoke-WebRequest -Uri "https://raw.githubusercontent.com/cat
 
 ## 🤝 社区与支持
 
-- 📚 **文档**: [项目 Wiki](https://github.com/catlog22/Claude-Code-Workflow/wiki)
-- 🐛 **问题反馈**: [GitHub Issues](https://github.com/catlog22/Claude-Code-Workflow/issues)
-- 💬 **社区讨论**: [讨论区](https://github.com/catlog22/Claude-Code-Workflow/discussions)
+- 📚 **文档**: [项目 Wiki](https://github.com/ding113/Claude-Code-Workflow/wiki)
+- 🐛 **问题反馈**: [GitHub Issues](https://github.com/ding113/Claude-Code-Workflow/issues)
+- 💬 **社区讨论**: [讨论区](https://github.com/ding113/Claude-Code-Workflow/discussions)
 - 📋 **更新日志**: [发布历史](CHANGELOG.md)
 
 ---
@@ -393,8 +394,8 @@ Invoke-Expression (Invoke-WebRequest -Uri "https://raw.githubusercontent.com/cat
 
 🌟 **立即体验 CCW，开启您的智能化开发之旅！**
 
-[![⭐ Star on GitHub](https://img.shields.io/badge/⭐-Star%20on%20GitHub-yellow.svg)](https://github.com/catlog22/Claude-Code-Workflow)
-[![🚀 Latest Release](https://img.shields.io/badge/🚀-Download%20Latest-blue.svg)](https://github.com/catlog22/Claude-Code-Workflow/releases/latest)
+[![⭐ Star on GitHub](https://img.shields.io/badge/⭐-Star%20on%20GitHub-yellow.svg)](https://github.com/ding113/Claude-Code-Workflow)
+[![🚀 Latest Release](https://img.shields.io/badge/🚀-Download%20Latest-blue.svg)](https://github.com/ding113/Claude-Code-Workflow/releases/latest)
 
 ---
 
