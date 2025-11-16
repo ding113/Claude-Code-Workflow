@@ -162,27 +162,20 @@ try {
   result = executeCLI("gemini", config);
 } catch (error) {
   if (error.code === 429 || error.code === 404) {
-    console.error("Gemini unavailable, no fallback configured");
-    try {
-        // Fallback to Gemini removed. Proceeding to degraded state.
-      return {
-        status: "degraded",
-    } catch (qwenError) {
-      console.error("Both Gemini failed");
-      // Return minimal analysis with basic fix strategy
-      return {
-        status: "degraded",
-        message: "CLI analysis failed, using fallback strategy",
-        fix_strategy: generateBasicFixStrategy(failure_context)
-      };
-    }
+    console.error("Gemini unavailable, entering degraded state");
+    // Return minimal analysis with basic fix strategy
+    return {
+      status: "degraded",
+      message: "CLI analysis failed, using fallback strategy",
+      fix_strategy: generateBasicFixStrategy(failure_context)
+    };
   } else {
     throw error;
   }
 }
 ```
 
-**Fallback Strategy (When All CLI Tools Fail)**:
+**Fallback Strategy (When CLI Tool Fails)**:
 - Generate basic fix task based on error patterns matching
 - Use previous successful fix patterns from fix-history.toon
 - Limit to simple, low-risk fixes (add null checks, fix typos)
@@ -410,7 +403,7 @@ See: `.process/iteration-{iteration}-cli-output.txt`
 
 ### CLI Execution Standards
 - **Timeout Management**: Use dynamic timeout (2400000ms = 40min for analysis)
-- **Fallback Chain**: None (previously Gemini)
+- **Fallback Chain**: None (degraded mode on Gemini failure)
 - **Error Context**: Include full error details in failure reports
 - **Output Preservation**: Save raw CLI output for debugging
 
@@ -463,15 +456,7 @@ See: `.process/iteration-{iteration}-cli-output.txt`
 }
 ```
 
-### Gemini Configuration (REMOVED)
-```javascript
-// Gemini configuration has been removed as part of model consolidation.
-  "templates": {
-    "test-failure": "01-diagnose-bug-root-cause.txt",
-    "coverage-gap": "02-analyze-code-patterns.txt"
-  }
-}
-```
+
 
 ## Integration with test-cycle-execute
 

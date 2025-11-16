@@ -768,11 +768,8 @@ async function executeCLIAnalysis(prompt) {
     const result = await execBash(command, { timeout: 120000 }); // 2 min timeout
     return parseAnalysisResult(result.stdout);
   } catch (error) {
-    // Fallback to gemini if gemini fails
-    console.warn('Gemini failed, falling back to qwen');
-    const fallbackCmd = `qwen -p "${escapePrompt(prompt)}" -m coder-model --include-directories ${referencePath}`;
-    const result = await execBash(fallbackCmd, { timeout: 120000 });
-    return parseAnalysisResult(result.stdout);
+    console.error('Gemini analysis failed:', error);
+    throw error;
   }
 }
 

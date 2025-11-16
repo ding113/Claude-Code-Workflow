@@ -168,9 +168,6 @@ update_module_claude() {
             gemini)
                 model="gemini-2.5-flash"
                 ;;
-            qwen)
-                model="coder-model"
-                ;;
             codex)
                 model="gpt5-codex"
                 ;;
@@ -268,15 +265,6 @@ Instructions:
         # Execute with selected tool
         # NOTE: Model parameter (-m) is placed AFTER the prompt
         case "$tool" in
-            qwen)
-                if [ "$model" = "coder-model" ]; then
-                    # coder-model is default, -m is optional
-                    gemini -p "$final_prompt" --yolo 2>&1
-                else
-                    gemini -p "$final_prompt" -m "$model" --yolo 2>&1
-                fi
-                tool_result=$?
-                ;;
             codex)
                 codex --full-auto exec "$final_prompt" -m "$model" --skip-git-repo-check -s danger-full-access 2>&1
                 tool_result=$?
@@ -319,7 +307,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
         echo "  single-layer    - Read current dir code + child CLAUDE.md, generate ./CLAUDE.md"
         echo "  multi-layer     - Read all files, generate CLAUDE.md for each directory"
         echo ""
-        echo "Tools: gemini (default), qwen, codex"
+        echo "Tools: gemini (default), codex"
         echo "Models: Use tool defaults if not specified"
         echo ""
         echo "Examples:"

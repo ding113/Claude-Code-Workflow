@@ -195,7 +195,6 @@ function Test-Prerequisites {
     $claudeMd = Join-Path $sourceDir "CLAUDE.md"
     $codexDir = Join-Path $sourceDir ".codex"
     $geminiDir = Join-Path $sourceDir ".gemini"
-    $qwenDir = Join-Path $sourceDir ".qwen"
 
     if (-not (Test-Path $claudeDir)) {
         Write-ColorOutput "ERROR: .claude directory not found in $sourceDir" $ColorError
@@ -214,11 +213,6 @@ function Test-Prerequisites {
 
     if (-not (Test-Path $geminiDir)) {
         Write-ColorOutput "ERROR: .gemini directory not found in $sourceDir" $ColorError
-        return $false
-    }
-
-    if (-not (Test-Path $qwenDir)) {
-        Write-ColorOutput "ERROR: .qwen directory not found in $sourceDir" $ColorError
         return $false
     }
 
@@ -1005,7 +999,6 @@ function Uninstall-ClaudeWorkflow {
         Write-Host "  - ~/.claude/CLAUDE.md"
         Write-Host "  - ~/.codex"
         Write-Host "  - ~/.gemini"
-        Write-Host "  - ~/.qwen"
         return $false
     }
 
@@ -1215,7 +1208,6 @@ function Install-Global {
     $globalClaudeMd = Join-Path $globalClaudeDir "CLAUDE.md"
     $globalCodexDir = Join-Path $userProfile ".codex"
     $globalGeminiDir = Join-Path $userProfile ".gemini"
-    $globalQwenDir = Join-Path $userProfile ".qwen"
 
     Write-ColorOutput "Global installation path: $userProfile" $ColorInfo
 
@@ -1228,12 +1220,11 @@ function Install-Global {
     $sourceClaudeMd = Join-Path $sourceDir "CLAUDE.md"
     $sourceCodexDir = Join-Path $sourceDir ".codex"
     $sourceGeminiDir = Join-Path $sourceDir ".gemini"
-    $sourceQwenDir = Join-Path $sourceDir ".qwen"
 
     # Create backup folder if needed (default behavior unless NoBackup is specified)
     $backupFolder = $null
     if (-not $NoBackup) {
-        if ((Test-Path $globalClaudeDir) -or (Test-Path $globalCodexDir) -or (Test-Path $globalGeminiDir) -or (Test-Path $globalQwenDir)) {
+        if ((Test-Path $globalClaudeDir) -or (Test-Path $globalCodexDir) -or (Test-Path $globalGeminiDir)) {
             $existingFiles = @()
             if (Test-Path $globalClaudeDir) {
                 $existingFiles += Get-ChildItem $globalClaudeDir -Recurse -File -ErrorAction SilentlyContinue
@@ -1243,9 +1234,6 @@ function Install-Global {
             }
             if (Test-Path $globalGeminiDir) {
                 $existingFiles += Get-ChildItem $globalGeminiDir -Recurse -File -ErrorAction SilentlyContinue
-            }
-            if (Test-Path $globalQwenDir) {
-                $existingFiles += Get-ChildItem $globalQwenDir -Recurse -File -ErrorAction SilentlyContinue
             }
             if (($existingFiles -and ($existingFiles | Measure-Object).Count -gt 0)) {
                 $backupFolder = Get-BackupDirectory -TargetDirectory $userProfile
@@ -1320,24 +1308,6 @@ function Install-Global {
         }
     }
 
-    # Backup critical config files in .qwen directory before installation
-    Backup-CriticalConfigFiles -TargetDirectory $globalQwenDir -BackupFolder $backupFolder -FileNames @("QWEN.md")
-
-    # Merge .qwen directory (incremental overlay - preserves user files)
-    Write-ColorOutput "Installing .qwen directory (incremental merge)..." $ColorInfo
-    $qwenInstalled = Merge-DirectoryContents -Source $sourceQwenDir -Destination $globalQwenDir -Description ".qwen directory" -BackupFolder $backupFolder
-
-    # Track .qwen directory in manifest
-    if ($qwenInstalled) {
-        Add-ManifestEntry -Manifest $manifest -Path $globalQwenDir -Type "Directory"
-        # Track files from SOURCE directory
-        Get-ChildItem -Path $sourceQwenDir -Recurse -File | ForEach-Object {
-            $relativePath = $_.FullName.Substring($sourceQwenDir.Length)
-            $targetPath = $globalQwenDir + $relativePath
-            Add-ManifestEntry -Manifest $manifest -Path $targetPath -Type "File"
-        }
-    }
-
     # Create version.json in global .claude directory
     Write-ColorOutput "Creating version.json..." $ColorInfo
     Create-VersionJson -TargetClaudeDir $globalClaudeDir -InstallationMode "Global"
@@ -1380,18 +1350,16 @@ function Install-Path {
     $sourceClaudeMd = Join-Path $sourceDir "CLAUDE.md"
     $sourceCodexDir = Join-Path $sourceDir ".codex"
     $sourceGeminiDir = Join-Path $sourceDir ".gemini"
-    $sourceQwenDir = Join-Path $sourceDir ".qwen"
 
-    # Local paths - for agents, commands, output-styles, .codex, .gemini, .qwen
+    # Local paths - for agents, commands, output-styles, .codex, .gemini
     $localClaudeDir = Join-Path $TargetDirectory ".claude"
     $localCodexDir = Join-Path $TargetDirectory ".codex"
     $localGeminiDir = Join-Path $TargetDirectory ".gemini"
-    $localQwenDir = Join-Path $TargetDirectory ".qwen"
 
     # Create backup folder if needed
     $backupFolder = $null
     if (-not $NoBackup) {
-        if ((Test-Path $localClaudeDir) -or (Test-Path $localCodexDir) -or (Test-Path $localGeminiDir) -or (Test-Path $localQwenDir) -or (Test-Path $globalClaudeDir)) {
+        if ((Test-Path $localClaudeDir) -or (Test-Path $localCodexDir) -or (Test-Path $localGeminiDir) -or (Test-Path $globalClaudeDir)) {
             $backupFolder = Get-BackupDirectory -TargetDirectory $TargetDirectory
             Write-ColorOutput "Backup folder created: $backupFolder" $ColorInfo
         }
@@ -1537,24 +1505,6 @@ function Install-Path {
         }
     }
 
-    # Backup critical config files in .qwen directory before installation
-    Backup-CriticalConfigFiles -TargetDirectory $localQwenDir -BackupFolder $backupFolder -FileNames @("QWEN.md")
-
-    # Merge .qwen directory to local location (incremental overlay - preserves user files)
-    Write-ColorOutput "Installing .qwen directory to local location (incremental merge)..." $ColorInfo
-    $qwenInstalled = Merge-DirectoryContents -Source $sourceQwenDir -Destination $localQwenDir -Description ".qwen directory" -BackupFolder $backupFolder
-
-    # Track .qwen directory in manifest
-    if ($qwenInstalled) {
-        Add-ManifestEntry -Manifest $manifest -Path $localQwenDir -Type "Directory"
-        # Track files from SOURCE directory
-        Get-ChildItem -Path $sourceQwenDir -Recurse -File | ForEach-Object {
-            $relativePath = $_.FullName.Substring($sourceQwenDir.Length)
-            $targetPath = $localQwenDir + $relativePath
-            Add-ManifestEntry -Manifest $manifest -Path $targetPath -Type "File"
-        }
-    }
-
     # Create version.json in local .claude directory
     Write-ColorOutput "Creating version.json in local directory..." $ColorInfo
     Create-VersionJson -TargetClaudeDir $localClaudeDir -InstallationMode "Path"
@@ -1671,11 +1621,11 @@ function Show-Summary {
     if ($Mode -eq "Path") {
         Write-Host "  Local Path: $Path"
         Write-Host "  Global Path: $([Environment]::GetFolderPath('UserProfile'))"
-        Write-Host "  Local Components: agents, commands, output-styles, .codex, .gemini, .qwen"
+        Write-Host "  Local Components: agents, commands, output-styles, .codex, .gemini"
         Write-Host "  Global Components: workflows, scripts, python_script, etc."
     } else {
         Write-Host "  Path: $Path"
-        Write-Host "  Global Components: .claude, .codex, .gemini, .qwen"
+        Write-Host "  Global Components: .claude, .codex, .gemini"
     }
 
     if ($NoBackup) {
@@ -1691,13 +1641,12 @@ function Show-Summary {
     Write-Host "1. Review CLAUDE.md - Customize guidelines for your project"
     Write-Host "2. Review .codex/Agent.md - Codex agent execution protocol"
     Write-Host "3. Review .gemini/CLAUDE.md - Gemini agent execution protocol"
-    Write-Host "4. Review .qwen/QWEN.md - Gemini agent execution protocol"
-    Write-Host "5. Configure settings - Edit .claude/settings.local.json as needed"
-    Write-Host "6. Install TOON dependencies - Run 'npm install' for workflow utilities"
-    Write-Host "7. Test TOON wrapper - Try './scripts/toon-wrapper.sh --help'"
-    Write-Host "8. Start using Claude Code with Agent workflow coordination!"
-    Write-Host "9. Use /workflow commands for task execution"
-    Write-Host "10. Use /update-memory commands for memory system management"
+    Write-Host "4. Configure settings - Edit .claude/settings.local.json as needed"
+    Write-Host "5. Install TOON dependencies - Run 'npm install' for workflow utilities"
+    Write-Host "6. Test TOON wrapper - Try './scripts/toon-wrapper.sh --help'"
+    Write-Host "7. Start using Claude Code with Agent workflow coordination!"
+    Write-Host "8. Use /workflow commands for task execution"
+    Write-Host "9. Use /update-memory commands for memory system management"
 
     Write-Host ""
     Write-ColorOutput "TOON Format Info:" $ColorInfo

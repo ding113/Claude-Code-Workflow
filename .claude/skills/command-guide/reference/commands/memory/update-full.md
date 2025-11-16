@@ -1,6 +1,6 @@
 ---
 name: update-full
-description: Update all CLAUDE.md files using layer-based execution (Layer 3→1) with batched agents (4 modules/agent) and gemini→qwen→codex fallback, <20 modules uses direct parallel
+description: Update all CLAUDE.md files using layer-based execution (Layer 3→1) with batched agents (4 modules/agent) and gemini→codex fallback, <20 modules uses direct parallel
 argument-hint: "[--tool gemini|codex] [--path <directory>]"
 ---
 
@@ -78,9 +78,9 @@ src/ (depth 1) → SINGLE-LAYER STRATEGY
 ## Tool Fallback Hierarchy
 
 ```javascript
---tool gemini  →  [gemini, qwen, codex]  // default
---tool gemini    →  [qwen, gemini, codex]
---tool codex   →  [codex, gemini, qwen]
+--tool gemini  →  [gemini, codex]  // default
+--tool gemini    →  [gemini, codex]
+--tool codex   →  [codex, gemini]
 ```
 
 **Trigger**: Non-zero exit code from update script
@@ -299,7 +299,7 @@ bash(git status --short)
 ```
 Update Summary:
   Total: 31 | Success: 29 | Failed: 2
-  Tool usage: gemini: 25, qwen: 4, codex: 0
+  Tool usage: gemini: total, codex: 0
   Failed: path1, path2
 ```
 
@@ -320,8 +320,8 @@ Update Summary:
 /memory:update-full --path src/features/auth
 
 # Use specific tool
-/memory:update-full --tool qwen
-/memory:update-full --path .claude --tool qwen
+/memory:update-full --tool gemini
+/memory:update-full --path .claude --tool gemini
 ```
 
 ## Key Advantages

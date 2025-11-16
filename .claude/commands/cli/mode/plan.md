@@ -13,7 +13,6 @@ Strategic software architecture planning template (`~/.claude/workflows/cli-temp
 
 **Tool Selection**:
 - **gemini** (default) - Best for architecture planning
-- **qwen** - Fallback when Gemini unavailable
 - **codex** - Alternative for implementation planning
 
 ## Parameters
@@ -28,11 +27,6 @@ Strategic software architecture planning template (`~/.claude/workflows/cli-temp
 **Gemini** (Primary):
 ```bash
 --tool gemini  # or omit (default)
-```
-
-**Qwen** (Fallback):
-```bash
---tool qwen
 ```
 
 **Codex** (Alternative):
@@ -71,7 +65,7 @@ Task(
        - Identify potential conflicts and mitigation strategies
 
     3. CLI Command Construction:
-       - Tool: ${tool_flag || 'gemini'} (qwen fallback, codex for implementation guidance)
+       - Tool: ${tool_flag || 'gemini'}
        - Directory: cd ${cd_path || '.'} &&
        - Context: @**/* (full architecture context)
        - Mode: analysis (read-only, no code generation)

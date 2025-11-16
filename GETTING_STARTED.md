@@ -218,7 +218,7 @@ Quickly analyze project code structure and architectural patterns:
 # Code analysis with Gemini
 /cli:analyze --tool gemini "Analyze authentication module architecture"
 
-# Code quality analysis with Qwen
+# Code quality analysis with Gemini
 /cli:analyze --tool gemini "Review database model design for best practices"
 ```
 
@@ -366,13 +366,13 @@ When using external CLI tools for the first time, initialization commands provid
 
 # Configure specific tools only
 /cli:cli-init --tool gemini
-/cli:cli-init --tool qwen
+/cli:cli-init --tool gemini
 ```
 
 This command will:
 - Analyze project structure
 - Generate tool configuration files
-- Set up `.geminiignore` / `.qwenignore`
+- Set up `.geminiignore`
 - Create context file references
 
 ---

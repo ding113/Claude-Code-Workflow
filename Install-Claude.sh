@@ -106,7 +106,6 @@ function test_prerequisites() {
     local claude_md="$script_dir/CLAUDE.md"
     local codex_dir="$script_dir/.codex"
     local gemini_dir="$script_dir/.gemini"
-    local qwen_dir="$script_dir/.qwen"
 
     if [ ! -d "$claude_dir" ]; then
         write_color "ERROR: .claude directory not found in $script_dir" "$COLOR_ERROR"
@@ -125,11 +124,6 @@ function test_prerequisites() {
 
     if [ ! -d "$gemini_dir" ]; then
         write_color "ERROR: .gemini directory not found in $script_dir" "$COLOR_ERROR"
-        return 1
-    fi
-
-    if [ ! -d "$qwen_dir" ]; then
-        write_color "ERROR: .qwen directory not found in $script_dir" "$COLOR_ERROR"
         return 1
     fi
 
@@ -504,7 +498,6 @@ function install_global() {
     local global_claude_md="${global_claude_dir}/CLAUDE.md"
     local global_codex_dir="${user_home}/.codex"
     local global_gemini_dir="${user_home}/.gemini"
-    local global_qwen_dir="${user_home}/.qwen"
 
     write_color "Global installation path: $user_home" "$COLOR_INFO"
 
@@ -517,7 +510,6 @@ function install_global() {
     local source_claude_md="${script_dir}/CLAUDE.md"
     local source_codex_dir="${script_dir}/.codex"
     local source_gemini_dir="${script_dir}/.gemini"
-    local source_qwen_dir="${script_dir}/.qwen"
 
     # Create backup folder if needed
     local backup_folder=""
@@ -529,8 +521,6 @@ function install_global() {
         elif [ -d "$global_codex_dir" ] && [ "$(ls -A "$global_codex_dir" 2>/dev/null)" ]; then
             has_existing_files=true
         elif [ -d "$global_gemini_dir" ] && [ "$(ls -A "$global_gemini_dir" 2>/dev/null)" ]; then
-            has_existing_files=true
-        elif [ -d "$global_qwen_dir" ] && [ "$(ls -A "$global_qwen_dir" 2>/dev/null)" ]; then
             has_existing_files=true
         elif [ -f "$global_claude_md" ]; then
             has_existing_files=true
@@ -597,22 +587,7 @@ function install_global() {
         done < <(find "$source_gemini_dir" -type f -print0)
     fi
 
-    # Backup critical config files in .qwen directory before installation
-    backup_critical_config_files "$global_qwen_dir" "$backup_folder" "QWEN.md"
 
-    # Merge .qwen directory (incremental overlay - preserves user files)
-    write_color "Installing .qwen directory (incremental merge)..." "$COLOR_INFO"
-    if merge_directory_contents "$source_qwen_dir" "$global_qwen_dir" ".qwen directory" "$backup_folder"; then
-        # Track .qwen directory in manifest
-        add_manifest_entry "$manifest_file" "$global_qwen_dir" "Directory"
-
-        # Track files from SOURCE directory
-        while IFS= read -r -d '' source_file; do
-            local relative_path="${source_file#$source_qwen_dir}"
-            local target_path="${global_qwen_dir}${relative_path}"
-            add_manifest_entry "$manifest_file" "$target_path" "File"
-        done < <(find "$source_qwen_dir" -type f -print0)
-    fi
 
     # Remove empty backup folder
     if [ -n "$backup_folder" ] && [ -d "$backup_folder" ]; then
@@ -651,18 +626,16 @@ function install_path() {
     local source_claude_md="${script_dir}/CLAUDE.md"
     local source_codex_dir="${script_dir}/.codex"
     local source_gemini_dir="${script_dir}/.gemini"
-    local source_qwen_dir="${script_dir}/.qwen"
 
     # Local paths
     local local_claude_dir="${target_dir}/.claude"
     local local_codex_dir="${target_dir}/.codex"
     local local_gemini_dir="${target_dir}/.gemini"
-    local local_qwen_dir="${target_dir}/.qwen"
 
     # Create backup folder if needed
     local backup_folder=""
     if [ "$NO_BACKUP" = false ]; then
-        if [ -d "$local_claude_dir" ] || [ -d "$local_codex_dir" ] || [ -d "$local_gemini_dir" ] || [ -d "$local_qwen_dir" ] || [ -d "$global_claude_dir" ]; then
+        if [ -d "$local_claude_dir" ] || [ -d "$local_codex_dir" ] || [ -d "$local_gemini_dir" ] || [ -d "$global_claude_dir" ]; then
             backup_folder=$(get_backup_directory "$target_dir")
             write_color "Backup folder created: $backup_folder" "$COLOR_INFO"
         fi
@@ -788,22 +761,7 @@ function install_path() {
         done < <(find "$source_gemini_dir" -type f -print0)
     fi
 
-    # Backup critical config files in .qwen directory before installation
-    backup_critical_config_files "$local_qwen_dir" "$backup_folder" "QWEN.md"
 
-    # Merge .qwen directory to local location (incremental overlay - preserves user files)
-    write_color "Installing .qwen directory to local location (incremental merge)..." "$COLOR_INFO"
-    if merge_directory_contents "$source_qwen_dir" "$local_qwen_dir" ".qwen directory" "$backup_folder"; then
-        # Track .qwen directory in manifest
-        add_manifest_entry "$manifest_file" "$local_qwen_dir" "Directory"
-
-        # Track files from SOURCE directory
-        while IFS= read -r -d '' source_file; do
-            local relative_path="${source_file#$source_qwen_dir}"
-            local target_path="${local_qwen_dir}${relative_path}"
-            add_manifest_entry "$manifest_file" "$target_path" "File"
-        done < <(find "$source_qwen_dir" -type f -print0)
-    fi
 
     # Remove empty backup folder
     if [ -n "$backup_folder" ] && [ -d "$backup_folder" ]; then
@@ -1093,7 +1051,6 @@ function uninstall_claude_workflow() {
         echo "  - ~/.claude/CLAUDE.md"
         echo "  - ~/.codex"
         echo "  - ~/.gemini"
-        echo "  - ~/.qwen"
         return 1
     fi
 
@@ -1304,11 +1261,11 @@ function show_summary() {
     if [ "$mode" = "Path" ]; then
         echo "  Local Path: $path"
         echo "  Global Path: $HOME"
-        echo "  Local Components: agents, commands, output-styles, .codex, .gemini, .qwen"
+        echo "  Local Components: agents, commands, output-styles, .codex, .gemini"
         echo "  Global Components: workflows, scripts, python_script, etc."
     else
         echo "  Path: $path"
-        echo "  Global Components: .claude, .codex, .gemini, .qwen"
+        echo "  Global Components: .claude, .codex, .gemini"
     fi
 
     if [ "$NO_BACKUP" = true ]; then
@@ -1324,12 +1281,11 @@ function show_summary() {
     echo "1. Review CLAUDE.md - Customize guidelines for your project"
     echo "2. Review .codex/Agent.md - Codex agent execution protocol"
     echo "3. Review .gemini/CLAUDE.md - Gemini agent execution protocol"
-    echo "4. Review .qwen/QWEN.md - Gemini agent execution protocol"
-    echo "5. Configure settings - Edit .claude/settings.local.json as needed"
-    echo "6. Install TOON dependencies - Run 'npm install' for workflow utilities"
-    echo "7. Test TOON wrapper - Try './scripts/toon-wrapper.sh --help'"
-    echo "8. Start using Claude Code with Agent workflow coordination!"
-    echo "9. Use /workflow commands for task execution"
+    echo "4. Configure settings - Edit .claude/settings.local.json as needed"
+    echo "5. Install TOON dependencies - Run 'npm install' for workflow utilities"
+    echo "6. Test TOON wrapper - Try './scripts/toon-wrapper.sh --help'"
+    echo "7. Start using Claude Code with Agent workflow coordination!"
+    echo "8. Use /workflow commands for task execution"
     echo "10. Use /update-memory commands for memory system management"
 
     echo ""

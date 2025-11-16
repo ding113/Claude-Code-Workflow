@@ -446,7 +446,7 @@ Ask user to select execution method:
   - "Direct - Execute with Agent" (@code-developer)
   - "CLI - Gemini" (gemini-2.5-pro)
   - "CLI - Codex" (gpt-5.1-codex)
-  - "CLI - Qwen" (coder-model)
+  - "CLI - Gemini" (gemini-2.5-pro)
 - Store selection for Phase 5 execution
 
 **Simplified AskUserQuestion Reference**:
@@ -473,7 +473,7 @@ AskUserQuestion({
       { label: "Direct - Agent", description: "Interactive execution" },
       { label: "CLI - Gemini", description: "gemini-2.5-pro" },
       { label: "CLI - Codex", description: "gpt-5.1-codex" },
-      { label: "CLI - Qwen", description: "coder-model" }
+      { label: "CLI - Gemini", description: "gemini-2.5-pro" }
     ]
   }]
 })
@@ -580,7 +580,7 @@ Based on user selection in Phase 4, execute appropriate method:
 - Mark tasks as completed when finished
 - Update TodoWrite in real-time for user visibility
 
-#### Option B: CLI Execution (Gemini/Codex/Qwen)
+#### Option B: CLI Execution (Gemini/Codex)
 
 **Operations**:
 - Build CLI command with comprehensive context
@@ -706,11 +706,6 @@ Maintain context from previous execution.
 - Resume inherits all context from original execution
 - Useful for complex tasks that may hit timeouts or require iteration
 
-**Command Format (Qwen)** - Full context similar to Gemini:
-```bash
-qwen -p "
-PURPOSE: Implement planned tasks with comprehensive context
-
 TASK:
 ${planObject.tasks.map((t, i) => `• ${t}`).join('\n')}
 
@@ -766,7 +761,7 @@ Time Estimate: ${planObject.estimated_time}
 EXPECTED: Complete implementation with tests and proper error handling
 
 RULES: $(cat ~/.claude/workflows/cli-templates/prompts/development/02-implement-feature.txt) | Follow approach strictly | Test thoroughly | write=CREATE/MODIFY/DELETE
-" -m coder-model --approval-mode yolo
+" -m gemini-2.5-pro --approval-mode yolo
 ```
 
 **Execution with Progress Tracking**:
@@ -933,7 +928,7 @@ TodoWrite({
     - "Refactor logging module for better performance"
     - "Add unit tests for authentication service"
 - Flags (optional):
-  - `--tool <name>`: Preset execution tool (claude|gemini|codex|qwen)
+  - `--tool <name>`: Preset execution tool (claude|gemini|codex)
   - `--quick`: Skip code exploration phase
 
 ### Output Format
@@ -949,7 +944,7 @@ TodoWrite({
     // ... 3-7 tasks total
   ],
   complexity: "Low|Medium|High",
-  recommended_tool: "Claude|Gemini|Codex|Qwen",
+  recommended_tool: "Claude|Gemini|Codex",
   estimated_time: "X minutes"
 }
 ```

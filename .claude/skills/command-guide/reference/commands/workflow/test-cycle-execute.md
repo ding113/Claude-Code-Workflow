@@ -694,7 +694,7 @@ Task(subagent_type="{meta.agent}",
 | Scenario | Handling | Recovery |
 |----------|----------|----------|
 | Test execution error | Log error, save context | Retry with error context |
-| CLI analysis failure | Fallback to Qwen, or manual analysis | Retry analysis with different tool |
+| CLI analysis failure | Manual analysis | Retry analysis with different tool |
 | Agent execution error | Save iteration state | Retry agent with simplified context |
 | Max iterations reached | Generate failure report | Mark blocked, return to user |
 | Unexpected test regression | Rollback last fix | Analyze regression, add to fix strategy |

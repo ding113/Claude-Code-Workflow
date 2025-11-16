@@ -13,7 +13,6 @@ Direct Q&A interaction with CLI tools for codebase analysis. **Read-only - does 
 
 **Tool Selection**:
 - **gemini** (default) - Best for Q&A and explanations
-- **qwen** - Fallback when Gemini unavailable
 - **codex** - Alternative for technical deep-dives
 
 ## Parameters
@@ -27,11 +26,6 @@ Direct Q&A interaction with CLI tools for codebase analysis. **Read-only - does 
 **Gemini** (Primary):
 ```bash
 --tool gemini  # or omit (default)
-```
-
-**Qwen** (Fallback):
-```bash
---tool qwen
 ```
 
 **Codex** (Alternative):
@@ -62,7 +56,7 @@ Task(
        - Validate context relevance to question
 
     2. CLI Command Construction:
-       - Tool: ${tool_flag || 'gemini'} (qwen fallback, codex for deep dives)
+       - Tool: ${tool_flag || 'gemini'}
        - Context: @CLAUDE.md + discovered file patterns
        - Mode: analysis (read-only)
        - Expected: Clear, accurate answer with code references

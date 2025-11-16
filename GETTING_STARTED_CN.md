@@ -210,7 +210,7 @@
 
 ### CLI 工具直接调用
 
-CCW 支持通过统一的 CLI 接口直接调用外部 AI 工具（Gemini、Qwen、Codex），无需创建工作流会话。
+CCW 支持通过统一的 CLI 接口直接调用外部 AI 工具（Gemini、Codex），无需创建工作流会话。
 
 #### 代码分析
 
@@ -368,13 +368,13 @@ CCW 使用分层的 CLAUDE.md 文档系统维护项目上下文。定期更新�
 
 # 只配置特定工具
 /cli:cli-init --tool gemini
-/cli:cli-init --tool qwen
+/cli:cli-init --tool gemini
 ```
 
 该命令会：
 - 分析项目结构
 - 生成工具配置文件
-- 设置 `.geminiignore` / `.qwenignore`
+- 设置 `.geminiignore`
 - 创建上下文文件引用
 
 ---

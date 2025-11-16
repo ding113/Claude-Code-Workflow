@@ -79,7 +79,7 @@ High-level orchestrators for complex, multi-phase development processes.
   - `--type` (Optional, String): The type of review to perform. Defaults to `quality`.
   - `session-id` (Optional, String): The session to review. Defaults to the active session.
 - **Responsibilities**: Performs a specialized, post-implementation review. This is optional, as the default quality gate is passing tests.
-- **Agent Calls**: Uses `gemini-wrapper` or `qwen-wrapper` for analysis based on the review type.
+- **Agent Calls**: Uses `gemini-wrapper` for analysis based on the review type.
 - **Integration**: Used after `/workflow:execute` to perform audits before deployment.
 - **Example**:
   ```bash
@@ -174,8 +174,8 @@ Direct access to AI tools for analysis and code interaction without a full workf
   ```
 
 ### **/cli:cli-init**
-- **Syntax**: `/cli:cli-init [--tool gemini|qwen|all] [--output path] [--preview]`
-- **Responsibilities**: Initializes configuration for CLI tools (`.gemini/`, `.qwen/`) by analyzing the workspace and creating optimized `.geminiignore` and `.qwenignore` files.
+- **Syntax**: `/cli:cli-init [--tool gemini] [--output path] [--preview]`
+- **Responsibilities**: Initializes configuration for CLI tools (`.gemini/`) by analyzing the workspace and creating optimized `.geminiignore` files.
 - **Agent Calls**: None.
 - **Example**:
   ```bash
@@ -302,10 +302,10 @@ Commands for managing individual tasks within a workflow session.
   ```
 
 ### **/memory:load**
-- **Syntax**: `/memory:load [--tool gemini|qwen] "task context description"`
+- **Syntax**: `/memory:load [--tool gemini] "task context description"`
 - **Parameters**:
   - `"task context description"` (Required, String): Task description to guide context extraction.
-  - `--tool <gemini|qwen>` (Optional): Specify CLI tool for agent to use (default: gemini).
+  - `--tool <gemini>` (Optional): Specify CLI tool for agent to use (default: gemini).
 - **Responsibilities**: Delegates to `@general-purpose` agent to analyze the project and return a structured "Core Content Pack". This pack is loaded into the main thread's memory, providing essential context for subsequent operations.
 - **Agent-Driven Execution**: Fully delegates to general-purpose agent which autonomously:
   1. Analyzes project structure and documentation

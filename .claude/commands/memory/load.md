@@ -1,7 +1,7 @@
 ---
 name: load
 description: Delegate to universal-executor agent to analyze project via Gemini CLI and return JSON core content package for task context
-argument-hint: "[--tool gemini|qwen] \"task context description\""
+argument-hint: "[--tool gemini] \"task context description\""
 allowed-tools: Task(*), Bash(*)
 examples:
   - /memory:load "在当前前端基础上开发用户认证功能"
@@ -28,9 +28,8 @@ The `memory:load` command **delegates to a universal-executor agent** to analyze
   - Example: "重构支付模块API"
   - Example: "修复数据库查询性能问题"
 
-- `--tool <gemini|qwen>` (Optional): Specify CLI tool for agent to use (default: gemini)
+- `--tool <gemini>` (Optional): Specify CLI tool for agent to use (default: gemini)
   - gemini: Large context window, suitable for complex project analysis
-  - qwen: Alternative to Gemini with similar capabilities
 
 ## 3. Agent-Driven Execution Flow
 

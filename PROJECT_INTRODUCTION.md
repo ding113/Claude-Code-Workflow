@@ -32,7 +32,7 @@ graph TD
 
     A --> A1[Gemini CLI - 分析探索]
     A --> A2[Codex CLI - 自主开发]
-    A --> A3[Qwen CLI - 架构生成]
+    A --> A3[ - 架构生成]
 
     B --> B1[.active-session 标记]
     B --> B2[工作流会话状态]
@@ -187,7 +187,7 @@ graph LR
     A --> A2[模式识别]
     A --> A3[架构理解]
 
-    B[Qwen CLI] --> B1[架构设计]
+    B[] --> B1[架构设计]
     B --> B2[代码生成]
     B --> B3[系统规划]
 
@@ -204,7 +204,7 @@ CCW 基于任务类型自动选择最适合的工具：
 /gemini:analyze "认证系统架构模式"
 
 # 设计和规划阶段
-/qwen:mode:plan "微服务认证架构设计"
+/gemini:mode:plan "微服务认证架构设计"
 
 # 实现和开发阶段
 /codex:mode:auto "实现 JWT 认证系统"
@@ -316,7 +316,7 @@ CCW 基于任务类型自动选择最适合的工具：
 /workflow:session:start "微服务重构"
 /gemini:analyze "当前单体架构的技术债务"
 /workflow:plan-deep "单体到微服务的迁移策略"
-/qwen:mode:auto "重构用户服务为微服务架构"
+/gemini:mode:auto "重构用户服务为微服务架构"
 /workflow:test-gen WFS-microservice-refactoring
 ```
 

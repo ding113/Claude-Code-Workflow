@@ -13,7 +13,6 @@ Systematic code analysis with execution path tracing template (`~/.claude/workfl
 
 **Tool Selection**:
 - **gemini** (default) - Best for code analysis and tracing
-- **qwen** - Fallback when Gemini unavailable
 - **codex** - Alternative for complex analysis tasks
 
 **Key Feature**: `--cd` flag for directory-scoped analysis
@@ -32,11 +31,6 @@ Systematic code analysis with execution path tracing template (`~/.claude/workfl
 /cli:mode:code-analysis --tool gemini "trace auth flow"
 # OR (default)
 /cli:mode:code-analysis "trace auth flow"
-```
-
-**Qwen** (Fallback):
-```bash
-/cli:mode:code-analysis --tool gemini "trace auth flow"
 ```
 
 **Codex** (Alternative):
@@ -76,7 +70,7 @@ Task(
        - Identify optimization opportunities
 
     3. CLI Command Construction:
-       - Tool: ${tool_flag || 'gemini'} (qwen fallback, codex for complex analysis)
+       - Tool: ${tool_flag || 'gemini'}
        - Directory: cd ${cd_path || '.'} &&
        - Context: @**/* + discovered execution context
        - Mode: analysis (read-only)

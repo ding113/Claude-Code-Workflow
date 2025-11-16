@@ -1,7 +1,7 @@
 ---
 name: tech-research
 description: 3-phase orchestrator: extract tech stack from session/name → delegate to agent for Exa research and module generation → generate SKILL.md index (skips phase 2 if exists)
-argument-hint: "[session-id | tech-stack-name] [--regenerate] [--tool <gemini|qwen>]"
+argument-hint: "[session-id | tech-stack-name] [--regenerate] [--tool <gemini>]"
 allowed-tools: SlashCommand(*), TodoWrite(*), Bash(*), Read(*), Write(*), Task(*)
 ---
 
@@ -390,7 +390,7 @@ User → TodoWrite Init → Phase 1 (detect existing) → Phase 3 (update index)
 ## Parameters
 
 ```bash
-/memory:tech-research [session-id | "tech-stack-name"] [--regenerate] [--tool <gemini|qwen>]
+/memory:tech-research [session-id | "tech-stack-name"] [--regenerate] [--tool <gemini>]
 ```
 
 **Arguments**:

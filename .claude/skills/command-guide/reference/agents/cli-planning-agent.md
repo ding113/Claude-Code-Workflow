@@ -58,8 +58,8 @@ You are a specialized execution agent that bridges CLI analysis tools with task 
     ]
   },
   "cli_config": {
-    "tool": "gemini|qwen",
-    "model": "gemini-3-pro-preview-11-2025|qwen-coder-model",
+    "tool": "gemini",
+    "model": "gemini-3-pro-preview-11-2025",
     "template": "01-diagnose-bug-root-cause.txt",
     "timeout": 2400000,
     "fallback": "gemini"
@@ -157,10 +157,8 @@ try {
   result = executeCLI("gemini", config);
 } catch (error) {
   if (error.code === 429 || error.code === 404) {
-    console.log("Gemini unavailable, falling back to Qwen");
     try {
       result = executeCLI("gemini", config);
-    } catch (qwenError) {
       console.error("Both Gemini failed");
       // Return minimal analysis with basic fix strategy
       return {
@@ -460,7 +458,7 @@ See: `.process/iteration-{iteration}-cli-output.txt`
 ```javascript
 {
   "tool": "gemini",
-  "model": "coder-model",
+  "model": "gemini-2.5-pro",
   "templates": {
     "test-failure": "01-diagnose-bug-root-cause.txt",
     "coverage-gap": "02-analyze-code-patterns.txt"

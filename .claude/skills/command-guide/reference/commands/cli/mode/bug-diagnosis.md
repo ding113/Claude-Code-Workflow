@@ -13,7 +13,7 @@ Systematic bug diagnosis with root cause analysis template (`~/.claude/workflows
 
 **Tool Selection**:
 - **gemini** (default) - Best for bug diagnosis
-- **qwen** - Fallback when Gemini unavailable
+
 - **codex** - Alternative for complex bug analysis
 
 ## Parameters
@@ -31,9 +31,9 @@ Systematic bug diagnosis with root cause analysis template (`~/.claude/workflows
 --tool gemini
 ```
 
-**Qwen** (Fallback):
+
 ```bash
---tool qwen
+--tool gemini
 ```
 
 **Codex** (Alternative):
@@ -74,7 +74,6 @@ Task(
        - Assess bug severity and impact scope
 
     3. CLI Command Construction:
-       - Tool: ${tool_flag || 'gemini'} (qwen fallback, codex for complex bugs)
        - Directory: cd ${cd_path || '.'} &&
        - Context: @**/* + error traces + affected code
        - Mode: analysis (read-only)

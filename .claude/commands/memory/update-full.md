@@ -1,6 +1,6 @@
 ---
 name: update-full
-description: Update all CLAUDE.md files using layer-based execution (Layer 3→1) with batched agents (4 modules/agent) and gemini→qwen→codex fallback, <20 modules uses direct parallel
+description: Update all CLAUDE.md files using layer-based execution (Layer 3→1) with batched agents (4 modules/agent) and gemini→codex fallback, <20 modules uses direct parallel
 argument-hint: "[--tool gemini|codex] [--path <directory>]"
 ---
 
@@ -78,18 +78,16 @@ src/ (depth 1) → SINGLE-LAYER STRATEGY
 ## Tool Fallback Hierarchy
 
 ```javascript
---tool gemini  →  [gemini, qwen, codex]  // default
---tool gemini    →  [qwen, gemini, codex]
---tool codex   →  [codex, gemini, qwen]
+--tool gemini  →  [gemini, codex]  // default
+--tool codex   →  [codex, gemini]
 ```
 
 **Trigger**: Non-zero exit code from update script
 
 | Tool   | Best For                       | Fallback To    |
 |--------|--------------------------------|----------------|
-| gemini | Documentation, patterns        | gemini → codex   |
-| gemini   | Architecture, system design    | gemini → codex |
-| codex  | Implementation, code quality   | gemini → gemini  |
+| gemini | Documentation, patterns        | codex          |
+| codex  | Implementation, code quality   | gemini         |
 
 ## Execution Phases
 
@@ -114,7 +112,7 @@ bash(cd <target-path> && ~/.claude/scripts/get_modules_by_depth.sh list)
 **For <20 modules**:
 ```
 Update Plan:
-  Tool: gemini (fallback: gemini → codex)
+  Tool: gemini (fallback: codex)
   Total: 7 modules
   Execution: Direct parallel (< 20 modules threshold)
 
@@ -139,7 +137,7 @@ Update Plan:
 **For ≥20 modules**:
 ```
 Update Plan:
-  Tool: gemini (fallback: gemini → codex)
+  Tool: gemini (fallback: codex)
   Total: 31 modules
   Execution: Agent batch processing (4 modules/agent)
 
@@ -299,7 +297,7 @@ bash(git status --short)
 ```
 Update Summary:
   Total: 31 | Success: 29 | Failed: 2
-  Tool usage: gemini: 25, qwen: 4, codex: 0
+  Tool usage: gemini: 25, codex: 4
   Failed: path1, path2
 ```
 
@@ -320,8 +318,8 @@ Update Summary:
 /memory:update-full --path src/features/auth
 
 # Use specific tool
-/memory:update-full --tool qwen
-/memory:update-full --path .claude --tool qwen
+/memory:update-full --tool codex
+/memory:update-full --path .claude --tool codex
 ```
 
 ## Key Advantages

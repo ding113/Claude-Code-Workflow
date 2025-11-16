@@ -492,7 +492,7 @@ The `[FLOW_CONTROL]` marker indicates that a task or prompt contains flow contro
 "command": "gemini \"analyze [context]\""
 
 // Gemini (fallback for Gemini)
-"command": "qwen \"analyze [context]\""
+"command": "gemini \"analyze [context]\""
 ```
 
 **Example Step**:
@@ -533,10 +533,9 @@ gemini "prompt"
 gemini --approval-mode yolo "prompt"  # For write mode
 ```
 
-**Qwen CLI** (Gemini fallback):
 ```bash
-qwen "prompt"
-qwen --approval-mode yolo "prompt"  # For write mode
+gemini "prompt"
+gemini --approval-mode yolo "prompt"  # For write mode
 ```
 
 **Codex CLI**:

@@ -251,7 +251,7 @@ cd [directory] && gemini -p "[Standard Prompt Template]" -m gemini-2.5-pro
 cd [directory] && gemini -p "[Standard Prompt Template with MODE: write]" -m gemini-2.5-flash --approval-mode yolo
 
 # Fallback
-cd [directory] && gemini -p "[Standard Prompt Template]" -m coder-model
+cd [directory] && gemini -p "[Standard Prompt Template]" -m gemini-2.5-pro
 
 # Multi-directory support
 cd [directory] && gemini -p "[Standard Prompt Template]" -m gemini-2.5-pro --include-directories ../shared,../types

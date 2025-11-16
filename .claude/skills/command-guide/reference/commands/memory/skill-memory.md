@@ -457,8 +457,6 @@ User triggers command
 3. Phase 3: Executes documentation generation via `/workflow:execute`
 4. Phase 4: Generates SKILL.md at `.claude/skills/{project_name}/SKILL.md`
 
-### Example 2: Regenerate with Qwen
-
 ```bash
 /memory:skill-memory /d/my_app --tool gemini --regenerate
 ```

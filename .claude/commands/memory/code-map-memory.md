@@ -1,7 +1,7 @@
 ---
 name: code-map-memory
 description: 3-phase orchestrator: parse feature keyword → cli-explore-agent analyzes (Deep Scan dual-source) → orchestrator generates Mermaid docs + SKILL package (skips phase 2 if exists)
-argument-hint: "\"feature-keyword\" [--regenerate] [--tool <gemini|qwen>]"
+argument-hint: "\"feature-keyword\" [--regenerate] [--tool <gemini>]"
 allowed-tools: SlashCommand(*), TodoWrite(*), Bash(*), Read(*), Write(*), Task(*)
 ---
 
@@ -61,7 +61,7 @@ normalized_feature=$(echo "$FEATURE_KEYWORD" | tr '[:upper:]' '[:lower:]' | tr '
 
 **Step 2: Set Tool Preference**
 ```bash
-# Default to gemini unless --tool specified
+# Default to gemini
 TOOL="${tool_flag:-gemini}"
 ```
 
@@ -96,7 +96,7 @@ if (existing_files > 0 && !regenerate_flag) {
 - `FEATURE_KEYWORD`: Original feature keyword
 - `normalized_feature`: Normalized feature name for directory
 - `CODEMAP_DIR`: `.claude/skills/codemap-{feature}`
-- `TOOL`: CLI tool to use (gemini or qwen)
+- `TOOL`: CLI tool to use (gemini)
 - `SKIP_GENERATION`: Boolean - whether to skip Phase 2
 
 **TodoWrite**:
@@ -139,7 +139,7 @@ Perform Deep Scan analysis for feature: {FEATURE_KEYWORD}
 
 **Scope**:
 - Feature: {FEATURE_KEYWORD}
-- CLI Tool: {TOOL} (gemini-2.5-pro or gemini coder-model)
+- CLI Tool: {TOOL} (gemini-2.5-pro)
 - File Discovery: MCP Code Index (preferred) + rg fallback
 - Target: 5-15 most relevant files
 
@@ -148,7 +148,7 @@ Return comprehensive analysis as structured JSON:
 {
   \"feature\": \"{FEATURE_KEYWORD}\",
   \"analysis_metadata\": {
-    \"tool_used\": \"gemini|qwen\",
+    \"tool_used\": \"gemini\",
     \"timestamp\": \"ISO_TIMESTAMP\",
     \"analysis_mode\": \"deep-scan\"
   },
@@ -672,7 +672,7 @@ User → TodoWrite Init → Phase 1 (detect existing) → Phase 3 (update index)
 ## Parameters
 
 ```bash
-/memory:code-map-memory "feature-keyword" [--regenerate] [--tool <gemini|qwen>]
+/memory:code-map-memory "feature-keyword" [--regenerate] [--tool <gemini>]
 ```
 
 **Arguments**:
@@ -683,7 +683,6 @@ User → TodoWrite Init → Phase 1 (detect existing) → Phase 3 (update index)
 - **--regenerate**: Force regenerate existing codemap (deletes and recreates)
 - **--tool**: CLI tool for analysis (default: gemini)
   - `gemini`: Comprehensive flow analysis with gemini-2.5-pro
-  - `gemini`: Alternative with coder-model
 
 ---
 
@@ -715,15 +714,15 @@ User → TodoWrite Init → Phase 1 (detect existing) → Phase 3 (update index)
 **Output**: `.claude/skills/codemap-user-authentication/` with 6 files + metadata
 
 
-### Example 3: Regenerate with Qwen
+### Example 3: Regenerate Existing
 
 ```bash
-/memory:code-map-memory "payment processing" --regenerate --tool qwen
+/memory:code-map-memory "payment processing" --regenerate
 ```
 
 **Workflow**:
 1. Phase 1: Deletes existing codemap due to --regenerate
-2. Phase 2: Agent uses gemini with coder-model for fresh analysis
+2. Phase 2: Agent uses gemini for fresh analysis
 3. Phase 3: Generates updated SKILL.md
 
 ---
@@ -739,7 +738,7 @@ User → TodoWrite Init → Phase 1 (detect existing) → Phase 3 (update index)
 - **Progressive Loading**: Token-efficient context loading (2K → 30K)
 - **Auto-Continue**: Fully autonomous 3-phase execution
 - **Smart Skip**: Detects existing codemap, 10x faster index updates
-- **CLI Integration**: Gemini for deep semantic understanding
+- **CLI Integration**: Gemini CLI for deep semantic understanding
 
 ## Architecture
 

@@ -16,8 +16,7 @@ You are an intelligent CLI execution specialist that autonomously orchestrates c
 ## Tool Selection Hierarchy
 
 1. **Gemini (Primary)** - Analysis, understanding, exploration & documentation
-2. **Qwen (Fallback)** - Same capabilities as Gemini, use when unavailable
-3. **Codex (Alternative)** - Development, implementation & automation
+2. **Codex (Alternative)** - Development, implementation & automation
 
 **Templates**: `~/.claude/workflows/cli-templates/prompts/`
 - `analysis/` - pattern.txt, architecture.txt, code-execution-tracing.txt, security.txt, quality.txt
@@ -137,8 +136,8 @@ RULES: $(cat {selected_template}) | {constraints}
 
 **Auto-Selection**:
 ```
-analyze|plan → gemini (qwen fallback) + mode=analysis
-execute (simple|medium) → gemini (qwen fallback) + mode=write
+analyze|plan → gemini + mode=analysis
+execute (simple|medium) → gemini + mode=write
 execute (complex) → codex + mode=auto
 discuss → multi (gemini + codex parallel)
 ```
@@ -160,8 +159,6 @@ CONTEXT: @**/*
 EXPECTED: {output}
 RULES: $(cat ~/.claude/workflows/cli-templates/prompts/analysis/pattern.txt)
 " -m gemini-2.5-pro
-
-# Gemini fallback: Replace 'gemini' with 'qwen'
 ```
 
 **Gemini (Write)**:
@@ -221,11 +218,10 @@ find .workflow/ -name '.active-*' -type f
 
 **Tool Fallback**:
 ```
-Gemini unavailable → Qwen
 Codex unavailable → Gemini write mode
 ```
 
-**Gemini 429**: Check results exist → success (ignore error) | no results → retry → Qwen
+**Gemini 429**: Check results exist → success (ignore error) | no results → retry
 
 **MCP Exa Unavailable**: Fallback to local search (find/rg)
 

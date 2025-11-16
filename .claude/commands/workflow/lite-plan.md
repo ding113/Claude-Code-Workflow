@@ -461,7 +461,6 @@ AskUserQuestion({
       { label: "No", description: "Skip code review" },
       { label: "Claude (default)", description: "Current Claude agent review" },
       { label: "Gemini", description: "gemini-2.5-pro analysis" },
-      { label: "Qwen", description: "coder-model analysis" },
       { label: "Codex", description: "gpt-5.1-codex analysis" }
     ]
   }]
@@ -483,7 +482,6 @@ Execution Method Selection (Multi-select):
 Code Review Selection (after execution):
   ├─ No → Skip review, workflow complete
   ├─ Claude (default) → Current Claude agent review
-  ├─ Gemini → Run gemini code analysis
   ├─ Gemini → Run gemini code analysis
   └─ Codex → Run codex code analysis
 ```
@@ -578,7 +576,7 @@ Based on user selection in Phase 4, execute appropriate method:
 - Mark tasks as completed when finished
 - Update TodoWrite in real-time for user visibility
 
-#### Option B: CLI Execution (Gemini/Codex/Qwen)
+#### Option B: CLI Execution (Gemini/Codex)
 
 **Operations**:
 - Build CLI command with comprehensive context
@@ -703,68 +701,7 @@ Maintain context from previous execution.
 - Resume inherits all context from original execution
 - Useful for complex tasks that may hit timeouts or require iteration
 
-**Command Format (Qwen)** - Full context similar to Gemini:
-```bash
-qwen -p "
-PURPOSE: Implement planned tasks with comprehensive context
 
-TASK:
-${planObject.tasks.map((t, i) => `• ${t}`).join('\n')}
-
-MODE: write
-
-CONTEXT: @**/* | Memory: Full implementation context from lite-plan
-
-## Code Exploration Results
-${explorationContext ? `
-Analyzed Project Structure:
-${explorationContext.project_structure || 'Standard structure'}
-
-Key Files to Modify:
-${explorationContext.relevant_files?.join('\n') || 'To be determined during implementation'}
-
-Existing Code Patterns:
-${explorationContext.patterns || 'Follow codebase conventions'}
-
-Dependencies:
-${explorationContext.dependencies || 'None specified'}
-
-Constraints:
-${explorationContext.constraints || 'None identified'}
-` : 'No exploration performed - analyze codebase patterns as you implement'}
-
-## Clarifications from User
-${clarificationContext ? `
-${Object.entries(clarificationContext).map(([question, answer]) => `
-Question: ${question}
-Answer: ${answer}
-`).join('\n')}
-` : 'No additional clarifications provided'}
-
-## Implementation Strategy
-Summary: ${planObject.summary}
-
-Approach:
-${planObject.approach}
-
-${planObject.dependencies ? `
-Task Order (follow sequence):
-${planObject.dependencies.join('\n')}
-` : ''}
-
-${planObject.risks ? `
-Risk Mitigation:
-${planObject.risks.join('\n')}
-` : ''}
-
-Task Complexity: ${planObject.complexity}
-Time Estimate: ${planObject.estimated_time}
-
-EXPECTED: Complete implementation with tests and proper error handling
-
-RULES: $(cat ~/.claude/workflows/cli-templates/prompts/development/02-implement-feature.txt) | Follow approach strictly | Test thoroughly | write=CREATE/MODIFY/DELETE
-" -m coder-model --approval-mode yolo
-```
 
 **Execution with Progress Tracking**:
 ```javascript
@@ -961,7 +898,7 @@ RULES: $(cat ~/.claude/workflows/cli-templates/prompts/analysis/02-review-code-q
     - "Refactor logging module for better performance"
     - "Add unit tests for authentication service"
 - Flags (optional):
-  - `--tool <name>`: Preset execution tool (claude|gemini|codex|qwen)
+  - `--tool <name>`: Preset execution tool (claude|gemini|codex)
   - `-e` or `--explore`: Force code exploration phase (overrides auto-detection)
 
 ### Output Format
@@ -977,7 +914,7 @@ RULES: $(cat ~/.claude/workflows/cli-templates/prompts/analysis/02-review-code-q
     // ... 3-7 tasks total
   ],
   complexity: "Low|Medium|High",
-  recommended_tool: "Claude|Gemini|Codex|Qwen",
+  recommended_tool: "Claude|Gemini|Codex",
   estimated_time: "X minutes"
 }
 ```

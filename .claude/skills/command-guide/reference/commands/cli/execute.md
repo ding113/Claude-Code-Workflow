@@ -12,7 +12,7 @@ allowed-tools: SlashCommand(*), Bash(*), Task(*)
 Execute implementation tasks with **YOLO permissions** (auto-approves all confirmations). **MODIFIES CODE**.
 
 **Intent**: Autonomous code implementation, modification, and generation
-**Supported Tools**: codex, gemini (default), qwen
+**Supported Tools**: codex, gemini (default)
 **Key Feature**: Automatic context inference and file pattern detection
 
 ## Core Behavior
@@ -185,7 +185,7 @@ Task(
 # Result: MODIFIED query code, new indexes, updated tests
 ```
 
-**Qwen Code Generation** (modifies code):
+**Gemini Code Generation** (modifies code):
 ```bash
 /cli:execute --tool gemini --enhance "refactor auth module"
 # Step 1: Enhanced refactoring plan

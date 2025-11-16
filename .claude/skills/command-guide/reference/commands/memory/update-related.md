@@ -1,6 +1,6 @@
 ---
 name: update-related
-description: Update CLAUDE.md for git-changed modules using batched agent execution (4 modules/agent) with gemini→qwen→codex fallback, <15 modules uses direct execution
+description: Update CLAUDE.md for git-changed modules using batched agent execution (4 modules/agent) with gemini→codex fallback, <15 modules uses direct execution
 argument-hint: "[--tool gemini|codex]"
 ---
 
@@ -8,7 +8,7 @@ argument-hint: "[--tool gemini|codex]"
 
 ## Overview
 
-Orchestrates context-aware CLAUDE.md updates for changed modules using batched agent execution with automatic tool fallback (gemini→qwen→codex).
+Orchestrates context-aware CLAUDE.md updates for changed modules using batched agent execution with automatic tool fallback (gemini→codex).
 
 **Parameters**:
 - `--tool <gemini|codex>`: Primary tool (default: gemini)
@@ -30,9 +30,9 @@ Orchestrates context-aware CLAUDE.md updates for changed modules using batched a
 ## Tool Fallback Hierarchy
 
 ```javascript
---tool gemini  →  [gemini, qwen, codex]  // default
---tool gemini    →  [qwen, gemini, codex]
---tool codex   →  [codex, gemini, qwen]
+--tool gemini  →  [gemini, codex]  // default
+--tool gemini    →  [gemini, codex]
+--tool codex   →  [codex, gemini]
 ```
 
 **Trigger**: Non-zero exit code from update script
@@ -246,7 +246,7 @@ Update Summary:
 
   Tool usage:
   - gemini: 4 modules
-  - qwen: 0 modules (fallback)
+  
   - codex: 0 modules
 
   Changes:
@@ -300,7 +300,7 @@ Update Summary:
 /memory:update-related
 
 # After feature work with specific tool
-/memory:update-related --tool qwen
+/memory:update-related --tool gemini
 
 # Code quality review after implementation
 /memory:update-related --tool codex
@@ -345,5 +345,5 @@ Update Summary:
 | **Mode** | `"related"` | `"full"` |
 | **Trigger** | After commits | After major changes |
 | **Batching** | 4 modules/agent | 4 modules/agent |
-| **Fallback** | gemini→qwen→codex | gemini→qwen→codex |
+| **Fallback** | gemini→codex | gemini→codex |
 | **Complexity threshold** | ≤15 modules | ≤20 modules |

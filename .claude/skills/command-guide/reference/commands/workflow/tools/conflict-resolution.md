@@ -209,7 +209,7 @@ Task(subagent_type="cli-execution-agent", prompt=`
 1. Load context package
 2. Check conflict_risk (exit if none/low)
 3. Read existing files + plan artifacts
-4. Run CLI analysis (Gemini→Qwen→Claude)
+4. Run CLI analysis (Gemini→Claude)
 5. Parse conflict findings
 6. Generate 2-4 strategies per conflict with modifications
 7. Return JSON to stdout (NOT file write)

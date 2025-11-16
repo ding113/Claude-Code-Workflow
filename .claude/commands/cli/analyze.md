@@ -1,6 +1,6 @@
 ---
 name: analyze
-description: Read-only codebase analysis using Gemini (default), Qwen, or Codex with auto-pattern detection and template selection
+description: Read-only codebase analysis using Gemini (default) or Codex with auto-pattern detection and template selection
 argument-hint: "[--tool codex|gemini] [--enhance] analysis target"
 allowed-tools: SlashCommand(*), Bash(*), TodoWrite(*), Read(*), Glob(*), Task(*)
 ---
@@ -13,7 +13,6 @@ Quick codebase analysis using CLI tools. **Read-only - does NOT modify code**.
 
 **Tool Selection**:
 - **gemini** (default) - Best for code analysis
-- **qwen** - Fallback when Gemini unavailable
 - **codex** - Alternative for deep analysis
 
 ## Parameters
@@ -27,11 +26,6 @@ Quick codebase analysis using CLI tools. **Read-only - does NOT modify code**.
 **Gemini** (Primary):
 ```bash
 --tool gemini  # or omit (default)
-```
-
-**Qwen** (Fallback):
-```bash
---tool qwen
 ```
 
 **Codex** (Alternative):
@@ -67,7 +61,7 @@ Task(
        - Include @CLAUDE.md for project context
 
     3. CLI Command Construction:
-       - Tool: ${tool_flag || 'gemini'} (qwen fallback, codex for deep analysis)
+       - Tool: ${tool_flag || 'gemini'}
        - Context: @CLAUDE.md + auto-detected patterns + discovered files
        - Mode: analysis (read-only)
        - Expected: Insights, recommendations, pattern analysis

@@ -132,7 +132,6 @@ CCW uses a **configuration-based tool control system** that makes external CLI t
 tools:
   gemini:
     enabled: false  # Optional: AI analysis & documentation
-  qwen:
     enabled: true   # Optional: AI architecture & code generation
   codex:
     enabled: true   # Optional: AI development & implementation
@@ -162,7 +161,6 @@ Configure these tools in `~/.claude/workflows/tool-control.yaml` after installat
 |------|---------|--------------|
 | **Gemini CLI** | AI analysis & documentation | Follow [official docs](https://ai.google.dev) - Free quota, extended context |
 | **Codex CLI** | AI development & implementation | Follow [official docs](https://github.com/openai/codex) - Autonomous development |
-| **Qwen Code** | AI architecture & code generation | Follow [official docs](https://github.com/QwenLM/qwen-code) - Large context window |
 
 ### Recommended: MCP Tools *(Enhanced Analysis)*
 

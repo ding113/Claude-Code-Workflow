@@ -46,7 +46,7 @@ This release introduces a comprehensive command-guide skill with interactive hel
 - 🔄 **Example Updates**:
   - `workflow:plan`: "5-phase planning workflow with Gemini analysis and action-planning-agent task generation, outputs IMPL_PLAN.md and task JSONs with optional CLI auto-execution"
   - `cli:execute`: "Autonomous code implementation with YOLO auto-approval using Gemini/Codex, supports task ID or description input with automatic file pattern detection"
-  - `memory:update-related`: "Update CLAUDE.md for git-changed modules using batched agent execution (4 modules/agent) with gemini→qwen→codex fallback"
+  - `memory:update-related`: "Update CLAUDE.md for git-changed modules using batched agent execution (4 modules/agent) with gemini→codex fallback"
 
 **Index Organization**:
 - 🔄 **Use-Case Categories Expanded** - From 2 to 10 distinct scenarios
@@ -352,7 +352,7 @@ This release introduces a powerful new command that automatically generates prog
   - Level 3: Deep Dive (~40K tokens) - Everything + Examples
 - ✨ **Intelligent Description Generation** - Auto-extracts capabilities and triggers from documentation
 - ✨ **Regeneration Support** - `--regenerate` flag to force fresh documentation
-- ✨ **Multi-Tool Support** - Supports gemini, qwen, and codex for documentation generation
+- ✨ **Multi-Tool Support** - Supports gemini and codex for documentation generation
 
 **Command Parameters**:
 ```bash
@@ -435,8 +435,7 @@ SKILL: .claude/skills/my_app/knowledge/src/modules/auth/API.md
 # Specify target directory
 /memory:skill-memory /path/to/project
 
-# Force regeneration with Qwen
-/memory:skill-memory --tool qwen --regenerate
+/memory:skill-memory --tool gemini --regenerate
 
 # Partial mode (modules only)
 /memory:skill-memory --mode partial
